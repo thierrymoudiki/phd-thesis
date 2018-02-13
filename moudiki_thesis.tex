@@ -49,6 +49,8 @@
 \newcommand{\thesisUniversityStreetAddress}{Street address}
 \newcommand{\thesisUniversityPostalCode}{Postal Code}
 
+\newcommand{\forcenewpage}{\clearpage \newpage \mbox{~} \clearpage \newpage}
+
 % --------------------------
 % new commands
 % --------------------------
@@ -157,13 +159,19 @@
 \pagestyle{maincontentstyle} 	% fancy header and footer
 
 \input{content/chapter-introduction} % INCLUDE: introduction
-\input{content/chapter-related-work} % INCLUDE: related work
-\input{content/chapter-system}	% INCLUDE: system
-\input{content/chapter-concepts} % INCLUDE: concepts
+\forcenewpage
 
+\input{content/chapter-related-work} % INCLUDE: related work
+\forcenewpage
+
+\input{content/chapter-system}	% INCLUDE: system
+\forcenewpage
+
+\input{content/chapter-concepts} % INCLUDE: concepts
+\forcenewpage
 
 \input{content/chapter-yc-insurance} % INCLUDE: yc-insurance
-
+\forcenewpage
 
 \input{content/chapter-conclusion} % INCLUDE: conclusion
 \cleardoublepage
