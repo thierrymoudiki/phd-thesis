@@ -1,0 +1,271 @@
+% !TEX root = ../thesis-example.tex
+%
+\chapter{Multiple time series forecasting using ensembles of quasi-randomized functional link neural networks}
+\label{sec:rvfl_ensembles}
+
+\section{Introduction}
+
+The goal of ensemble learning is to combine two or more individual statistical/machine learning models - the base models or base learners - into one, in order to obtain an ensemble model, with an improved out-of-sample error over the base models.
+
+\medskip
+
+Ensemble learning is widely used in the winning solutions of machine learning competitions. It allows to achieve very good performances indeed, at the expense of being relatively less interpretable than the base learners.
+
+\medskip
+
+As a consequence, choosing to use ensemble models or a base model for solving a given problem, could sometimes be seen as finding a trade-off between the desire for interpretability and the desire for an highly increased performance. That said, some techniques such as variable importance for ensemble of trees, can give a sense of which predictor contributes the most to the perfomance of the model.
+
+\medskip
+
+In this paper, we apply two popular ensemble learning methods to multiple time series forecasting: Bootstrap aggregating (cite Efron), known as bagging and stacked generalization(cite Wolpert), known as stacking. The base learners that we use, are the quasi-random vector functional link neural networks introduced in Moudiki et al. (2017).
+
+\medskip
+
+In the next section, we give an overview of the base learners. Then, we describe how we use these models as the basic components of our bagged/stacked ensembles. To finish, we present some numerical examples of use of these new models for forecasting multiple time series.
+
+\section{Description of the base models}
+\label{sec:basemodeldesc}
+
+The model described in Moudiki et al. (2017) is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
+p\right\rbrace$. The RVFL networks that we use to explain $y$ is described for $i \in \left\lbrace 1, \ldots, n\right\rbrace$ as:
+$$
+y_i = \beta_0 + \sum_{j = 1}^p \beta_j X_i^{(j)} + \sum_{l = 1}^L \gamma_l \:
+g\left(\sum_{j = 1}^p W^{(j, l)} X_i^{(j)}\right) + \epsilon_i
+$$
+
+\medskip
+
+Where $g$ is the \textit{activation function}, $L$ the number of nodes in the hidden
+layer, $W^{(j, l)}$ are elements of the hidden layer, and the parameters
+$\beta_j$ and $\gamma_l$ are to be learned from the observed data $X^{(j)}, \: j
+\in \left\lbrace 1, \ldots, p\right\rbrace$. The $\epsilon_i$'s are the residual
+differences between the output variable values and the RVFL model.
+
+\medskip
+
+This type of model can be seen as a one explaining $y_i$, by finding a
+compromise between linear and potentially non-linear effects of the original
+predictors $X^{(j)}$ and transformed predictors
+$$
+\Phi(\bfX)^{(l)}= g\left(\sum_{j = 1}^p W^{(j, l)} X_i^{(j)}\right)
+$$
+$\left \lbrace 1, \ldots, L\right\rbrace$ on the response. In this paper, we use the Rectified Linear Units activation function, known as ReLU
+$$
+g: \: x \mapsto max(x, 0)
+$$
+But other choices of activation functions, such as the sigmoid function or the hyperbolic tangent (or others) can be envisaged.
+
+\medskip
+
+The elements $W^{(j, l)}$ of the hidden layer are taken from a quasi-random (deterministic) \textit{sobol} sequence on $[0, 1]$, which is shifted in such a way that they belong to $[-1, 1]$. Solving for the optimal $\beta_j$'s and $\gamma_l$'s is done by searching these parameters,  in restricted regions where we have:
+$$
+\sum_{j=1}^p \beta_j^2  \leq u
+$$
+and
+$$
+\sum_{l=1}^L
+\gamma_l^2 \leq v
+$$ for $u, v \in \RR^*$. That is, by applying a regularization to these unknown parameters.
+
+
+\medskip
+
+Now, if we consider $p \in \mathbb{N}^*$ time series $(X_t^{(j)})_{t \geq 0}, j = 1, \ldots, p$,
+observed at $n \in \mathbb{N}^*$ discrete dates. We are interested in
+obtaining simultaneous forecasts of the $p$ time series at time $n+h$, $h \in
+\mathbb{N}^*$, by allowing each of the $p$ variables to be influenced by the
+others. We use $k < n$ lags of each of the observed $p$ time
+series. So that, the output variables to be explained are:
+
+\begin{equation}
+Y^{(j)} = \left(X^{(j)}_n, \ldots, X^{(j)}_{k+1} \right)^T
+\end{equation}
+
+for $j \in \left\lbrace 1, \ldots,
+p \right\rbrace$. Where $X^{(j)}_n$ is the most contemporaneous observed value
+of the $j^{th}$ time series, and $X^{(j)}_{k+1}$ was observed $k$ dates earlier
+in time for $(X^{(j)}_t)_{t \geq 0}$. These output variables are stored in a
+matrix: $$ \bfY \in \RR^{(n-k) \times p} $$ and the predictors are
+stored in a matrix: $$ \bfX \in \RR^{(n-k) \times (k \times p)} $$
+where $\bfX$ consists in $p$ blocks of $k$ lags, for each one of the observed
+$p$ time series.
+
+\medskip
+
+An additional layer of transformed  predictors
+is added to $\bfX$, in order to capture the potentially non-linear
+interactions between the predictors and the output variable. Adding the transformed predictors to the original ones, leads to a new matrix of predictors with dimensions $(n-k) \times (k \times p + L)$, where $L$ is the number of nodes in the hidden layer.
+
+\medskip
+
+We let $y$ be the $j_0^{th}$ column (out of $p$) of the response matrix $\bfY$, and $\Phi(\bfX)$ be the matrix of transformed predictors obtained from $\bfX$ by the hidden layer. We also denote the set of regression parameters associated with this $j_0^{th}$ time series, as:
+$$
+\beta_m^{(j_0)} =: \beta_m
+$$
+and
+$$
+\gamma_l^{(j_0)} =: \gamma_l
+$$
+
+for $m \in \left\lbrace 1, \ldots, k \right\rbrace$; $l \in \left\lbrace 1, \ldots,  L\right\rbrace$. Solving for the regression parameters for the $j_0^{th}$ time series, under the constraints
+$$
+\sum_{m=1}^{k\times p} \beta_m^2 \leq u
+$$
+and
+$$
+\sum_{l=1}^L \gamma_l^2 \leq v
+$$
+for $u, v \in \RR^*$, leads to minimizing a penalized residual sum of squares:
+$$
+\mathcal{L}(\bfX; \beta, \gamma) = \left(y - \bfX\beta -
+\Phi(\bfX)\gamma\right)^T\left(y - \bfX\beta - \Phi(\bfX)\gamma\right) + \lambda_1
+\beta^T \beta + \lambda_2 \gamma^T\gamma
+$$
+
+\medskip
+
+where $\lambda_1$ and $\lambda_2$ are Lagrange multipliers. Now, by denoting:
+
+$$ A = \left( {\begin{array}{cc} \bfX^T\bfX + \lambda_1 I_{k\times p} &  \bfX^T\Phi(\bfX)\\
+\Phi(\bfX)^T\bfX & \Phi(\bfX)^T\Phi(\bfX) + \lambda_2 I_{L} \      \end{array} } \right) =:
+\left( {\begin{array}{cc} B &  C^T\\ C & D \      \end{array} } \right) $$
+
+and $S = D - CB^+C^T$. And:
+
+$$
+A^+ = \left( {\begin{array}{cc} B^+ + B^+ C^T
+S^+ CB^+  &  -B^+ C^T S^+\\ -S^+CB^+ & S^+ \      \end{array} } \right) =:
+\left( {\begin{array}{cc} A_1^+  &  A_2^+\\ A_3^+ & A_4^+ \      \end{array} }
+\right)
+$$
+
+
+where $S^+$ and $B^+$ are the Moore-Penrose pseudo-inverse of matrices $S$ and
+$B$. The whole set of parameters, for all the $p$ observed time series is given by:
+
+$$
+\left( {\begin{array}{c} \bm{\hat{\beta}} \\       \bm{\hat{\gamma}} \      \end{array}
+} \right) := \left( {\begin{array}{cc} A_1^+  &  A_2^+\\ A_3^+ & A_4^+ \      \end{array}
+} \right)\left( {\begin{array}{c} \bfX^T\bfY \\       \Phi(\bfX)^T\bfY \      \end{array} }
+\right)
+$$
+
+\section{Ensembles of RVFL}
+\label{sec:ensemblemethods}
+
+As mentioned in the introduction, we will use bagging and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. Both techniques will be described in the next sections ~\ref{section:rvflbagging} and \ref{section:rvflstacking}. Firstly in a general context, and secondly as how they are applied to our RVFL models.
+
+
+\subsection{Bagging}
+\label{section:rvflbagging}
+
+The Bootstrap (cite Efron) uses multiple random replications of a given data set, to obtain standard errors of model parameters, for example. In the context of ensemble learning, these replications of the original data set are used to produce various predictions of the base models, which are then aggregated - in the case of regression problems, they are averaged, and in the case of classification problems, majority vote could be used - to obtain a single prediction with less out-of-sample variance. This procedure is called bootstrap aggregating or \textit{bagging}.
+
+\medskip
+
+In order to illustrate the benefits of the bagging, we consider $n$ different base learners, with out-of-sample prediction errors equal to $\epsilon_1, \ldots, \epsilon_n$, and assume that the distribution of these errors are centered around $0$:
+$$
+\EE \left[ \epsilon_i\right] = 0
+$$
+for $i = 1, \ldots, n$. In addition, we have:
+$$
+\EE \left[ \epsilon_i \epsilon_j\right] = \gamma
+$$
+for $i \neq j$; that is, the covariance between the errors is equal to $\gamma$. And:
+$$
+Var(\epsilon_i) = \sigma^2
+$$
+for $i = 1, \ldots, n$. The out-of-sample mean squared error (MSE) of the aggregated (averaged) model including these $n$ base models is equal to:
+
+\begin{eqnarray*}
+MSE = \EE\left[ \left( \frac{1}{n} \sum_{i = 1}^n \epsilon_i \right)^2 \right] &=& \frac{1}{n^2} \EE\left[ \left( \sum_{i = 1}^n \epsilon_i \right)^2 \right]\\
+ &=& \frac{1}{n^2} \EE\left[ \sum_{i = 1}^n \epsilon_i^2 + 2 \sum_{i < j} \epsilon_i \epsilon_j  \right]\\
+ &=& \frac{1}{n^2} \left( \sum_{i = 1}^n \EE\left[\epsilon_i^2\right] + 2 \sum_{i < j} \EE\left[\epsilon_i \epsilon_j  \right] \right)\\
+ &=& \frac{1}{n^2} \left( n \sigma^2 + 2 \frac{n(n-1)}{2} \gamma \right)\\
+ &=& \frac{\sigma^2}{n} + \frac{(n-1)}{n} \gamma \\
+\end{eqnarray*}
+
+From this expression of the $MSE$, we can observe that if $n$ is high ($n \rightarrow \infty$), that is, if there are several base learners in the ensemble, and the out-of-sample expected error is low, the out-of-sample MSE of the ensemble prediction will decrease, and can eventually be reduced to $\gamma$. If, in addition, the model predictions are perfectly uncorrelated, i.e $\gamma ~= 0$, then the out-of-sample MSE is further decreased.
+
+\medskip
+
+Having a low value for $\gamma$, along with a low out-of-sample expected error, helps in achieving a lower out-of-sample prediction error for the ensemble model. Decorrelation in ensemble learning is hence important, and consists in increasing the diversity in the base learners, in order to obtain a low value for $\gamma$.
+
+\medskip
+
+This decorrelation among the base learners is achieved for example in Random Forest models (cite Breiman, L. (2001)), by growing each tree in the forest, with only a subset of the predictors available. Also, an example of use of decorrelation, specifically for ensembles of neural networks is demonstrated in (cite Rosen (1996)). The author presents three approaches for achieving \textit{disagreement} between the networks: one in which they are trained independently and aggregated with the hope that their predictions are somewhat different; a second one, in which different activation functions or achitecture (typically, more or less hidden layers or nodes in the hidden layers etc.) for each base learner. A third approach consists in training the individual networks on different subsamples of the original training set. The case of decorrelation learning for RVFL is treated in (cite Alamdoosh et Wang (2014))
+
+\medskip
+
+In both papers, (cite Rosen (1996)) and (cite Alamdoosh et Wang (2014)), the procedure implemented in order to obtain a decorrelation of the base learners is denoted as Negative Correlation Learning (NCL). The general idea is to minimize the penalized Root Mean Squared Error:
+$$
+\sum_{i = 1}^n\left[\left(y_i - f_k(\textbf{x}_i)\right)^2 + \lambda p_k(\textbf{x}_i)\right]
+$$
+where $\textbf{x}_i \in \RR^p$ is the $i^{th}$ observation of the training data set, with $p$ features. $f_k$ is a base learner with $k \in \left \lbrace 1 \ldots B\right \rbrace$, and $B$ is the number of bootstrap resamples. $p_k$ is a penalty term decorrelating the current network's error with the errors of the networks previously trained. $\lambda$ is a Lagrange multiplier, a regularization parameter, preventing the correlation between the successive base learners in-sample errors from being high. For example, $p_k$ could be defined as:
+$$
+p_k(\textbf{x}_i) = \left(y_i - f_k(\textbf{x}_i)\right)\sum_{j < k}\left(y_i - f_j(\textbf{x}_i)\right)
+$$
+
+\medskip
+
+In this paper, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple training data sets are constructed by randomly picking a fraction of the covariates for each bootstrap resample. The predictions associated to each training set resample are then averaged, in order to obtain a single prediction, with a confidence interval around it. Some numerical examples on the application of bagging to RVFL base learners can be found in section \ref{sec:numericalexamples}
+
+\subsection{Stacking}
+\label{section:rvflstacking}
+
+Stacked generalization or stacking, was introduced (cite Wolpert (1992)). It is also presented in (Breiman (2001)) for regression models. The idea behind this procedure is to construct new predictors for the training data set, by using diverse predictions of multiple models, which are combined by a meta-learner model. A simple example of 2-fold stacking applied to regression is described hereafter:
+
+\begin{itemize}
+\item Divide the original training data set $\textbf{X} \in \RR^{n \times p}$, into two parts: \code{part1} and \code{part2}, each with $n/2$ rows
+\item Train a base learner model on \code{part1} and obtain $n/2$ predictions on \code{part2}.
+\item Train the same base learner model on \code{part2} and obtain $n/2$ predictions on \code{part1}.
+\item Train a  meta-learner model on the new data set \code{part3}, consisting in the the original predictors, plus the predictors constructed by applying the base learner model on \code{part1} and \code{part2}.
+\end{itemize}
+
+\medskip
+
+Typically, in this procedure, various types of base learners are used, to increate the diversity of new predictors. Since we are using time series data here, which inherently exhibit a serial dependence between the observations, we have to adapt the procedure described previously. In the case of a 2-fold stacking again, we divide the original training data set  $\textbf{X} \in \RR^{n \times p}$ (with $p$ time series observed at $n$ dates) into two parts: \code{part1} and \code{part2}; each consisting of $n/2$ rows. \code{part1} contains the most ancient observations and \code{part2}, the most recent observations of the time series contained in $\textbf{X}$. Also, we use multiple resamples of the base learner, as follows:
+
+\begin{itemize}
+\item Train $B$ resampled RVFL models on \code{part1}, using a random subset of \code{part1} in each resampling iteration. Obtain $B$ sets of predictions ($B \times p$ new predictors) with these models, over the whole horizon  of \code{part2}.
+\item Create a new enriched data set \code{part3}, containing the observed time series from \code{part2}, and the $B \times p$ additional series predicted from \code{part1} on \code{part2}.
+\item Use a meta-learner to obtain predictions on the new, enriched data set \code{part3}.
+\end{itemize}
+
+For the latter point, we consider a few meta-learner models that have been used in the past in the literature (cite Breiman's Stacked Regressions). In general, the idea is that a relatively simple meta-learner will achieve a good performance. We use the following models for this purpose:
+\begin{itemize}
+\item Linear \textbf{least squares regression} model
+\item Linear least squares regression model \textbf{with positive coefficients} (cite Lawson CL, Hanson RJ (1974)) and Lawson CL, Hanson RJ (1995), as used in (cite Breiman (2001))
+\item \textbf{Ridge regression} with the use of singular values of $\ldots$ (cite Hoerl et Kennard 1970)
+\item \textbf{Elastic net regression} with the use of coordinate descent (cite Friedman, J., Hastie, T. and Tibshirani, R. (2008))
+\end{itemize}
+
+These selected meta-learners are trained on \code{part3}, with the most contemporaneous observations of the series as responses, and their respective lags as predictors. Some numerical examples on the application of stacking to RVFL base learners can be found in section \ref{sec:numericalexamples}
+
+\section{Numerical examples}
+\label{sec:numericalexamples}
+
+For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from (cite Greene (20something)). $4$ of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis. We annualize the last three time series, but keep the Treasury Bill rates unchanged. So that, the $4$ time series are nearly on the same scale.
+
+\subsection{Descriptive statistics}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/all_series.png}
+\caption{Treasury Bills data from (cite Greene et. al (2007)) in a data-rich environment}
+\label{all_series_plot}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=11cm]{gfx/chapter-rvfl-ensembles/scatterplot.png}
+\caption{Correlation plot for the 4 times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
+\label{corrplot}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/acf.png}
+\caption{Autocorrelation function for the 4 times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
+\label{acf}
+\end{figure}
