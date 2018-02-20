@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Clean Thesis
 *-- A LaTeX Style for Thesis Documents --*
 
@@ -34,3 +35,6 @@ This work has the LPPL maintenance status `maintained'.
 The Current Maintainer of this work is R. Langner.
 
 This work consists of all files listed in MANIFEST.md.
+=======
+# phd
+>>>>>>> a38d4f6a426cf66685747df00d7a973230e9cccc
