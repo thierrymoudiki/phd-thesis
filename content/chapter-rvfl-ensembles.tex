@@ -213,7 +213,7 @@ In this paper, we use the third approach described in (cite Rosen (1996))  (alth
 \subsection{Stacking}
 \label{section:rvflstacking}
 
-Stacked generalization or stacking, was introduced (cite Wolpert (1992)). It is also presented in (Breiman (2001)) for regression models. The idea behind this procedure is to construct new predictors for the training data set, by using diverse predictions of multiple models, which are combined by a meta-learner model. A simple example of 2-fold stacking applied to regression is described hereafter:
+Stacked generalization or stacking, was introduced (cite Wolpert (1992)). It is also presented in (Breiman (2001)) for regression models. The idea behind this procedure is to construct new predictors for the training data set, by using diverse predictions of multiple models, which are combined by a meta-learner model. A simple example of 2-fold stacking applied to regression is described hereafter. It is possible to imagine examples with more stacked layers:
 
 \begin{itemize}
 \item Divide the original training data set $\textbf{X} \in \RR^{n \times p}$, into two parts: \code{part1} and \code{part2}, each with $n/2$ rows
@@ -245,27 +245,74 @@ These selected meta-learners are trained on \code{part3}, with the most contempo
 \section{Numerical examples}
 \label{sec:numericalexamples}
 
-For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from (cite Greene (20something)). $4$ of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis. We annualize the last three time series, but keep the Treasury Bill rates unchanged. So that, the $4$ time series are nearly on the same scale.
+For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from (cite Greene (20something)). Four of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis. We annualize the last three time series, but keep the Treasury Bill rates unchanged. So that, the four time series are nearly on the same scale.
+
+%\newpage
 
 \subsection{Descriptive statistics}
+
+Figure \ref{all_series_plot} presents the resulting time series' data obtained after the few transformations described in the previous section. And table \ref{tab:summary_four_ts} contains a summary of these data, where we can see that the four time series are now nearly expressed in the same scale. 
+
+\begin{table}
+\begin{center}
+% table caption is above the table
+\caption{Summary statistics for the four transformed time series: Treasury Bills and transformed Real consumption, Real disposable income, and  Inflation data from (cite Greene et. al (2007))}
+\label{tab:summary_four_ts}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllllll}
+\hline\noalign{\smallskip}
+Series & Min & 1st Qrt  & Median  & Mean & 3rd Qrt  & Max & Std. Dev.\\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  Real consumption  & -11.990 & 1.814 & 3.637 & \textbf{3.513} & 5.414 & 19.978 & \textbf{3.546}\\
+  Real disposable income  & -7.275 & 1.613 & 3.390 & \textbf{3.423} & 5.518 & 18.358 & \textbf{3.486}\\
+  Inflation & -2.530  & 1.755 & 3.135 & \textbf{3.936} & 5.593 & 16.864 & \textbf{3.407}\\
+  Treasury Bills rates & 0.810  & 3.138 & 5.050 & \textbf{5.270} & 6.715 & 15.090 & \textbf{2.829} \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/all_series.png}
-\caption{Treasury Bills data from (cite Greene et. al (2007)) in a data-rich environment}
+\caption{Treasury Bills rates and transformed Real consumption, Real disposable income, and  Inflation data from (cite Greene et. al (2007)) in a \textit{data-rich} environment}
 \label{all_series_plot}
 \end{figure}
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=11cm]{gfx/chapter-rvfl-ensembles/scatterplot.png}
-\caption{Correlation plot for the 4 times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
-\label{corrplot}
-\end{figure}
+\newpage
+
+The Box-Pierce tests results presented in table \ref{tab:boxpierce}, and the autocorrelation functions presented in \ref{acf}, show that the two time series for Real consumption and Real disposable income could be considered as stationary after the transformations. Whereas for the Treasury Bills rates and Inflation, there is still a non-negligible autocorrelation within the series. 
+
+\begin{table}
+\begin{center}
+% table caption is above the table
+\caption{\textbf{Box-Pierce test for the independence} in the time series observations}
+\label{tab:boxpierce}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllll}
+\hline\noalign{\smallskip}
+Series &  \code{X-squared} & \code{p-value}  \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  Real consumption & 0.0133 & 0.9082  \\
+  Real disposable income & 1.3912 & 0.2382 \\
+  Inflation & 86.428 &  2.2e-16 \\
+  Treasury Bills rates & 186.35 & 2.2e-16 \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/acf.png}
-\caption{Autocorrelation function for the 4 times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
+\caption{Autocorrelation function for the four times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
 \label{acf}
+\end{figure}
+
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=11cm]{gfx/chapter-rvfl-ensembles/scatterplot.png}
+\caption{Correlation plot for the four times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
+\label{corrplot}
 \end{figure}
