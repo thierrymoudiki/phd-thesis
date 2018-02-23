@@ -15,7 +15,7 @@ In the DNS framework \cite{diebold2006forecasting}, each cross-section of yields
 
 \medskip
 
-The second approach is a machine learning/data-driven one, in which we put no  specific constraint on the model to reproduce the specific Yield Curve stylized facts. The regularization parameters inherent to the KRLS model will act as implicit constraints, that cause the model to converge as close as possible to reproducing these stylized facts. In this latter approach, we are mostly interested in the model with the {\it best} out-of-sample error. As a consequence, the technique as is, is probably less adapted than the former framework based on DNS (in its arbitrage-free version) to no-arbitrage pricing (if it's required).
+The second approach is a machine learning/data-driven one, in which we put no  specific constraint on the model to reproduce the specific Yield Curve stylized facts. The regularization parameters inherent to the KRLS model will act as implicit constraints, that cause the model to converge as close as possible to reproducing these stylized facts. In this latter approach, we are mostly interested in the model with the {\it best} out-of-sample error. As a consequence, the technique as is, is probably less adapted than the former framework based on DNS (in its arbitrage-free version) to no-arbitrage pricing (if no-arbitrage pricing is required).
 
 \medskip
 
@@ -320,7 +320,8 @@ $$
                           \tau_5 &  t_2\\
        \end{array} } \right)
 $$
-If some new observations arrive at time $t_3$ in the model, these will be stored in: 
+
+If some new observations arrive at time $t_3$ in the model, these new observations will be stored in: 
 $$
 \bfX^* = \left( {\begin{array}{cc} \tau_1 &  t_3\\
                           \vdots & \vdots\\
@@ -328,16 +329,33 @@ $$
        \end{array} } \right)
 $$
 
+In this other setting, it is also possible to add other regressors  such as dummy variables, or indicators of special events. Again, and as suggested in the previous section and in \cite{exterkate2016nonlinear}, we can avoid the constraining of these dummy variables, in a Kernel ridge regression with unpenalized terms. For example, if we wanted to add another indicator $(I_t)_t$ observed at times $t_1 < t_2$, we would have to consider the following matrix of predictors:
+
+$$
+\bfX = \left( {\begin{array}{ccc}
+                \tau_1 &  t_1   & I_{t_1}\\
+                \vdots & \vdots & \vdots\\
+                \tau_5 &  t_1   & I_{t_1}\\
+                \tau_1 &  t_2   & I_{t_2}\\
+                \vdots & \vdots & \vdots\\
+                \tau_5 &  t_2   & I_{t_2}\\
+               \end{array} } \right)
+$$
+
+In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls} on this dataset. 
+
 %\newpage
 
 \section{Numerical examples}
 \label{sec:numericalexamples}
 
-The following examples are not exhaustive benchmarks, but aim at illustrating the forecasting capabilities of the models described in this paper. We use calibrated discount rates data from \href{http://www.bundesbank.de/Navigation/EN/Statistics/Time_series_databases/time_series_databases.html}{Deutsche Bundesbank website}, observed on a monthly basis, from the beginning of 2002 to the end 2015. There are 167 curves, observed at 50 maturities in the dataset. Only $15$ time to maturities are used in these examples: $1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30$. 
+In this section, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls}. The examples are not exhaustive benchmarks, but aim at illustrating the forecasting capabilities of the models. We use calibrated discount rates data from \textcolor{blue}{\href{http://www.bundesbank.de/Navigation/EN/Statistics/Time_series_databases/time_series_databases.html}{Deutsche Bundesbank website}}, observed on a monthly basis, from the beginning of 2002 to the end 2015. There are 167 curves, observed at 50 maturities in the dataset. Only $15$ time to maturities are used in these examples (in years): $1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30$. 
 
 \medskip
 
 In figure ~\ref{db_zerorates}, we present the data that we use, and table ~\ref{tab:summary_db_zeros} contains a summary of these data; the minimum, maximum, median, first and third quartiles of the discount rates observed at given maturities. There are alternate cycles of increases and decreases of the discount rates, with generally a decreasing trend. Some of the discount rates, at the most recent dates, and lower maturities, are negative.
+
+\newpage
 
 \begin{figure}[!htb]
 \centering
@@ -366,7 +384,15 @@ Maturity & Min & 1st Qrt  & Median  & 3rd Qrt  & Max  \\
 \end{center}
 \end{table}
 
-We use the same grids for all the models, in order to ease the comparability, and to avoid too much manual tuning for the optimal set of parameters. For both types of models, we consider $5$ values of $\sigma$, $l$ and $\lambda$ (kernels' parameters and regularization parameters) comprised between and for the DNS-KRLS model, we use 5 values $\eta$ comprised between the minimum observed time to maturity and the maximum observed time to maturity.
+A rolling forecasting methodology (see \cite{bergmeir2015note}) is implemented in order to obtain the benchmarks between the models. A fixed 12 months-length window for training the model, and the following 12 months for testing, the origin of the training set is then advanced of 1 month, and the training/testing procedure is repeated. The measure of forecasting performance is the Root Mean Squared Error ($RMSE$) \footnote{for a complete treatment, a validation set should be added, in order to verify that we are not 'overtraining' the models on the training set}.
+
+\newpage
+
+We use similar grids for all the models, in order to ease the comparability of the results, and avoid too much manual tweaking of the hyperparameters. Hence for both models, DNS-KRLS (from section \ref{sec:dnskrls}) and KRLS (from section \ref{sec:purekrls}), we consider $5$ values of $\sigma$, $l$ (the variance and length-scale parameters for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels) and $\lambda$ (the regularization parameter for all the kernels) regularly spaced between $\left[ 10^{-2}, 10^2\right]$: $10^{-2}, 10^{-1}, 1, 10, 10^{2}$. 
+
+\medskip
+
+For the additional parameter $\eta$ in the DNS-KRLS model, we use 5 values comprised (regularly spaced) between the minimum observed time to maturity and the maximum observed time to maturity.
 
 
 
