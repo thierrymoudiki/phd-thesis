@@ -98,6 +98,21 @@ interactions between the predictors and the output variable. Adding the transfor
 
 \medskip
 
+For example, we have $p = 2$ time series $(X^{(1)}_{t_1}, \ldots,  X^{(1)}_{t_5})$ and $(X^{(2)}_{t_1}, \ldots,  X^{(2)}_{t_5})$ observed at $n = 5$ dates $t_1 < \ldots < t_5$, with $k = 2$ lags, and $L = 3$ nodes in the hidden layer. In this case, the response variables are stored in:
+$$
+\bfY = \left( {\begin{array}{cc} X^{(1)}_{t_5} &  X^{(2)}_{t_5}\\ X^{(1)}_{t_4} & X^{(2)}_{t_4} \\ X^{(1)}_{t_3} & X^{(2)}_{t_3}\      \end{array} } \right)
+$$
+The predictors are stored in:
+$$
+\bfX = \left( {\begin{array}{cccc} X^{(1)}_{t_4} & X^{(1)}_{t_3} & X^{(2)}_{t_4} & X^{(2)}_{t_3} \\ X^{(1)}_{t_3} & X^{(1)}_{t_2} & X^{(2)}_{t_3} & X^{(2)}_{t_2} \\ X^{(1)}_{t_2} & X^{(1)}_{t_1} & X^{(2)}_{t_2} & X^{(2)}_{t_1} \      \end{array} }\right)
+$$
+And the coefficients in the hidden layer are:
+$$
+\textbf{W} = \left( {\begin{array}{ccc} W^{(1, 1)} & W^{(1, 2)} & W^{(1, 3)}  \\ W^{(2, 1)} & W^{(2, 2)} & W^{(2, 3)}  \\ W^{(3, 1)} & W^{(3, 2)} & W^{(3, 3)} \\ W^{(4, 1)} & W^{(4, 2)} & W^{(4, 3)}  \      \end{array} }\right)
+$$
+
+\medskip
+
 We let $y$ be the $j_0^{th}$ column (out of $p$) of the response matrix $\bfY$, and $\Phi(\bfX)$ be the matrix of transformed predictors obtained from $\bfX$ by the hidden layer. We also denote the set of regression parameters associated with this $j_0^{th}$ time series, as:
 $$
 \beta_m^{(j_0)} =: \beta_m
@@ -153,11 +168,11 @@ $$
 \section{Ensembles of RVFL}
 \label{sec:ensemblemethods}
 
-As mentioned in the introduction, we will use bagging and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. Both techniques will be described in the next sections ~\ref{section:rvflbagging} and \ref{section:rvflstacking}. Firstly in a general context, and secondly as how they are applied to our RVFL models.
+As mentioned in the introduction, we will use bagging and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. Both techniques will be described in the next sections ~\ref{sec:rvflbagging} and \ref{sec:rvflstacking}. Firstly in a general context, and secondly as how they are applied to our RVFL models.
 
 
 \subsection{Bagging}
-\label{section:rvflbagging}
+\label{sec:rvflbagging}
 
 The Bootstrap (cite Efron) uses multiple random replications of a given data set, to obtain standard errors of model parameters, for example. In the context of ensemble learning, these replications of the original data set are used to produce various predictions of the base models, which are then aggregated - in the case of regression problems, they are averaged, and in the case of classification problems, majority vote could be used - to obtain a single prediction with less out-of-sample variance. This procedure is called bootstrap aggregating or \textit{bagging}.
 
@@ -208,10 +223,10 @@ $$
 
 \medskip
 
-In this paper, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple training data sets are constructed by randomly picking a fraction of the covariates for each bootstrap resample. The predictions associated to each training set resample are then averaged, in order to obtain a single prediction, with a confidence interval around it. Some numerical examples on the application of bagging to RVFL base learners can be found in section \ref{sec:numericalexamples}
+In this chapter, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple training data sets are constructed by randomly picking a fraction of the covariates, and a subset of the lines. Taking a subset of the lines is done by respecting the serial dependence of the series and taking consecutive observations (that is, without skipping any observation) for each bootstrap resample. The predictions associated to each training set resample are then averaged, in order to obtain a single prediction, with a confidence interval around it. Some numerical examples on the application of bagging to RVFL base learners can be found in section \ref{sec:numericalexamples}
 
 \subsection{Stacking}
-\label{section:rvflstacking}
+\label{sec:rvflstacking}
 
 Stacked generalization or stacking, was introduced (cite Wolpert (1992)). It is also presented in (Breiman (2001)) for regression models. The idea behind this procedure is to construct new predictors for the training data set, by using diverse predictions of multiple models, which are combined by a meta-learner model. A simple example of 2-fold stacking applied to regression is described hereafter. It is possible to imagine examples with more stacked layers:
 
@@ -251,9 +266,17 @@ For the numerical examples, we obtain forecast of the Treasury Bill rates among 
 
 \subsection{Descriptive statistics}
 
-Figure \ref{all_series_plot} presents the resulting time series' data obtained after the few transformations described in the previous section. And table \ref{tab:summary_four_ts} contains a summary of these data, where we can see that the four time series are now nearly expressed in the same scale. 
+Figure \ref{all_series_plot} presents the resulting time series' data obtained after the few transformations described in the previous paragraph. Table \ref{tab:summary_four_ts} contains a summary of these data, where we can see that the four time series are now nearly expressed in the same scale.
 
-\begin{table}
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/all_series.png}
+\caption{Treasury Bills rates and transformed Real consumption, Real disposable income, and  Inflation data from (cite Greene et. al (2007)) in a \textit{data-rich} environment}
+\label{all_series_plot}
+\end{figure}
+
+
+\begin{table}[!htb]
 \begin{center}
 % table caption is above the table
 \caption{Summary statistics for the four transformed time series: Treasury Bills and transformed Real consumption, Real disposable income, and  Inflation data from (cite Greene et. al (2007))}
@@ -272,16 +295,6 @@ Series & Min & 1st Qrt  & Median  & Mean & 3rd Qrt  & Max & Std. Dev.\\
 \end{center}
 \end{table}
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/all_series.png}
-\caption{Treasury Bills rates and transformed Real consumption, Real disposable income, and  Inflation data from (cite Greene et. al (2007)) in a \textit{data-rich} environment}
-\label{all_series_plot}
-\end{figure}
-
-\newpage
-
-The Box-Pierce tests results presented in table \ref{tab:boxpierce}, and the autocorrelation functions presented in \ref{acf}, show that the two time series for Real consumption and Real disposable income could be considered as stationary after the transformations. Whereas for the Treasury Bills rates and Inflation, there is still a non-negligible autocorrelation within the series. 
 
 \begin{table}
 \begin{center}
@@ -293,8 +306,8 @@ The Box-Pierce tests results presented in table \ref{tab:boxpierce}, and the aut
 \hline\noalign{\smallskip}
 Series &  \code{X-squared} & \code{p-value}  \\
 \noalign{\smallskip}\hline\noalign{\smallskip}
-  Real consumption & 0.0133 & 0.9082  \\
-  Real disposable income & 1.3912 & 0.2382 \\
+  Real consumption & 0.0133 & \textbf{0.9082}  \\
+  Real disposable income & 1.3912 & \textbf{0.2382} \\
   Inflation & 86.428 &  2.2e-16 \\
   Treasury Bills rates & 186.35 & 2.2e-16 \\
 \noalign{\smallskip}\hline
@@ -304,19 +317,44 @@ Series &  \code{X-squared} & \code{p-value}  \\
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/acf.png}
+\includegraphics[width=12cm]{gfx/chapter-rvfl-ensembles/acf.png}
 \caption{Autocorrelation function for the four times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
 \label{acf}
 \end{figure}
 
 \newpage
-%\mbox{~}
 
-Another interesting information is given by figure \ref{corrplot}. We observe that the distribution of the data for inflation and Treasury Bills rates is skewed when compared to the data for Real consumption and Real disposable income. Also, according to the correlations, the Real consumption is decreasing when the Treasury Bills rates and the inflation are increasing. But when the Real disposable income increases, the Real consumption increases as well. 
+The Box-Pierce tests results presented in table \ref{tab:boxpierce}, and the autocorrelation functions presented in \ref{acf}, show that the two time series for Real consumption and Real disposable income could be considered as stationary after the transformations. Whereas for the Treasury Bills rates and Inflation, there is still a non-negligible autocorrelation within the series. 
+
+\medskip
+
+Another interesting information is given by figure \ref{corrplot}. We observe that the distribution of the data for inflation and Treasury Bills rates is skewed, when compared to the data for Real consumption and Real disposable income. 
+
+\medskip
+
+Also, based on the correlations displayed in figure \ref{corrplot}, the Real consumption is globally  decreasing when the Treasury Bills rates and the inflation are increasing. But when the Real disposable income increases, the Real consumption increases as well. 
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=12cm]{gfx/chapter-rvfl-ensembles/scatterplot.png}
+\includegraphics[width=14cm]{gfx/chapter-rvfl-ensembles/scatterplot.png}
 \caption{Correlation plot for the four times series: Treasury Bills rates, Real consumption, Real disposable income, Inflation}
 \label{corrplot}
 \end{figure}
+
+\newpage
+
+In sections \ref{bagging_example} and \ref{stacking_example}, we apply the bagging and stacking procedures described in sections \ref{sec:rvflbagging} and \ref{sec:rvflstacking} to the dataset we have just described. The dataset is divided into two parts: 
+\begin{itemize}
+\item A \textbf{training/testing set}: used for applying a rolling forecasting cross-validation method (see \cite{bergmeir2015note}). At the beginning of the procedure, the training set contains $12$ points ($4$ years), and the test set contains $4$ points(1 year). The training set is then advanced of one point forward (rolled), and the procedure is repeated until no more data for the training set are found.  
+\item A \textbf{validation set}: the validation set is used to verify that the parameters produced by the cross-validation from the previous point lead to \textit{good} forecast on unseen data. It contains four points (1-year ahead forecast) for each time series. 
+\end{itemize}
+
+We use the Root Mean Squared Error (RMSE) as a measure of the out-of-sample error. 
+
+\subsection{Numerical example for bagging}
+\label{bagging_example}
+
+
+
+\subsection{Numerical example for stacking}
+\label{stacking_example}
