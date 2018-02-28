@@ -1,12 +1,12 @@
 % !TEX root = ../thesis-example.tex
 %
-\chapter{A Bayesian Quasi-Randomized neural networks, and its application to the optimization of black box functions}
+\chapter{A Bayesian Quasi-Randomized neural network, and its application to the optimization of black box functions}
 \label{sec:bayesian_rvfl}
 
 \section{Introduction}
 \label{intro}
 
-In this paper, we present a Bayesian Quasi-Random Vector Functional Link (BQRVFL) neural network model, with one hidden layer. It is a penalized regression/neural networks model on an augmented data set, in which we assume that the regression parameters are governed by a prior distribution, and the hidden layer's nodes are (quasi-)randomized. As a prior distribution for the regression parameters, we will use a multivariate Gaussian distribution.
+In this chapter, we present a Bayesian Quasi-Random Vector Functional Link (BQRVFL) neural network model, with one hidden layer. It is a hybrid penalized regression/neural networks model on an augmented data set. In this hybrid regression model, we assume that the regression parameters are governed by a prior distribution, and that the hidden layer's nodes are (quasi-)randomized. As a prior distribution for the regression parameters, we will use a multivariate Gaussian distribution. And for the simulation of the nodes in the hidden layer, we will use a Sobol sequence. 
 
 \medskip
 
@@ -14,12 +14,11 @@ To the best of our knowledge, randomized neural networks were introduced by \cit
 
 \medskip
 
-The RVFL networks have been successfully applied to solving different types of classification and regression problems; see for example \cite{dehuri2010comprehensive}. Here, we will use RVFL networks with only one hidden layer. And instead of relying on fully randomized nodes, we will use sequences of deterministic quasi-random numbers. 
-
+The RVFL networks have been successfully applied to solving different types of classification and regression problems; see for example \cite{dehuri2010comprehensive}. Here, we will use RVFL networks with only one hidden layer.
 
 \medskip
 
-With the BQRVFL model presented here, it is possible to obtain predictions from a nonlinear model (actually, a combination of a linear and a nonlinear model), along with confidence intervals around the model's predictions. The choice of this relatively simple Gaussian prior should not, however,  prevent the user from checking the confidence intervals around the predictions. 
+With the BQRVFL model presented here, it is possible to obtain predictions from a nonlinear model (actually, a combination of a linear and a nonlinear model), along with confidence intervals around the model's predictions. The choice of this relatively simple Gaussian prior should not, however, prevent the user from checking the confidence intervals around the predictions. 
 
 \medskip 
 
@@ -27,24 +26,25 @@ There are other types of models, which are also capable of achieving this purpos
 
 \medskip 
 
-In section \ref{sec:modelprez}, we present the BQRFVL model, with one hidden layer. Formulas for the estimation of its parameters are given, along with formulas for the calculation of confidence intervals around the predictions. The  model's predictions on a validation set, and on simulated data from (cite Sapp (2014)) are also presented. 
+In section \ref{sec:modelprez}, we present the BQRFVL model, with one hidden layer. Formulas for the estimation of its parameters are given, along with formulas for the calculation of confidence intervals around the predictions. The model's predictions on a validation set, and on simulated data from (cite Sapp (2014)) are also presented. 
 
 \medskip 
 
-In section \ref{sec:bayesopt}, the model is used as a workhorse for Bayesian optimization (cite Mockus et al. (1978)). This type of optimization methods are used for finding minima or maxima of black box functions, whose evaluations are expensive, and gradients are not necessarily available in a closed form. It has been shown to be very effective on challenging optimization functions (cite Jones (1998) and Snoek et al. (2015)).
+In section \ref{sec:bayesopt}, the model is used as a workhorse for Bayesian optimization (cite Mockus et al. (1978)). This type of optimization methods are useful for finding minima or maxima of black box functions, whose evaluations are expensive, and gradients are not necessarily available in a closed form. It has been shown to be very effective on challenging optimization functions (cite Jones (1998) and Snoek et al. (2015)).
 
 \medskip 
 
-The idea of Bayesian optimization is to optimize an alternative, cheaper function called the acquisition function, rather than the main, expensive objective function. For doing this, the uncertainty around the predictions of an alternative machine learning model, called the surrogate model, is used in a way that will be described in more details in section \ref{sec:bayesopt}. 
+The idea of Bayesian optimization is to optimize an alternative, cheaper function called the acquisition function, rather than the main, expensive objective function. For doing this, the uncertainty around the predictions of an alternative machine learning model - called the surrogate model - is used in a way that will be described in more details in section \ref{sec:bayesopt}. 
 
 \medskip 
 
-The surrogate model's posterior distribution tries to approximate the objective function in the best way, and this posterior distribution is enhanced, as more points of the objective function are evaluated. Gaussian process regression models are often used are surrogate models (cite Snoek et al. (2015) for example). Here, the surrogate model will be the model presented in \ref{sec:modelprez}.
+The surrogate model's posterior distribution tries to approximate the objective function in the best way. And this posterior distribution is enhanced, as more points of the objective function are evaluated. Gaussian process regression models are often used are surrogate models (cite Snoek et al. (2015) for example). Here, the surrogate model will be the BQRVFL model presented in \ref{sec:modelprez}.
 
 \medskip 
 
-We apply Bayesian optimization, using the BQRVFL model, to the minimization of cross-validation error of two machine learning models, DNS-KRLS and DNS-RVFL (more details here or refer to another section). 
+We apply Bayesian optimization, using the BQRVFL model, to the minimization of the cross-validation error (produced on discount curve forecasting) of four machine learning models. One of these models is based on an RVFL applied to multivariate time series forecast (cite Moudiki et al. (2018)). The second one applies Kernel Regularized Least Squares (cite chapter) (KRLS hereafter) directly to the curves' observation dates and time to maturities. The two remaining models are based on the popular DNS framework, and are a DNS-KRLS and a DNS-RVFL (more details here or refer to another section). 
 
+\newpage
 
 \section{Description of the model}
 \label{sec:modelprez}
@@ -98,12 +98,16 @@ And depending on if $n << p$, or $p << n$, we can use one of the two previous  e
 
 \medskip 
 
-In the sequel of the paper, we will use a ReLU activation function, which is $g: x \mapsto max(x, 0)$. In the case where g is derivable, for example when 
+In the sequel of the chapter, we will use a ReLU activation function, which is $g: x \mapsto max(x, 0)$. In the case where g is derivable, for example when 
 $$
 g: x \mapsto x
 $$ or 
 $$
 g: x \mapsto sigmoid(x) = \frac{1}{1 + exp(-x)}
+$$
+or 
+$$
+g: x \mapsto tanh(x)
 $$
 It is possible to obtain a sensitivity (first order) of the response to a change in the covariates. Indeed, in this case, we have for $i \in \left \lbrace 1, \ldots, n \right \rbrace $: 
 
@@ -117,6 +121,8 @@ and for a fixed integer $j_0 \in \left \lbrace 1, \ldots, p \right \rbrace$, and
 \frac{\partial y_i}{\partial X_i^{(j_0)}} &=& \alpha_{j_0} + \sum_{k = 1}^L \gamma_k \frac{\partial g}{\partial u}\frac{\partial u}{\partial X_i^{(j_0)}} \\
  &=& \alpha_{j_0} + \sum_{k = 1}^L \gamma_k W_{j_0}^{(k)} \frac{\partial g}{\partial u}\\
 \end{eqnarray*}
+
+\newpage
 
 \subsection{Examples on data from (cite Sapp (2014))}
 \label{sec:sapp2014}
