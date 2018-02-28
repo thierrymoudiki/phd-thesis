@@ -55,7 +55,7 @@ We consider a response variable $y \in \RR^n$ that has to be explained as a func
 $$
 g \left(\textbf{X} W \right)
 $$
-where $g$ is an activation function, as in of neural networks models, and $W \in \RR^{p \times L}$ are obtained from a deterministic sobol sequence of quasi-random numbers (cite Niderreiter (1992) and Boyle et Tan (1997)). $L$ is the number of nodes in the hidden layer. 
+where $g$ is an activation function, as in of neural networks models, and $W \in \RR^{p \times L}$ are the nodes in the hidden layer, obtained from a deterministic sobol sequence of quasi-random numbers (cite Niderreiter (1992) and Boyle et Tan (1997)). $L$ is the number of nodes in the hidden layer. 
 
 \medskip 
 
@@ -78,13 +78,13 @@ $$
 
 \medskip
 
-Now, by using the Woodbury identity (cite Gene H. Golub and Charles F. van Loan. Matrix Computations and cite Max Welling The Kalman filter, Lecture Note) for ${\bf P}$ and ${\bf R}$ positive definite
+By using the Woodbury identity (cite Gene H. Golub and Charles F. van Loan. Matrix Computations and cite Max Welling The Kalman filter, Lecture Note) for ${\bf P}$ and ${\bf R}$ positive definite
 $$
 \left({\bf P}^{-1} + {\bf B}^T {\bf R}^{-1} {\bf B} \right)^{-1}{\bf B}^T {\bf R}^{-1} =
 {\bf P}{\bf B}^T \left( {\bf B} {\bf P} {\bf B}^T + {\bf R}\right)^{-1}
 $$
 
-and by noting $\sigma^2 = \lambda$, this is equivalent to: 
+and by noting $\sigma^2 = \lambda$, this is equivalent to having the same result for $y^*$, but with: 
 $$
 \mu_{\beta | y, \textbf{Z}} =  \left( \textbf{Z}^T\textbf{Z} + \lambda I_p\right)^{-1}\textbf{Z}^Ty
 $$
@@ -93,34 +93,37 @@ $$
 \Sigma_{\beta | y, \textbf{Z}} = I_p -  \left( \textbf{Z}^T\textbf{Z} + \lambda I_p\right)^{-1}\textbf{Z}^T\textbf{Z}
 $$
 
-And depending on if $n << p$, or $p << n$, we can use one of the two previous  expressions; the one leading to the lowest number operations.  
-
-
-\medskip 
-
-In the sequel of the chapter, we will use a ReLU activation function, which is $g: x \mapsto max(x, 0)$. In the case where g is derivable, for example when 
+And depending on the situations in which $n << p$, or $p << n$, we can use one of the two previous expressions. The one resulting in the lowest number operations. In the sequel of the chapter, we will use a ReLU activation function, which is equal to
 $$
+g: x \mapsto max(x, 0)
+$$ 
+In the case where g is derivable (for example when 
+$
 g: x \mapsto x
-$$ or 
-$$
+$ or 
+$
 g: x \mapsto sigmoid(x) = \frac{1}{1 + exp(-x)}
-$$
+$
 or 
-$$
+$
 g: x \mapsto tanh(x)
-$$
-It is possible to obtain a sensitivity (first order) of the response to a change in the covariates. Indeed, in this case, we have for $i \in \left \lbrace 1, \ldots, n \right \rbrace $: 
+$), it is possible to obtain a sensitivity (at the first order) of the response to a change in the covariates. Indeed, in this case, we have for a fixed (tied to the observations) $i \in \left \lbrace 1, \ldots, n \right \rbrace $: 
 
 $$
 y_i = \sum_{j = 1}^p \alpha_j X_i^{(j)} + \sum_{k = 1}^L \gamma_k g(X_i^T W^{(k)})
 $$
 
-and for a fixed integer $j_0 \in \left \lbrace 1, \ldots, p \right \rbrace$, and $u := X_i^T W^{(k)}$, we have: 
+Where $W^{(k)}$ is the $k^{th}$ column of $W$ among $L$. And for a fixed (tied to the covariates) integer $j_0 \in \left \lbrace 1, \ldots, p \right \rbrace$, and $u := X_i^T W^{(k)}$, we have the following sensitivity of $y_i$: 
 
 \begin{eqnarray*}
-\frac{\partial y_i}{\partial X_i^{(j_0)}} &=& \alpha_{j_0} + \sum_{k = 1}^L \gamma_k \frac{\partial g}{\partial u}\frac{\partial u}{\partial X_i^{(j_0)}} \\
- &=& \alpha_{j_0} + \sum_{k = 1}^L \gamma_k W_{j_0}^{(k)} \frac{\partial g}{\partial u}\\
+\frac{\partial y_i}{\partial X_i^{(j_0)}} &=& \alpha_{j_0} + \sum_{k = 1}^L \gamma_k \frac{\partial g}{\partial u}(u)\frac{\partial u}{\partial X_i^{(j_0)}}(u) \\
+ &=& \alpha_{j_0} + \sum_{k = 1}^L \gamma_k W_{j_0}^{(k)} \frac{\partial g}{\partial u}(u)\\
 \end{eqnarray*}
+
+For $g: x \mapsto x$ for example, this leads to: 
+$$
+\frac{\partial y_i}{\partial X_i^{(j_0)}} = \alpha_{j_0} + \sum_{k = 1}^L \gamma_k W_{j_0}^{(k)}
+$$
 
 \newpage
 
