@@ -300,7 +300,7 @@ It is also possible to add other regressors, such as dummy variables, or indicat
 In this other framework, we consider that the response variable is the spot interest rate observed at time $t$, for time to maturity $\tau$, $R(t, \tau)$. The predictors are the observation date, and the time to maturity. In this setting, we use the following weighted distance between the vectors $(t, \tau)$ in the Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels:
 
 $$
-r = \sqrt{\frac{||t_i - t_j||^2_2}{\theta_1^2} + \frac{||\tau_i - \tau_j||^2_2}{\theta_2^2}}
+r = \sqrt{\frac{||t_i - t_j||^2_2}{l_1^2} + \frac{||\tau_i - \tau_j||^2_2}{l_2^2}}
 $$
 
 So that here, the spot rates values are explained as linear combination of distances between vectors of  time to maturities and observation dates $(t_i, \tau_i)$ and $(t_j, \tau_j)$. In this setting, if we consider $10$ spot rates observed at $2$ dates $t_1 < t_2$ and $5$ time to maturities $\tau_1, \ldots, \tau_5$, the response variable is:
@@ -341,21 +341,30 @@ $$
                 \tau_5 &  t_2   & I_{t_2}\\
                \end{array} } \right)
 $$
+And another weighted distance in the Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels, taking into account the new indicator $(I_t)_t$:
 
-In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls} on this dataset. 
+$$
+r = \sqrt{\frac{||t_i - t_j||^2_2}{l_1^2} + \frac{||\tau_i - \tau_j||^2_2}{l_2^2} + \frac{||I_{t_i} - I_{t_j}||^2_2}{l_3^2}}
+$$
+
+In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls} on a training/testing dataset\footnote{for a further treatment, a validation set would be added, in order to verify that the models are not 'overtrained' on this training/testing set}. 
 
 %\newpage
 
 \section{Numerical examples}
 \label{sec:numericalexamples}
 
-In this section, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls}. The examples are not exhaustive benchmarks, but aim at illustrating the forecasting capabilities of the models. We use calibrated discount rates data from \textcolor{blue}{\href{http://www.bundesbank.de/Navigation/EN/Statistics/Time_series_databases/time_series_databases.html}{Deutsche Bundesbank website}}, observed on a monthly basis, from the beginning of 2002 to the end 2015. There are 167 curves, observed at 50 maturities in the dataset. Only $15$ time to maturities are used in these examples (in years): $1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30$. 
+In this section, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls}. The examples are not exhaustive benchmarks, but aim at illustrating the forecasting capabilities of the models. 
+
+\medskip
+
+We use calibrated discount rates data from \textcolor{blue}{\href{http://www.bundesbank.de/Navigation/EN/Statistics/Time_series_databases/time_series_databases.html}{Deutsche Bundesbank website}}, observed on a monthly basis, from the beginning of 2002 to the end 2015. There are 167 curves, observed at 50 maturities in the dataset. Only $15$ time to maturities are used in these examples (in years): $1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30$. 
 
 \medskip
 
 In figure ~\ref{db_zerorates}, we present the data that we use, and table ~\ref{tab:summary_db_zeros} contains a summary of these data; the minimum, maximum, median, first and third quartiles of the discount rates observed at given maturities. There are alternate cycles of increases and decreases of the discount rates, with generally a decreasing trend. Some of the discount rates, at the most recent dates, and lower maturities, are negative.
 
-\newpage
+%\newpage
 
 \begin{figure}[!htb]
 \centering
@@ -378,22 +387,78 @@ Maturity & Min & 1st Qrt  & Median  & 3rd Qrt  & Max  \\
   5 & 0.170 & 1.327 & 2.863 & 3.807 & 5.146\\
   15 & 0.711 & 2.616 & 3.954 & 4.702 & 5.758\\
   30 & 0.805 & 2.594 & 3.962 & 4.814 & 5.784\\
-  50 & 0.749 & 2.647 & 3.630 & 4.590 & 5.467\\
 \noalign{\smallskip}\hline
 \end{tabular}
 \end{center}
 \end{table}
 
-A rolling forecasting methodology (see \cite{bergmeir2015note}) is implemented in order to obtain the benchmarks between the models. A fixed 12 months-length window for training the model, and the following 12 months for testing, the origin of the training set is then advanced of 1 month, and the training/testing procedure is repeated. The measure of forecasting performance is the Root Mean Squared Error ($RMSE$) \footnote{for a complete treatment, a validation set should be added, in order to verify that we are not 'overtraining' the models on the training set}.
-
-\newpage
-
-We use similar grids for all the models, in order to ease the comparability of the results, and avoid too much manual tweaking of the hyperparameters. Hence for both models, DNS-KRLS (from section \ref{sec:dnskrls}) and KRLS (from section \ref{sec:purekrls}), we consider $5$ values of $\sigma$, $l$ (the variance and length-scale parameters for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels) and $\lambda$ (the regularization parameter for all the kernels) regularly spaced between $\left[ 10^{-2}, 10^2\right]$: $10^{-2}, 10^{-1}, 1, 10, 10^{2}$. 
+A rolling forecasting methodology (see \cite{bergmeir2015note}) is implemented in order to obtain the benchmarks between the models. A fixed 12 months/36 months-length window for training the model, and the following 12 months/36 months for testing, the origin of the training set is then advanced of 1 month, and the training/testing procedure is repeated. The measure of forecasting performance is the Root Mean Squared Error ($RMSE$).
 
 \medskip
 
-For the additional parameter $\eta$ in the DNS-KRLS model, we use 5 values comprised (regularly spaced) between the minimum observed time to maturity and the maximum observed time to maturity.
+We use similar grids for all the models, in order to ease the comparability of the results, and avoid too much manual tweaking of the hyperparameters and overtraining the available data. 
 
+\medskip
+
+Hence for both models, DNS-KRLS (from section \ref{sec:dnskrls}) and KRLS (from section \ref{sec:purekrls}), we consider $5$ values of $\sigma$ (variance parameter), $l$, $l_1$, $l_2$ (length-scale parameters for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels) and $\lambda$ (the regularization parameter for all the kernels) regularly spaced between $\left[ 10^{-2}, 10^2\right]$: $0.01, 0.1, 1, 10, 100$. 
+
+\medskip
+
+For the additional parameter $\eta$ in the DNS-KRLS model, we use 5 values comprised (regularly spaced) between the minimum of the observed time to maturities  and the maximum of the observed time to maturities (on $\left[1, 30\right]$): $1, 8.25, 15.5, 22.75, 30$.
+
+
+\subsection{Cross-validation results}
+
+The results obtained after the cross-validation procedure are reported in table \ref{tab:avg_oos_rmse12} and \ref{tab:avg_oos_rmse36}. 
+
+\begin{table}[!htb]
+\begin{center}
+% table caption is above the table
+\caption{Average out-of-sample RMSE for training set length = 12 months and test set length = 12 months}
+\label{tab:avg_oos_rmse12}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllllll}
+\hline\noalign{\smallskip}
+Model              & $\sigma$ & $l$ & $l_1$ & $l_2$  & $\lambda$  & $\eta$  & \textbf{RMSE}  \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  Gaussian         &    10 &  - &   0.01&    10 &    10 & - & 0.5839150 \\
+  Mat\'ern 3/2     &   100 &  - & 1 & 100 &   0.1 & - & \textbf{0.5136373}\\
+  Mat\'ern 5/2     &   1 & - & 0.01 & 10 & 0.1 & - & 0.5781184\\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  DNS-Gaussian     & 0.1 & 10 & - & - & 0.01 & 15.5 & 0.6041652\\
+  DNS-Mat\'ern 3/2 & 100 & 1 & - & - & 0.01 & 22.75 & \textbf{0.6038667}\\
+  DNS-Mat\'ern 5/2 & 100 & 1 & - & - & 0.01 & 15.5 & 0.6041580\\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!htb]
+\begin{center}
+% table caption is above the table
+\caption{Average out-of-sample RMSE for training set length = 36 months and test set length = 36 months}
+\label{tab:avg_oos_rmse36}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllllll}
+\hline\noalign{\smallskip}
+Model            & $\sigma$ & $l$ & $l_1$ & $l_2$ & $\lambda$  & $\eta$  & \textbf{RMSE}  \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  Gaussian         & 10  & - & 0.1 & 10 & 100 & - & 1.170690 \\
+  Mat\'ern 3/2     & 100 & - & 1 & 10 & 0.01 & - & \textbf{1.003246} \\
+  Mat\'ern 5/2     &  10 & - & 10 & 100 & 10 & - & 1.134833 \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  DNS-Gaussian     & 0.01 & 0.01 & - & - & 0.01 & 30 & 1.264533 \\
+  DNS-Mat\'ern 3/2 & 0.01 & 0.01 & - & - & 0.01 & 30 & \textbf{1.264533} \\
+  DNS-Mat\'ern 5/2 & 0.01 & 0.01 & - & - & 0.01 & 30 & 1.264533 \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+We observe that no matter the length of the training/testing window (either $12$ months or $36$ months), or the method employed (either DNS-KRLS or KRLS), the Mat\'ern 3/2 kernel performs better than the other models. It is even performing better on this specific problem with a KRLS model, considering the similarities between vectors of time to maturities and observation dates. In the next section \ref{sec:fcast_curves}, we examine these results further, by looking at the projected discount/discount factors'/discrete forward curves.
+
+\subsection{Implied forecast term-structure of discrete forward rates}
+\label{sec:fcast_curves}
 
 
 \section{Conclusion}
