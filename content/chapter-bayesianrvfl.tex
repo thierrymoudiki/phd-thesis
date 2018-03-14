@@ -199,7 +199,7 @@ $$
 
 \medskip 
 
-The whole optimization process that we use is iterative, and is described below with the total number of iterations denoted as $nb_{iter}$: 
+The whole optimization process that we use is iterative and is described below, with the total number of iterations denoted as $nb_{iter}$: 
 
 \begin{enumerate}
 \item We start with $nb_{init}$ points randomly sampled in $\AC$, for which some evaluations of $f$ have been obtained. With these points, we construct a training data set for the surrogate model:
@@ -237,7 +237,7 @@ Where $\Phi$ is the probability distribution function of a $\MN(0, 1)$, and $\Ph
 
 \medskip
 
-This, is to illustrate the model's behaviour on a simple example. A further tuning of the Random Forest hyperparameters, or of the parameter $\kappa$, or a different choice for $nb_{init}$, would of course lead to different results. For $100$ seeds, and a fixed number of iterations $nb_{iter}$, we rerun the procedure described before, $100$ times. For the BQRVFL, $nb_{iter}$ goes from $5$ to $100$ with steps of $5$, and for the Random Forest with confidence intervals, $nb_{iter} \in \left \lbrace 5, 50, 100 \right \rbrace$. 
+This, is to illustrate the model's behaviour on a simple example. A further tuning of the Random Forest hyperparameters, or of the parameter $\kappa$, or a different choice for $nb_{init}$, or activation function for the BQRVFL, would of course lead to different results. For $100$ seeds, and a fixed number of iterations $nb_{iter}$, we rerun the procedure described before, $100$ times. For the BQRVFL, $nb_{iter}$ goes from $5$ to $100$ with steps of $5$, and for the Random Forest with confidence intervals, $nb_{iter} \in \left \lbrace 5, 50, 100 \right \rbrace$. 
 
 \begin{figure}[!htb]
 \centering
