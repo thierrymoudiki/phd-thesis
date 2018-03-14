@@ -34,16 +34,16 @@ Germany
 \label{sec:intro:structure}
 
 \textbf{Chapter \ref{sec:related}} \\[0.2em]
-\blindtext
+We derived a class of discount curve construction and extrapolation methods,  based on a class of interest rate models called \textit{exogenous short-rate models}. That means: constructing a static Yield Curve at a given date, by using some specific financial instruments with different maturities quoted at this date. Then, defining what are the discount rates beyond the longest maturity observed for these financial instruments. The extrapolated part of the curve is typically necessary for the pricing of long-term insurance liabilities. In the framework that we propose, Yield Curve forecasts can be obtained by using a \textbf{functional principal components analysis} on the model parameters.
 
 \textbf{Chapter \ref{sec:system}} \\[0.2em]
-\blindtext
+We were interested in obtaining forecasts for multiple time series, by taking into account the potential nonlinear relationships between their observations. For this purpose, we used a specific type of regression model on an augmented dataset of lagged time series. Our model is inspired by dynamic regression models, with the response variable's lags included as predictors, and is known as \textbf{random vector functional link (RVFL) neural networks}. The RVFL neural networks have been successfully applied in the past, to solving regression and classification problems. The novelty of our approach is to apply an RVFL model to multivariate time series, under two separate regularization constraints on the regression parameters.
 
 \textbf{Chapter \ref{sec:concepts}} \\[0.2em]
-\blindtext
+The goal of ensemble learning is to combine two or more statistical/machine learning models - the base learners - into one, in order to obtain an ensemble model. The ensemble model is expected to have an improved out-of-sample error over the base models. We apply two popular ensemble learning methods to multiple time series forecasting: \textbf{bootstrap aggregating}, known as bagging and \textbf{stacked generalization}, known as stacking. The base learners that we use, are the RVFL introduced in the previous paragraph.
 
 \textbf{Chapter \ref{sec:concepts}} \\[0.2em]
-\blindtext
+\textbf{Kernel regularized least squares} (KRLS) learning methods are applied to Yield Curve forecasting. Two types of formulations of the forecasting problem are tested. One relying on a popular framework called Dynamic Nelson-Siegel, and another one, in which we apply the KRLS directly to the explain the spot rates (response variable) as a function of the observation dates and time to maturities (covariates).
 
 \textbf{Chapter \ref{sec:conclusion}} \\[0.2em]
-\blindtext
+We present a \textbf{bayesian quasi-randomized vector functional link neural network model} (BQRVFL), with one hidden layer. It's a penalized regression model on an augmented data set, in which we assume that a prior multivariate gaussian distribution governs the regression parameters. The BQRVFL model is presented, along with the associated formulas for confidence interval around its predictions. It is then applied as a workhorse for \textbf{bayesian optimization} of machine learning cross-validation functions. The machine learning cross-validation functions that we consider are those associated to the selection of hyperparameters of RVFL and KRLS models.
