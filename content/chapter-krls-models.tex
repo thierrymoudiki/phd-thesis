@@ -7,7 +7,7 @@
 
 \section{Introduction}
 
-In this chapter, we apply Kernel Regularized Least Squares (KRLS) learning methods to Yield Curve forecasting. By 'Yield Curve', we actually mean a discount curves. That is, we consider that the curves used in theexamples do not include counterparty credit risk, and we focus on the forecasting problem. Two types of formulations of the forecasting problem are tested. One relying on the popular Dynamic Nelson-Siegel (DNS) framework from \cite{diebold2006forecasting}, and another one, in which we apply the KRLS directly to the Yield Curve observation dates and time to maturities, to model the spot rates.
+In this chapter, we apply Kernel Regularized Least Squares (KRLS) learning methods to Yield Curve forecasting. By 'Yield Curve', we actually mean a discount curves. That is, we consider that the curves used in the examples do not include any counterparty credit risk, and focus on the forecasting problem. Two types of formulations of the spot rates' forecasting problem are tested here. One relying on the popular Dynamic Nelson-Siegel (DNS) framework from \cite{diebold2006forecasting}, and another one, in which we apply the KRLS directly to the Yield Curve observation dates and time to maturities, to model the spot rates.
 
 \medskip
 
@@ -15,7 +15,7 @@ In the DNS framework \cite{diebold2006forecasting}, each cross-section of yields
 
 \medskip
 
-The second approach is a machine learning/data-driven one, in which we put no  specific constraint on the model to reproduce the specific Yield Curve stylized facts. The regularization parameters inherent to the KRLS model will act as implicit constraints, that cause the model to converge as close as possible to reproducing these stylized facts. In this latter approach, we are mostly interested in the model with the {\it best} out-of-sample error. As a consequence, the technique as is, is probably less adapted than the former framework based on DNS (in its arbitrage-free version) to no-arbitrage pricing (if no-arbitrage pricing is required).
+The second approach based on KRLS is a machine learning/data-driven one, in which we put no  specific constraint on the model to reproduce the specific Yield Curve stylized facts. The regularization parameters inherent to the KRLS model will act as implicit constraints, that cause the model to converge as close as possible to reproducing these stylized facts. In this latter approach, we are mostly interested in the model with the {\it best} out-of-sample error. As a consequence, the technique as is, is probably less adapted than the former framework based on DNS (in its arbitrage-free version) to no-arbitrage pricing (if no-arbitrage pricing is required).
 
 \medskip
 
@@ -81,7 +81,7 @@ $$
 {\bf K}_{ij} =: K(\textbf{x}_i, \textbf{x}_j) = f(||\textbf{x}_i - \textbf{x}_j||_1) \: \: or \: \: f(||\textbf{x}_i - \textbf{x}_j||_2)
 $$
 
-As described in (cite Halmueller \& Hazlett (2013)), two approaches can be used to interpret/motivate the KRLS: a similarity-based view and the superposition of Gaussians view. Here, we refer only to the first one, which is the most intuitive to us, and is also the one described in Ferwerda, Hainmueller et Hazlett (2017). Indeed, here, the $i^{th}$ observation $y_i$ is explained as a linear combination of functions measuring the similarity/dissimilarity between its characteristics gathered in $\textbf{x}_i$, and the other observations from the training set, $\textbf{x}_j$, $j \neq i$:
+As described in (cite Halmueller \& Hazlett (2013)), two approaches can be used to interpret/motivate the KRLS: a similarity-based view and the superposition of Gaussians view. Here, we refer only to the first one, which is the most intuitive to us, and is also the one described in (cite Ferwerda, Hainmueller et Hazlett (2017)). Indeed here, the $i^{th}$ observation of the response, $y_i$ is explained as a linear combination of functions measuring the similarity/dissimilarity between its characteristics gathered in $\textbf{x}_i$, and the other observations from the training set, $\textbf{x}_j$, $j \neq i$:
 
 \begin{equation}
 \label{eq:comblinresponse}
@@ -156,7 +156,7 @@ In section \ref{sec:sensitivity}, we derive formulas for the sensitivities of th
 \section{Sensitivity of the response to a change in the covariates}
 \label{sec:sensitivity}
 
-We let:
+We let $r^2$ be:
 
 $$
 r^2 := || \textbf{x}_i - \textbf{x}_k ||^2_2 = (\textbf{x}_i - \textbf{x}_k)^T(\textbf{x}_i - \textbf{x}_k)
@@ -219,7 +219,7 @@ We have:
 
 \end{itemize}
 
-%\newpage
+From these expressions of the sensitivities, we can derive the average  marginal effect of a covariate on the response, as demonstrated in equation \ref{average_sensi}. These formulas will be valid in the DNS framework described in section \ref{sec:dnskrls}, where only one lengthscale $l$ parameter is required. Similar types of formulas could be derived in the KRLS framework from section \label{sec:krls}, but they would include two lengthscale parameters. 
 
 \section{Description of DNS-KRLS model}
 \label{sec:dnskrls}
@@ -231,7 +231,7 @@ R_t(\tau) = \alpha_{1, t} + \alpha_{2, t}\left(\frac{1-e^{-\tau/\eta}}{e^{-\tau/
 
 \medskip
 
-If these spot interest rates $R_t(\tau)$ are observed at increasing dates $t = t_1 < \ldots < t_n$, for increasing time to maturities $\tau = \tau_1 < \ldots < \tau_p$, the factor loadings are the vectors of length $p$:  
+If these spot interest rates $R_t(\tau)$ are observed at increasing dates $t = t_1 < \ldots < t_n$, for increasing time to maturities $\tau = \tau_1 < \ldots < \tau_p$, the factor loadings in the DNS framework are the vectors (of length $p$):  
 $$
 (1, \ldots, 1)^T
 $$
@@ -243,59 +243,55 @@ and
 $$
 \left(\frac{1-e^{-\tau_1/\eta}}{e^{-\tau_1/\eta}} - e^{-\tau_1/\eta}, \ldots, \frac{1-e^{-\tau_p/\eta}}{e^{-\tau_p/\eta}} - e^{-\tau_p/\eta}\right)^T
 $$ 
-They are used to represent respectively the level, slope, and curvature of the Yield Curve. Estimations of $\alpha_{i, t}, i = 1, \ldots, 3$ are obtained for each cross-section of yields (that is, for each fixed date $t$) by taking a fixed $\eta$, and doing a least squares regression of the spot rates observed at time $t$ on these factor loadings. The three time series $(\alpha_{i, t})_t, i = 1, \ldots, 3$ associated to the loadings for each cross-section of yields, are those that we wish to forecast simultaneously, by using KRLS learning.
 
 \medskip
 
- For doing this, we store the three time series in a response matrix ${\bf Y}$, and their lags in a matrix of predictors ${\bf X}$. We will then have, for new observations stored in ${\bf X}^*$:
+These vectors are used to represent respectively the level, slope, and curvature of the Yield Curve. Estimations of $\alpha_{i, t}, i = 1, \ldots, 3$ are obtained for each cross-section of yields (that is, for each fixed date $t$) by taking a fixed $\eta$, and doing a least squares regression of the spot rates observed at time $t$ on these factor loadings. 
 
- $$
- {\bf Y}^* = {\bf K^*} \left( {\bf K} + \lambda I_{n \times n} \right)^{-1} {\bf Y}
- $$
- 
- We consider $p \in \mathbb{N}^*$ time series $(X_t^{(j)})_{t \geq 0}, j = 1, \ldots, p$,
+\medskip
+
+The three time series $(\alpha_{i, t})_t, i = 1, \ldots, 3$ associated to the loadings for each cross-section of yields, are those that we wish to forecast simultaneously, by using KRLS learning. For doing this, we store the most contemporaneous values of the three time series $(\alpha_{i, t})_t, i = 1, \ldots, 3$ in a response matrix ${\bf Y}$, and their lags in a matrix of predictors ${\bf X}$. 
+
+\medskip
+
+Considering the $p \in \mathbb{N}^*$ time series $(\alpha_t^{(j)})_{t \geq 0}, j = 1, \ldots, p$ (with $p = 3$),
 observed at $n \in \mathbb{N}^*$ discrete dates. We are interested in
 obtaining simultaneous forecasts of the $p$ time series at time $n+h$, $h \in
 \mathbb{N}^*$, by allowing each of the $p$ variables to be influenced by the
-others (in the spirit of VAR models, see \cite{lutkepohl2005new}).
-
-\medskip
-
-For this purpose, we use $k < n$ lags of each of the observed $p$ time
-series. The output variables to be explained are:
+others (in the spirit of VAR models, see \cite{lutkepohl2005new}). We use $k < n$ lags of each of the observed $p$ time series. Hence, the output variables (columns of ${\bf Y}$) to be explained are:
 
 \begin{equation}
-Y^{(j)} = \left(X^{(j)}_n, \ldots, X^{(j)}_{k+1} \right)^T
+Y^{(j)} = \left(\alpha^{(j)}_n, \ldots, \alpha^{(j)}_{k+1} \right)^T
 \end{equation}
 
 for $j \in \left\lbrace 1, \ldots,
-p \right\rbrace$. Where $X^{(j)}_n$ is the most contemporaneously observed value
-of the $j^{th}$ time series, and $X^{(j)}_{k+1}$ was observed $k$ dates earlier
-in time for $(X^{(j)}_t)_{t \geq 0}$. These output variables are stored in: $$ \bfY \in \RR^{(n-k) \times p} $$ and the predictors are
+p \right\rbrace$. Where $\alpha^{(j)}_n$ is the most contemporaneously observed value
+of the $j^{th}$ time series, and $\alpha^{(j)}_{k+1}$ was observed $k$ dates earlier
+in time for $(\alpha^{(j)}_t)_{t \geq 0}$. These output variables are stored in: $$ \bfY \in \RR^{(n-k) \times p} $$ and the predictors are
 stored in: $$ \bfX \in \RR^{(n-k) \times (k \times p)} $$
 where $\bfX$ consists in $p$ blocks of $k$ lags, for each one of the observed
 $p$ time series. For example, the $j_0^{th}$ block of ${\bf X}$, for $j_0 \in
 \left\lbrace 1, \ldots, p \right\rbrace$  contains in columns:
 
 \begin{equation}
-\left( X^{(j_0)}_{n-i}, \ldots, X^{(j_0)}_{k+1-i} \right)^T
+\left( \alpha^{(j_0)}_{n-i}, \ldots, \alpha^{(j_0)}_{k+1-i} \right)^T
 \end{equation}
 
 with $i \in
-\left\lbrace 1, \ldots, k \right\rbrace$. If we consider $p = 2$ time series $(X^{(1)}_{t_1}, \ldots,  X^{(1)}_{t_5})$ and $(X^{(2)}_{t_1}, \ldots,  X^{(2)}_{t_5})$ observed at $n = 5$ dates $t_1 < \ldots < t_5$, with $k = 2$ lags,  the response variables are stored in:
+\left\lbrace 1, \ldots, k \right\rbrace$. If we consider the $p = 3$ time series $(\alpha^{(1)}_{t_1}, \ldots,  \alpha^{(1)}_{t_5})$, $(\alpha^{(2)}_{t_1}, \ldots,  \alpha^{(2)}_{t_5})$ and $(\alpha^{(3)}_{t_1}, \ldots,  \alpha^{(3)}_{t_5})$ observed at $n = 5$ dates $t_1 < \ldots < t_5$, with $k = 2$ lags,  the response variables are stored in:
 $$
-\bfY = \left( {\begin{array}{cc} X^{(1)}_{t_5} &  X^{(2)}_{t_5}\\ X^{(1)}_{t_4} & X^{(2)}_{t_4} \\ X^{(1)}_{t_3} & X^{(2)}_{t_3}\      \end{array} } \right)
+\bfY = \left( {\begin{array}{ccc} \alpha^{(1)}_{t_5} &  \alpha^{(2)}_{t_5} &  \alpha^{(3)}_{t_5}\\ \alpha^{(1)}_{t_4} & \alpha^{(2)}_{t_4} & \alpha^{(3)}_{t_4} \\ \alpha^{(1)}_{t_3} & \alpha^{(2)}_{t_3} & \alpha^{(3)}_{t_3}\      \end{array} } \right)
 $$
 The predictors are stored in:
 $$
-\bfX = \left( {\begin{array}{cccc} X^{(1)}_{t_4} & X^{(1)}_{t_3} & X^{(2)}_{t_4} & X^{(2)}_{t_3} \\ X^{(1)}_{t_3} & X^{(1)}_{t_2} & X^{(2)}_{t_3} & X^{(2)}_{t_2} \\ X^{(1)}_{t_2} & X^{(1)}_{t_1} & X^{(2)}_{t_2} & X^{(2)}_{t_1} \      \end{array} }\right)
+\bfX = \left( {\begin{array}{cccccc} \alpha^{(1)}_{t_4} & \alpha^{(1)}_{t_3} & \alpha^{(2)}_{t_4} & \alpha^{(2)}_{t_3} & \alpha^{(3)}_{t_4} & \alpha^{(3)}_{t_3} \\ \alpha^{(1)}_{t_3} & \alpha^{(1)}_{t_2} & \alpha^{(2)}_{t_3} & \alpha^{(2)}_{t_2} & \alpha^{(3)}_{t_3} & \alpha^{(3)}_{t_2} \\ \alpha^{(1)}_{t_2} & \alpha^{(1)}_{t_1} & \alpha^{(2)}_{t_2} & \alpha^{(2)}_{t_1} & \alpha^{(1)}_{t_2} & \alpha^{(1)}_{t_1} \      \end{array} }\right)
 $$
 
 
-It is also possible to add other regressors, such as dummy variables, or indicators of special events. In this situation, as discussed in \cite{exterkate2016nonlinear}, we can avoid the constraining of these dummy variables, in a Kernel ridge regression with unpenalized terms. Here, we consider only the inclusion of the observed time series' lags in the model.
+It is also possible to add other regressors to $\bfX$, such as dummy variables, or indicators of special events. In this situation, and as discussed in \cite{exterkate2016nonlinear}, we can avoid the constraining of these dummy variables, in a Kernel ridge regression with unpenalized terms. Here, we consider only the inclusion of the observed time series' lags in the model.
 
 \section{Description of the KRLS model applied to observed dates and time to maturities}
-\label{sec:purekrls}
+\label{sec:krls}
 
 In this other framework, we consider that the response variable is the spot interest rate observed at time $t$, for time to maturity $\tau$, $R(t, \tau)$. The predictors are the observation date, and the time to maturity. In this setting, we use the following weighted distance between the vectors $(t, \tau)$ in the Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels:
 
