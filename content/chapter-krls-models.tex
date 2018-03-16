@@ -219,7 +219,7 @@ We have:
 
 \end{itemize}
 
-From these expressions of the sensitivities, we can derive the average  marginal effect of a covariate on the response, as demonstrated in equation \ref{average_sensi}. These formulas will be valid in the DNS framework described in section \ref{sec:dnskrls}, where only one lengthscale $l$ parameter is required. Similar types of formulas could be derived in the KRLS framework from section \label{sec:krls}, but they would include two lengthscale parameters. 
+From these expressions of the sensitivities, we can derive the average  marginal effect of a covariate on the response, as demonstrated in equation \ref{average_sensi}. These formulas will be valid in the DNS framework described in section \ref{sec:dnskrls}, where only one length-scale $l$ parameter is required. Similar types of formulas could be derived in the KRLS framework from section \label{sec:krls}, but they would include two length-scale parameters. 
 
 \section{Description of DNS-KRLS model}
 \label{sec:dnskrls}
@@ -293,7 +293,11 @@ It is also possible to add other regressors to $\bfX$, such as dummy variables, 
 \section{Description of the KRLS model applied to observed dates and time to maturities}
 \label{sec:krls}
 
-In this other framework, we consider that the response variable is the spot interest rate observed at time $t$, for time to maturity $\tau$, $R(t, \tau)$. The predictors are the observation date, and the time to maturity. In this setting, we use the following weighted distance between the vectors $(t, \tau)$ in the Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels:
+In this other framework, we consider that the response variable is the spot interest rate observed at time $t$, for time to maturity $\tau$, $R(t, \tau)$. The predictors are the observation date, and the time to maturity. 
+
+\medskip
+
+In this setting, we use the following weighted distance between the vectors $(t, \tau)$ in the Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels:
 
 $$
 r = \sqrt{\frac{||t_i - t_j||^2_2}{l_1^2} + \frac{||\tau_i - \tau_j||^2_2}{l_2^2}}
@@ -325,7 +329,11 @@ $$
        \end{array} } \right)
 $$
 
-In this other setting, it is also possible to add other regressors  such as dummy variables, or indicators of special events. Again, and as suggested in the previous section and in \cite{exterkate2016nonlinear}, we can avoid the constraining of these dummy variables, in a Kernel ridge regression with unpenalized terms. For example, if we wanted to add another indicator $(I_t)_t$ observed at times $t_1 < t_2$, we would have to consider the following matrix of predictors:
+In this other setting, it is also possible to add other regressors  such as dummy variables, or indicators of special events. Again, and as suggested in the previous section and in \cite{exterkate2016nonlinear}, we can avoid the constraining of these dummy variables, in a Kernel ridge regression with unpenalized terms. 
+
+\medskip
+
+For example, if we wanted to add another indicator $(I_t)_t$ observed at times $t_1 < t_2$, we would have to consider the following matrix of predictors:
 
 $$
 \bfX = \left( {\begin{array}{ccc}
@@ -343,7 +351,7 @@ $$
 r = \sqrt{\frac{||t_i - t_j||^2_2}{l_1^2} + \frac{||\tau_i - \tau_j||^2_2}{l_2^2} + \frac{||I_{t_i} - I_{t_j}||^2_2}{l_3^2}}
 $$
 
-In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls} on a training/testing dataset\footnote{for a further treatment, a validation set would be added, in order to verify that the models are not 'overtrained' on this training/testing set}. 
+In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:krls} on a training/testing dataset\footnote{for a further treatment, a validation set would be added, in order to verify that the models are not 'overtrained' on this training/testing set}. 
 
 %\newpage
 
@@ -388,9 +396,15 @@ Maturity & Min & 1st Qrt  & Median  & 3rd Qrt  & Max  \\
 \end{center}
 \end{table}
 
-A rolling forecasting methodology (see \cite{bergmeir2015note}) is implemented in order to obtain the benchmarks between the models. A fixed 12 months/36 months-length window for training the model, and the following 12 months/36 months for testing, the origin of the training set is then advanced of 1 month, and the training/testing procedure is repeated. The measure of forecasting performance is the Root Mean Squared Error ($RMSE$).
+A rolling forecasting methodology (see \cite{bergmeir2015note}) is implemented in order to obtain the benchmarks between the models. It is described in figure \ref{rolling_cv}. A fixed 12 months/36 months-length window for training the model, and the following 12 months/36 months for testing, the origin of the training set is then advanced of 1 month, and the training/testing procedure is repeated. The measure of forecasting performance is the Root Mean Squared Error ($RMSE$).
 
-\medskip
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12cm]{gfx/chapter-krls-models/rolling_cv}
+\caption{rolling forecasting cross-validation sets}
+\label{rolling_cv}
+\end{figure}
+
 
 We use similar grids for all the models, in order to ease the comparability of the results, and avoid too much manual tweaking of the hyperparameters and overtraining the available data. 
 
@@ -451,7 +465,13 @@ Model            & $\sigma$ & $l$ & $l_1$ & $l_2$ & $\lambda$  & $\eta$  & \text
 \end{center}
 \end{table}
 
-We observe that no matter the length of the training/testing window (either $12$ months or $36$ months), or the method employed (either DNS-KRLS or KRLS), the Mat\'ern 3/2 kernel performs better than the other models. It is even performing better on this specific problem with a KRLS model, considering the similarities between vectors of time to maturities and observation dates. In the next section \ref{sec:fcast_curves}, we examine these results further, by looking at the projected discount/discount factors'/discrete forward curves.
+We observe that no matter the length of the training/testing window (either $12$ months or $36$ months), or the method employed (either DNS-KRLS or KRLS), the Mat\'ern 3/2 kernel performs better than the other models. It is even performing better on this specific problem with a KRLS model, considering the similarities between vectors of time to maturities and observation dates. 
+
+\medskip
+
+In the next section \ref{sec:fcast_curves}, we examine these results further, by looking at the projected discount/discount factors'/discrete forward curves.
+
+\newpage
 
 \subsection{Implied forecast term-structure of discrete forward rates}
 \label{sec:fcast_curves}
