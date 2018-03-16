@@ -223,7 +223,14 @@ $$
 
 \medskip
 
-In this chapter, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple training data sets are constructed by randomly picking a fraction of the covariates, and a subset of the lines. Taking a subset of the lines is done by respecting the serial dependence of the series and taking consecutive observations (that is, without skipping any observation) for each bootstrap resample. The predictions associated to each training set resample are then averaged, in order to obtain a single prediction, with a confidence interval around it. Some numerical examples on the application of bagging to RVFL base learners can be found in section \ref{sec:numericalexamples}
+In this chapter, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple samples (training) data sets are constructed by randomly picking a fraction \code{col\underline{ }sample\underline{ }coeff} of the covariates, and a subset (using the fraction \code{row\underline{ }sample\underline{ }coeff}) of the lines, as described in figure \ref{bootstrap_resampling_plot} (using notations from section \ref{sec:basemodeldesc}). Taking a subset of the lines is done by respecting the serial dependence of the series and taking consecutive observations (that is, without skipping any observation) for each bootstrap resample. The predictions associated to each training set resample are then averaged, in order to obtain a single prediction, with a confidence interval around it. Some numerical examples on the application of bagging to RVFL base learners can be found in section \ref{sec:numericalexamples}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12cm]{gfx/chapter-rvfl-ensembles/bootstrap_resampling.png}
+\caption{Construction of $B$ bootstrap resamples by using the initial data}
+\label{bootstrap_resampling_plot}
+\end{figure}
 
 \subsection{Stacking}
 \label{sec:rvflstacking}
@@ -236,23 +243,31 @@ Stacked generalization or stacking, was introduced (cite Wolpert (1992)). It is 
 \item Train the same base learner model on \code{part2} and obtain $n/2$ predictions on \code{part1}.
 \item Train a  meta-learner model on the new data set \code{part3}, consisting in the the original predictors, plus the predictors constructed by applying the base learner model on \code{part1} and \code{part2}.
 \end{itemize}
-
 \medskip
 
-Typically, in this procedure, various types of base learners are used, to increate the diversity of new predictors. Since we are using time series data here, which inherently exhibit a serial dependence between the observations, we have to adapt the procedure described previously. In the case of a 2-fold stacking again, we divide the original training data set  $\textbf{X} \in \RR^{n \times p}$ (with $p$ time series observed at $n$ dates) into two parts: \code{part1} and \code{part2}; each consisting of $n/2$ rows. \code{part1} contains the most ancient observations and \code{part2}, the most recent observations of the time series contained in $\textbf{X}$. Also, we use multiple resamples of the base learner, as follows:
+Typically, in this procedure, various types of base learners are used, to increate the diversity of new predictors. Since we are using time series data here, which inherently exhibit a serial dependence between the observations, we have to adapt the procedure described previously. In the case of a 2-fold stacking again, we divide the original training data set  $\textbf{X} \in \RR^{n \times p}$ (with $p$ time series observed at $n$ dates) into two parts: \code{part1} and \code{part2}; each consisting of $n/2$ rows. \code{part1} contains the most ancient observations and \code{part2}, the most recent observations of the time series contained in $\textbf{X}$. Also, we use multiple resamples of the base learner, as follows (this procedure is also described in figure \ref{rvfl_stacking_plot}):
 
 \begin{itemize}
 \item Train $B$ resampled RVFL models on \code{part1}, using a random subset of \code{part1} in each resampling iteration. Obtain $B$ sets of predictions ($B \times p$ new predictors) with these models, over the whole horizon  of \code{part2}.
 \item Create a new enriched data set \code{part3}, containing the observed time series from \code{part2}, and the $B \times p$ additional series predicted from \code{part1} on \code{part2}.
-\item Use a meta-learner to obtain predictions on the new, enriched data set \code{part3}.
+\item Use a meta-learner to obtain predictions on the new, enriched dataset, \code{part3}.
 \end{itemize}
+
+\newpage
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=14cm]{gfx/chapter-rvfl-ensembles/rvfl_stacking.png}
+\caption{Construction of the enriched/stacked dataset}
+\label{rvfl_stacking_plot}
+\end{figure}
+
 
 For the latter point, we consider a few meta-learner models that have been used in the past in the literature (cite Breiman's Stacked Regressions). In general, the idea is that a relatively simple meta-learner will achieve a good performance. We use the following models for this purpose:
 \begin{itemize}
 \item Linear \textbf{least squares regression} model
 \item Linear least squares regression model \textbf{with positive coefficients} (cite Lawson CL, Hanson RJ (1974)) and Lawson CL, Hanson RJ (1995), as used in (cite Breiman (2001))
 \item \textbf{Ridge regression} with the use of singular values of $\ldots$ (cite Hoerl et Kennard 1970)
-\item \textbf{Elastic net regression} with the use of coordinate descent (cite Friedman, J., Hastie, T. and Tibshirani, R. (2008))
 \end{itemize}
 
 These selected meta-learners are trained on \code{part3}, with the most contemporaneous observations of the series as responses, and their respective lags as predictors. Some numerical examples on the application of stacking to RVFL base learners can be found in section \ref{sec:numericalexamples}
@@ -341,20 +356,28 @@ Also, based on the correlations displayed in figure \ref{corrplot}, the Real con
 \label{corrplot}
 \end{figure}
 
-\newpage
+%\newpage
 
-In sections \ref{bagging_example} and \ref{stacking_example}, we apply the bagging and stacking procedures described in sections \ref{sec:rvflbagging} and \ref{sec:rvflstacking} to the dataset we have just described. The dataset is divided into two parts: 
-\begin{itemize}
-\item A \textbf{training/testing set}: used for applying a rolling forecasting cross-validation method (see \cite{bergmeir2015note}). At the beginning of the procedure, the training set contains $12$ points ($4$ years), and the test set contains $4$ points(1 year). The training set is then advanced of one point forward (rolled), and the procedure is repeated until no more data for the training set are found.  
-\item A \textbf{validation set}: the validation set is used to verify that the parameters produced by the cross-validation from the previous point lead to \textit{good} forecast on unseen data. It contains four points (1-year ahead forecast) for each time series. 
-\end{itemize}
+In sections \ref{bagging_example} and \ref{stacking_example}, we apply the bagging and stacking procedures described in sections \ref{sec:rvflbagging} and \ref{sec:rvflstacking} to the dataset we have just described. 
 
-We use the Root Mean Squared Error (RMSE) as a measure of the out-of-sample error. 
+
+A rolling forecasting cross-validation method (see \cite{bergmeir2015note} and figure \ref{rolling_cv}). At the beginning of the procedure, the training set contains $12$ points ($4$ years), and the test set contains $4$ points(1 year). The training set is then advanced of one point forward (rolled), and the procedure is repeated until no more data for the training set are found.  
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=14cm]{gfx/chapter-rvfl-ensembles/rolling_cv.png}
+\caption{Training and testing sets in rolling forecasting cross-validation}
+\label{rolling_cv}
+\end{figure}
+
+We use the Root Mean Squared Error (RMSE) as a measure of the out-of-sample error. All the benchmarks are made on what is defined as \code{part3} in section \ref{sec:rvflstacking}, in order to have a similar perimeter for bagging and stacking. The results obtained by the ensembles are compared to those obtained by the base RVFL model. 
 
 \subsection{Numerical example for bagging}
 \label{bagging_example}
 
-
+In this example, we use $B = 100$ resamples of the data, and calculate the average out-of-sample RMSE obtained by the ensemble model on all the testing sets (see figure \ref{rolling_cv}). The dataset used, is the one defined as \code{part3} in section \ref{sec:rvflstacking}.  
 
 \subsection{Numerical example for stacking}
 \label{stacking_example}
+
+We calculate the average out-of-sample RMSE obtained by the ensemble model on all the testing sets (see figure \ref{rolling_cv}). The dataset used, is the one defined as \code{part3} in section \ref{sec:rvflstacking}.
