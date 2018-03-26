@@ -7,7 +7,7 @@
 
 \section{Introduction}
 
-In this chapter, we apply Kernel Regularized Least Squares (KRLS) learning methods to Yield Curve forecasting. By 'Yield Curve', we actually mean a discount curves. That is, we consider that the curves used in the examples do not include any counterparty credit risk, and focus on the forecasting problem. Two types of formulations of the spot rates' forecasting problem are tested here. One relying on the popular Dynamic Nelson-Siegel (DNS) framework from \cite{diebold2006forecasting}, and another one, in which we apply the KRLS directly to the Yield Curve observation dates and time to maturities, to model the spot rates.
+In this chapter, we apply Kernel Regularized Least Squares (KRLS) learning methods to Yield Curve forecasting. By 'Yield Curve', we actually mean 'discount curves'. That is, we consider that the curves used in the examples do not include any counterparty credit risk, and focus on the forecasting problem. Two types of formulations of the spot rates' forecasting problem are tested here. One relying on the popular Dynamic Nelson-Siegel (DNS) framework from \cite{diebold2006forecasting}, and another one, in which we apply the KRLS directly to the Yield Curve observation dates and time to maturities, to model the spot rates.
 
 \medskip
 
@@ -131,8 +131,16 @@ $$
 \textbf{K}_{ij} = K_{5/2}(r) = \sigma^2 \left( 1 + \frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right) exp \left( - \frac{\sqrt{5}r}{l} \right)
 $$
 
+Figure \ref{cov_functions} below, provides more insights on the kernels we have just defined; $K_{Gauss}$,  $K_{Mat\'ern 3/2}$ and $K_{Mat\'ern 5/2}$, for $\sigma^2 = 1$ and $l = 1$.
 
-\medskip
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=14cm]{gfx/chapter-krls-models/covariance_functions.png}
+\caption{\textbf{Left:} covariance functions; \textbf{Right:} random simulations from a multivariate Gaussian distribution $\MN(\textbf{0}, K)$ , with $\sigma^2 = 1$ and $l = 1$. The sample functions on the right were obtained using a discretization of the x-axis of 1000 equally-spaced points}
+\label{cov_functions}
+\end{figure}
+
+The Gaussian kernel is the more flexible of the three kernels; then, comes the Mat\'ern 5/2, and to finish, the Mat\'ern 3/2. We observe in figure \ref{cov_functions} that the more flexible the kernel, the higher the covariance associated to observations that are close to each other (that are similar). This relationship is inverted as the distance between the observations grows, but with a lower magnitude. 
 
 Another interesting feature of KRLS learning, is the possibility to derive estimators for the  marginal effects of the covariates on the response. For example, (and like in Ferwerda, Hainmueller et Hazlett (2017)), since we have the relationship ~\ref{eq:comblinresponse}, we can write for a fixed $j_0 \in \left \lbrace 1, \ldots, p \right \rbrace$ and for any $k \in \left \lbrace 1, \ldots, n \right \rbrace $, :
 
@@ -149,80 +157,12 @@ That's an approximation of how much of an increase (at the first order) we obtai
 \frac{1}{n}\sum_{k = 1}^n \frac{\partial y_i}{\partial x_k^{(j_0)}} = \frac{1}{n}\sum_{k = 1}^n c_k \frac{\partial K(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}}
 \end{equation}
 
-\medskip
-
 In section \ref{sec:sensitivity}, we derive formulas for the sensitivities of the response variable $y_i$ to a change in the covariates $\textbf{x}^{(j)}$. We do this for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels. These sensitivities can then be plugged into formula \ref{average_sensi}, in order to obtain average marginal effects of the covariates on the response.
 
-\section{Sensitivity of the response to a change in the covariates}
-\label{sec:sensitivity}
-
-We let $r^2$ be:
-
-$$
-r^2 := || \textbf{x}_i - \textbf{x}_k ||^2_2 = (\textbf{x}_i - \textbf{x}_k)^T(\textbf{x}_i - \textbf{x}_k)
-$$
-
-Hence:
-$$
-\frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}} = -2\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)
-$$
-
-And:
-$$
-\frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} = \frac{1}{2r}\frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}} = -\frac{1}{r}\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)
-$$
-
-\medskip
-
-As a consequence: 
-
-\begin{itemize}
-
-\item For the \textbf{Gaussian kernel} 
-$$
-(\textbf{x}_i, \textbf{x}_k) \mapsto \sigma^2 exp \left( -\frac{r^2}{2l^2} \right)
-$$ 
-We have:
-
-\begin{eqnarray*}
-\frac{\partial K_{Gauss}(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}} &=& -\frac{\sigma^2}{2l^2} exp \left(-\frac{r^2}{2l^2} \right) \frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}}\\
-&=& -\frac{\sigma^2}{2l^2} exp \left(-\frac{r^2}{2l^2} \right) \left[ -2\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \right]\\
-&=& \frac{\sigma^2}{l^2} exp \left(-\frac{r^2}{2l^2} \right) \left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \\
-&=& \frac{\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)}{l^2} K_{Gauss}(\textbf{x}_i, \textbf{x}_k)\\
-\end{eqnarray*}
-
-\item For the \textbf{Mat\'ern 3/2 kernel} 
-$$
-(\textbf{x}_i, \textbf{x}_k) \mapsto \sigma^2 \left( 1 + \frac{\sqrt{3}r}{l} \right) exp \left( - \frac{\sqrt{3}r}{l} \right)
-$$ 
-We have:
-
-\begin{eqnarray*}
-\frac{\partial K_{3/2}(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}} &=& \sigma^2 \frac{\sqrt{3}}{l} exp \left( - \frac{\sqrt{3}}{l} r\right) \left[   \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}}  - \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} \left( 1 + \frac{\sqrt{3}}{l}r \right) \right]\\
-&=&  \sigma^2 \frac{\sqrt{3}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} exp \left( - \frac{\sqrt{3}}{l} r\right) \left[1  -  \left( 1 + \frac{\sqrt{3}}{l}r \right) \right]\\
-&=& \sigma^2 \frac{\sqrt{3}}{l} exp \left( - \frac{\sqrt{3}}{l} r\right) \frac{\sqrt{3}\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)}{l} \\
-\end{eqnarray*}
-
-\item For the \textbf{Mat\'ern 5/2 kernel} 
-$$
-(\textbf{x}_i, \textbf{x}_k) \mapsto \sigma^2 \left( 1 + \frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right) exp \left( - \frac{\sqrt{5}r}{l} \right)
-$$
-We have:
-
-\begin{eqnarray*}
-\frac{\partial K_{5/2}(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}} &=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left[ \left( \frac{\sqrt{5}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} + \frac{5}{3 l^2} \frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}} \right)  - \frac{\sqrt{5}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}}\left( 1 + \frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right)\right] \\
-&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left[ \frac{5}{3 l^2} \frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}}  - \frac{\sqrt{5}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}}\left(\frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right)\right] \\
-&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \left[ -2\frac{5}{3 l^2} + \frac{1}{r}\frac{\sqrt{5}}{l} \left(\frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right)\right] \\
-%&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \left[ -\frac{10}{3 l^2} + \frac{5}{l^2} + \frac{5\sqrt{5} r}{3 l^3} \right] \\
-&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \frac{5}{3l^2} \left( 1 + \frac{\sqrt{5} r}{l} \right)\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)\\
-\end{eqnarray*}
-
-\end{itemize}
-
-From these expressions of the sensitivities, we can derive the average  marginal effect of a covariate on the response, as demonstrated in equation \ref{average_sensi}. These formulas will be valid in the DNS framework described in section \ref{sec:dnskrls}, where only one length-scale $l$ parameter is required. Similar types of formulas could be derived in the KRLS framework from section \label{sec:krls}, but they would include two length-scale parameters. 
-
-\section{Description of DNS-KRLS model}
+\section{Description of the DNS-KRLS model and model's sensitivity}
 \label{sec:dnskrls}
+
+\subsection{The DNS-KRLS model}
 
 In the DNS framework (\cite{diebold2006forecasting}), the spot interest rates observed at time $t$, for time to maturity $\tau$ are modeled as:
 \begin{equation}
@@ -290,8 +230,83 @@ $$
 
 It is also possible to add other regressors to $\bfX$, such as dummy variables, or indicators of special events. In this situation, and as discussed in \cite{exterkate2016nonlinear}, we can avoid the constraining of these dummy variables, in a Kernel ridge regression with unpenalized terms. Here, we consider only the inclusion of the observed time series' lags in the model.
 
+\subsection{Sensitivity of the response to a change in the covariates}
+\label{sec:sensitivity}
+
+Here, the response is the matrix $\bfY$ described in the previous section. Thus, we are deriving the sensitivity of level, slope, and curvature, to the changes in their associated lags. 
+
+\medskip
+
+We let $r^2$ be:
+
+$$
+r^2 := || \textbf{x}_i - \textbf{x}_k ||^2_2 = (\textbf{x}_i - \textbf{x}_k)^T(\textbf{x}_i - \textbf{x}_k)
+$$
+
+Where $\textbf{x}_i$ is the $i^{-th}$ line of matrix $\bfX$. Hence:
+$$
+\frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}} = -2\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)
+$$
+
+And:
+$$
+\frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} = \frac{1}{2r}\frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}} = -\frac{1}{r}\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)
+$$
+
+%\medskip
+
+As a consequence: 
+
+\begin{itemize}
+
+\item For the \textbf{Gaussian kernel} 
+$$
+(\textbf{x}_i, \textbf{x}_k) \mapsto \sigma^2 exp \left( -\frac{r^2}{2l^2} \right)
+$$ 
+We have:
+
+\begin{eqnarray*}
+\frac{\partial K_{Gauss}(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}} &=& -\frac{\sigma^2}{2l^2} exp \left(-\frac{r^2}{2l^2} \right) \frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}}\\
+&=& -\frac{\sigma^2}{2l^2} exp \left(-\frac{r^2}{2l^2} \right) \left[ -2\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \right]\\
+&=& \frac{\sigma^2}{l^2} exp \left(-\frac{r^2}{2l^2} \right) \left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \\
+&=& \frac{\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)}{l^2} K_{Gauss}(\textbf{x}_i, \textbf{x}_k)\\
+\end{eqnarray*}
+
+\item For the \textbf{Mat\'ern 3/2 kernel} 
+$$
+(\textbf{x}_i, \textbf{x}_k) \mapsto \sigma^2 \left( 1 + \frac{\sqrt{3}r}{l} \right) exp \left( - \frac{\sqrt{3}r}{l} \right)
+$$ 
+We have:
+
+\begin{eqnarray*}
+\frac{\partial K_{3/2}(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}} &=& \sigma^2 \frac{\sqrt{3}}{l} exp \left( - \frac{\sqrt{3}}{l} r\right) \left[   \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}}  - \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} \left( 1 + \frac{\sqrt{3}}{l}r \right) \right]\\
+&=&  \sigma^2 \frac{\sqrt{3}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} exp \left( - \frac{\sqrt{3}}{l} r\right) \left[1  -  \left( 1 + \frac{\sqrt{3}}{l}r \right) \right]\\
+&=& \sigma^2 \frac{\sqrt{3}}{l} exp \left( - \frac{\sqrt{3}}{l} r\right) \frac{\sqrt{3}\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)}{l} \\
+\end{eqnarray*}
+
+\item For the \textbf{Mat\'ern 5/2 kernel} 
+$$
+(\textbf{x}_i, \textbf{x}_k) \mapsto \sigma^2 \left( 1 + \frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right) exp \left( - \frac{\sqrt{5}r}{l} \right)
+$$
+We have:
+
+\begin{eqnarray*}
+\frac{\partial K_{5/2}(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}} &=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left[ \left( \frac{\sqrt{5}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}} + \frac{5}{3 l^2} \frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}} \right)  - \frac{\sqrt{5}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}}\left( 1 + \frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right)\right] \\
+&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left[ \frac{5}{3 l^2} \frac{\partial r^2}{\partial \textbf{x}_k^{(j_0)}}  - \frac{\sqrt{5}}{l} \frac{\partial r}{\partial \textbf{x}_k^{(j_0)}}\left(\frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right)\right] \\
+&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \left[ -2\frac{5}{3 l^2} + \frac{1}{r}\frac{\sqrt{5}}{l} \left(\frac{\sqrt{5}r}{l} + \frac{5 r^2}{3 l^2} \right)\right] \\
+%&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right) \left[ -\frac{10}{3 l^2} + \frac{5}{l^2} + \frac{5\sqrt{5} r}{3 l^3} \right] \\
+&=& \sigma^2 exp\left(-\frac{\sqrt{5}}{l}r\right) \frac{5}{3l^2} \left( 1 + \frac{\sqrt{5} r}{l} \right)\left(\textbf{x}_i^{(j_0)} - \textbf{x}_k^{(j_0)} \right)\\
+\end{eqnarray*}
+
+\end{itemize}
+
+From these expressions of the sensitivities, we can derive the average  marginal effect of a covariate on the response, as demonstrated in equation \ref{average_sensi}. These formulas will be valid in the DNS framework described in section \ref{sec:dnskrls}, where only one length-scale $l$ parameter is required. Similar types of formulas could be derived in the KRLS framework from section \label{sec:krls}, but they would include two length-scale parameters. 
+
+
 \section{Description of the KRLS model applied to observed dates and time to maturities}
 \label{sec:krls}
+
+\subsection{Description of the model}
 
 In this other framework, we consider that the response variable is the spot interest rate observed at time $t$, for time to maturity $\tau$, $R(t, \tau)$. The predictors are the observation date, and the time to maturity. 
 
@@ -300,7 +315,7 @@ In this other framework, we consider that the response variable is the spot inte
 In this setting, we use the following weighted distance between the vectors $(t, \tau)$ in the Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels:
 
 $$
-r = \sqrt{\frac{||t_i - t_j||^2_2}{l_1^2} + \frac{||\tau_i - \tau_j||^2_2}{l_2^2}}
+r = \sqrt{\frac{(t_i - t_j)^2}{l_1^2} + \frac{(\tau_i - \tau_j)^2}{l_2^2}}
 $$
 
 So that here, the spot rates values are explained as linear combination of distances between vectors of  time to maturities and observation dates $(t_i, \tau_i)$ and $(t_j, \tau_j)$. In this setting, if we consider $10$ spot rates observed at $2$ dates $t_1 < t_2$ and $5$ time to maturities $\tau_1, \ldots, \tau_5$, the response variable is:
@@ -348,17 +363,74 @@ $$
 And another weighted distance in the Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels, taking into account the new indicator $(I_t)_t$:
 
 $$
-r = \sqrt{\frac{||t_i - t_j||^2_2}{l_1^2} + \frac{||\tau_i - \tau_j||^2_2}{l_2^2} + \frac{||I_{t_i} - I_{t_j}||^2_2}{l_3^2}}
+r = \sqrt{\frac{(t_i - t_j)^2}{l_1^2} + \frac{(\tau_i - \tau_j)^2}{l_2^2} + \frac{(I_{t_i} - I_{t_j})^2}{l_3^2}}
 $$
 
-In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:krls} on a training/testing dataset\footnote{for a further treatment, a validation set would be added, in order to verify that the models are not 'overtrained' on this training/testing set}. 
+
+\subsection{Sensitivity of the spot rates to a change in observation date and time to maturity}
+
+In this framework, and as mentioned in the previous section, we consider the following measure of similarity/dissimilarity between $\textbf{x}_i = (t_i, \tau_i)$ and $\textbf{x}_k = (t_k, \tau_k)$:  
+$$
+r^2 = \frac{(t_i - t_k)^2}{l_1^2} + \frac{(\tau_i - \tau_k)^2}{l_2^2}
+$$
+
+The associated kernels are the following ones: 
+$$
+(\textbf{x}_i, \textbf{x}_k) \mapsto K_{Gauss}(r) = \sigma^2 exp\left(-\frac{r^2}{2}\right)
+$$
+
+$$
+(\textbf{x}_i, \textbf{x}_k) \mapsto K_{Mat\'ern3/2}(r) = \sigma^2 \left(1 +  \sqrt{3}{r}\right) exp\left(-\sqrt{3}{r}\right)
+$$
+
+and 
+
+$$
+(\textbf{x}_i, \textbf{x}_k) \mapsto K_{Mat\'ern5/2}(r) = \sigma^2 \left(1 +  \sqrt{5}{r} + \frac{5}{3} r^2\right) exp\left(-\sqrt{5}{r}\right)
+$$
+
+It is possible to obtain the sensitivity of the spot rates to a change in the observation date, $\frac{\partial R(t_k, \tau)}{\partial t_k}$ for any $\tau$. Even if it is actually very difficult to predict in which direction the spot rates will move, this type of indicators could still serve as decision-assistance tools for risk management.  
+
+In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:krls} on a training/testing dataset\footnote{for a further treatment, a validation set would be added, in order to verify that the models are not 'overtrained' on this training/testing set}. We have: 
+
+$$
+\frac{\partial r^2}{\partial t_k} = -\frac{2(t_i - t_k)}{l_1^2} 
+$$
+
+and 
+
+$$
+\frac{\partial r}{\partial t_k} = -\frac{1}{r} \frac{(t_i - t_k)}{l_1^2} 
+$$
+
+Thus, we have: 
+
+\begin{eqnarray*}
+\frac{\partial K_{Gauss}(r)}{\partial t_k} &=& -\frac{\sigma^2}{2} exp \left(-\frac{r^2}{2} \right) \frac{\partial r^2}{\partial t_k}\\
+&=& \sigma^2 exp \left(-\frac{r^2}{2} \right) \frac{(t_i - t_k)}{l_1^2}\\
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\frac{\partial Mat\'ern3/2}{\partial t_k} &=& \sigma^2 \sqrt{3} \frac{\partial r}{\partial t_k}exp\left(-\sqrt{3}r \right)\left[ 1 - (1 + \sqrt{3}r)\right]\\
+&=& -3 \sigma^2 r exp\left(-\sqrt{3}r \right) \frac{\partial r}{\partial t_k}\\
+&=& 3 \sigma^2 exp\left(-\sqrt{3}r \right) \frac{(t_i - t_k)}{l_1^2}
+\end{eqnarray*}
+
+and 
+
+\begin{eqnarray*}
+\frac{\partial Mat\'ern5/2}{\partial t_k} &=& \sigma^2 exp\left(-\sqrt{5}r \right) \left[ \left(\sqrt{5}\frac{\partial r}{\partial t_k} + \frac{5}{3}\frac{\partial r^2}{\partial t_k} \right) - \sqrt{5}\frac{\partial r}{\partial t_k} \left(1 + \sqrt{5}r + \frac{5}{3} r^2 \right)\right]\\
+&=& \sigma^2 exp\left(-\sqrt{5}r \right) \left[ \frac{5}{3}\frac{\partial r^2}{\partial t_k} - \sqrt{5}\frac{\partial r}{\partial t_k} \left(\sqrt{5}r + \frac{5}{3} r^2 \right) \right]\\
+&=& \sigma^2 exp\left(-\sqrt{5}r \right) \left[ -\frac{10}{3}\frac{(t_i - t_k)}{l_1^2} + \frac{\sqrt{5}}{r}\frac{(t_i - t_k)}{l_1^2} \left(\sqrt{5}r + \frac{5}{3} r^2 \right)\right]\\
+&=& \sigma^2 exp\left(-\sqrt{5}r \right) \frac{5}{3} \left[ 1 + \sqrt{5}r \right]\frac{(t_i - t_k)}{l_1^2}
+\end{eqnarray*}
 
 %\newpage
 
 \section{Numerical examples}
 \label{sec:numericalexamples}
 
-In this section, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:purekrls}. The examples are not exhaustive benchmarks, but aim at illustrating the forecasting capabilities of the models. 
+In this section, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:krls}. The examples are not exhaustive benchmarks, but aim at illustrating the forecasting capabilities of the models. 
 
 \medskip
 
@@ -377,7 +449,7 @@ In figure ~\ref{db_zerorates}, we present the data that we use, and table ~\ref{
 \label{db_zerorates}
 \end{figure}
 
-\begin{table}
+\begin{table}[!htb]
 \begin{center}
 % table caption is above the table
 \caption{Summary of observed discount rates from Deutsche Bundesbank website, from 2002 to the end 2015}
@@ -400,7 +472,7 @@ A rolling forecasting methodology (see \cite{bergmeir2015note}) is implemented i
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=12cm]{gfx/chapter-krls-models/rolling_cv}
+\includegraphics[width=13.5cm]{gfx/chapter-krls-models/rolling_cv}
 \caption{rolling forecasting cross-validation sets}
 \label{rolling_cv}
 \end{figure}
@@ -410,7 +482,7 @@ We use similar grids for all the models, in order to ease the comparability of t
 
 \medskip
 
-Hence for both models, DNS-KRLS (from section \ref{sec:dnskrls}) and KRLS (from section \ref{sec:purekrls}), we consider $5$ values of $\sigma$ (variance parameter), $l$, $l_1$, $l_2$ (length-scale parameters for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels) and $\lambda$ (the regularization parameter for all the kernels) regularly spaced between $\left[ 10^{-2}, 10^2\right]$: $0.01, 0.1, 1, 10, 100$. 
+Hence for both models, DNS-KRLS (from section \ref{sec:dnskrls}) and KRLS (from section \ref{sec:krls}), we consider $5$ values of $\sigma$ (variance parameter), $l$, $l_1$, $l_2$ (length-scale parameters for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels) and $\lambda$ (the regularization parameter for all the kernels) regularly spaced between $\left[ 10^{-2}, 10^2\right]$: $0.01, 0.1, 1, 10, 100$. 
 
 \medskip
 
@@ -419,7 +491,7 @@ For the additional parameter $\eta$ in the DNS-KRLS model, we use 5 values compr
 
 \subsection{Cross-validation results}
 
-The results obtained after the cross-validation procedure are reported in table \ref{tab:avg_oos_rmse12} and \ref{tab:avg_oos_rmse36}. 
+The results obtained after the cross-validation procedure are reported in table \ref{tab:avg_oos_rmse12} and \ref{tab:avg_oos_rmse36}. The results obtained by considering an automatic ARIMA modeling (cite Hyndman et al.) of the three time series are also indicated, to serve as a benchmark. 
 
 \begin{table}[!htb]
 \begin{center}
@@ -432,12 +504,13 @@ The results obtained after the cross-validation procedure are reported in table 
 Model              & $\sigma$ & $l$ & $l_1$ & $l_2$  & $\lambda$  & $\eta$  & \textbf{RMSE}  \\
 \noalign{\smallskip}\hline\noalign{\smallskip}
   Gaussian         &    10 &  - &   0.01&    10 &    10 & - & 0.5839150 \\
-  Mat\'ern 3/2     &   100 &  - & 1 & 100 &   0.1 & - & \textbf{0.5136373}\\
+  Mat\'ern 3/2     &   100 &  - & 1 & 100 &   0.01 & - & \textbf{0.5136373}\\
   Mat\'ern 5/2     &   1 & - & 0.01 & 10 & 0.1 & - & 0.5781184\\
 \noalign{\smallskip}\hline\noalign{\smallskip}
   DNS-Gaussian     & 0.1 & 10 & - & - & 0.01 & 15.5 & 0.6041652\\
   DNS-Mat\'ern 3/2 & 100 & 1 & - & - & 0.01 & 22.75 & \textbf{0.6038667}\\
   DNS-Mat\'ern 5/2 & 100 & 1 & - & - & 0.01 & 15.5 & 0.6041580\\
+  DNS-ARIMA & - & - & - & - & - & 1 & 0.6751660\\
 \noalign{\smallskip}\hline
 \end{tabular}
 \end{center}
@@ -460,26 +533,194 @@ Model            & $\sigma$ & $l$ & $l_1$ & $l_2$ & $\lambda$  & $\eta$  & \text
   DNS-Gaussian     & 0.01 & 0.01 & - & - & 0.01 & 30 & 1.264533 \\
   DNS-Mat\'ern 3/2 & 0.01 & 0.01 & - & - & 0.01 & 30 & \textbf{1.264533} \\
   DNS-Mat\'ern 5/2 & 0.01 & 0.01 & - & - & 0.01 & 30 & 1.264533 \\
+  DNS-ARIMA & - & - & - & - & - & 1 & 1.281937 \\
 \noalign{\smallskip}\hline
 \end{tabular}
 \end{center}
 \end{table}
+For the DNS model and all the types of kernels (Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2), the \textit{optimal} number of lags is respectively equal to $5$ and $6$ for the $12$-months and $36$-months horizons. The last 12 months and 36 months of the data are respectively considered as training sets for obtaining these graphs. 
 
-We observe that no matter the length of the training/testing window (either $12$ months or $36$ months), or the method employed (either DNS-KRLS or KRLS), the Mat\'ern 3/2 kernel performs better than the other models. It is even performing better on this specific problem with a KRLS model, considering the similarities between vectors of time to maturities and observation dates. 
+\newpage
 
-\medskip
+We observe that no matter the length of the training/testing window (either $12$ months or $36$ months), or the method employed (either DNS-KRLS or KRLS), the Mat\'ern 3/2 kernel performs better than the other models. It is even performing better on this specific problem with a KRLS model, considering the similarities between vectors of time to maturities and observation dates. The other kernels are probably too flexible for the purpose, so that they are both overfitting the data a bit. 
 
-In the next section \ref{sec:fcast_curves}, we examine these results further, by looking at the projected discount/discount factors'/discrete forward curves.
+In the next sections \ref{sec:graph_rmse} and \ref{sec:fcast_curves}, we examine these results further, by looking at the out-of-sample root mean squared error (RMSE) obtained over time, and the projected discount/discount factors'/discrete forward curves obtained with the optimal parameters.
+
+\newpage
+
+\subsection{Out-of-sample RMSE over time}
+\label{sec:graph_rmse}
+
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12cm]{gfx/chapter-krls-models/krls_oos_rmse_1}
+\caption{Out-of-sample RMSE over time for KRLS models, with horizon = 12 and horizon = 36}
+\label{oos_rmse_krls}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12cm]{gfx/chapter-krls-models/krls_oos_rmse_2}
+\caption{Out-of-sample RMSE over time for DNS-KRLS, with horizon = 12 and horizon = 36}
+\label{oos_rmse_dns_krls}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12cm]{gfx/chapter-krls-models/oos_rmse_dns_krls_1}
+\caption{Boxplots for Out-of-sample RMSE over time}
+\label{oos_rmse_dns_krls_1}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12cm]{gfx/chapter-krls-models/oos_rmse_dns_krls_2}
+\caption{Boxplots for Out-of-sample RMSE over time}
+\label{oos_rmse_dns_krls_2}
+\end{figure}
 
 \newpage
 
 \subsection{Implied forecast term-structure of discrete forward rates}
 \label{sec:fcast_curves}
 
+The following figure, \ref{fcast_matern32}, presents the $12$-months ahead and $36$-months ahead ($h = 12$ and $h = 36$) forecasts obtained in the KRLS framework, by considering a Mat\'ern 3/2 kernel. 
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12.5cm]{gfx/chapter-krls-models/fcast_matern32}
+\caption{discount rates, discount factors and discrete forward rates for Mat\'ern 3/2}
+\label{fcast_matern32}
+\end{figure}
+
+Similarly, the following figure, \ref{fcast_ns_matern32}, presents the $12$-months ahead and $36$-months ahead ($h = 12$ and $h = 36$) forecasts obtained in the DNS-KRLS framework, by considering a Mat\'ern 3/2 kernel for forecasting the factors. 
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12.5cm]{gfx/chapter-krls-models/fcast_ns_matern32}
+\caption{discount rates, discount factors and discrete forward rates for DNS-Mat\'ern 3/2}
+\label{fcast_ns_matern32}
+\end{figure}
+
+These (figures \ref{fcast_matern32} and \ref{fcast_ns_matern32}) can be compared to a more familiar model, the one in which the level, slope, and curvature are modelled separately with an ARIMA model in a DNS framework. 
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12.5cm]{gfx/chapter-krls-models/fcast_ns_arima}
+\caption{discount rates, discount factors and discrete forward rates for DNS-ARIMA}
+\label{fcast_ns_arima}
+\end{figure}
+
+We observe that the discount (rates and factors) and forward curves obtained by each model do, indeed, exhibit the same patterns as actual market discount and discrete forward curves. In particular, for the projected negative rates, we observe projected discount factors that are greater than $1$. 
+
+\newpage
 
 \section{Conclusion}
 
 \newpage
 
-\nocite{wickham2016ggplot2}
+\section{Appendix}
+
+\subsection{Summary of KRLS Mat\'ern 3/2 and DNS-ARIMA forecasts (in \%) for horizon = 12 and horizon = 36}
+
+\textbf{KRLS Mat\'ern 3/2}
+
+\textbf{horizon = 12}
+
+\begin{verbatim}
+1y                5y              10y              30y       
+ Min.   :-0.1135   Min.   :0.1538   Min.   :0.8424   Min.   :1.509  
+ 1st Qu.:-0.1105   1st Qu.:0.1588   1st Qu.:0.8441   1st Qu.:1.514  
+ Median :-0.1091   Median :0.1636   Median :0.8456   Median :1.520  
+ Mean   :-0.1097   Mean   :0.1632   Mean   :0.8453   Mean   :1.520  
+ 3rd Qu.:-0.1084   3rd Qu.:0.1680   3rd Qu.:0.8468   3rd Qu.:1.526  
+ Max.   :-0.1078   Max.   :0.1708   Max.   :0.8471   Max.   :1.533
+\end{verbatim}
+
+\textbf{horizon = 36}
+
+\begin{verbatim}
+1y                 5y              10y              30y       
+ Min.   :-0.11114   Min.   :0.1066   Min.   :0.6661   Min.   :1.449  
+ 1st Qu.:-0.08006   1st Qu.:0.1120   1st Qu.:0.6823   1st Qu.:1.472  
+ Median :-0.02946   Median :0.1273   Median :0.7121   Median :1.495  
+ Mean   :-0.02263   Mean   :0.1324   Mean   :0.7262   Mean   :1.494  
+ 3rd Qu.: 0.03020   3rd Qu.:0.1490   3rd Qu.:0.7619   3rd Qu.:1.517  
+ Max.   : 0.09165   Max.   :0.1804   Max.   :0.8374   Max.   :1.535 
+\end{verbatim}
+
+\textbf{DNS-ARIMA}
+
+\textbf{horizon = 12}
+\begin{verbatim}
+1y                 5y              10y              30y       
+ Min.   :-0.15142   Min.   :0.2295   Min.   :0.9237   Min.   :1.429  
+ 1st Qu.:-0.14819   1st Qu.:0.2305   1st Qu.:0.9242   1st Qu.:1.429  
+ Median :-0.13914   Median :0.2333   Median :0.9256   Median :1.429  
+ Mean   :-0.12468   Mean   :0.2379   Mean   :0.9279   Mean   :1.430  
+ 3rd Qu.:-0.11405   3rd Qu.:0.2412   3rd Qu.:0.9296   3rd Qu.:1.431  
+ Max.   :-0.04527   Max.   :0.2628   Max.   :0.9405   Max.   :1.434 
+\end{verbatim}
+
+\textbf{horizon = 36}
+\begin{verbatim}
+ 1y                 5y              10y              30y       
+ Min.   :0.003647   Min.   :0.2782   Min.   :0.9482   Min.   :1.437  
+ 1st Qu.:0.003647   1st Qu.:0.2782   1st Qu.:0.9482   1st Qu.:1.437  
+ Median :0.003647   Median :0.2782   Median :0.9482   Median :1.437  
+ Mean   :0.003647   Mean   :0.2782   Mean   :0.9482   Mean   :1.437  
+ 3rd Qu.:0.003647   3rd Qu.:0.2782   3rd Qu.:0.9482   3rd Qu.:1.437  
+ Max.   :0.003647   Max.   :0.2782   Max.   :0.9482   Max.   :1.437
+\end{verbatim}
+
+\subsection{Summary of out-of-sample errors for all the models (in \%)}
+
+\textbf{KRLS, h = 12}
+
+\begin{verbatim}
+ gaussian         matern32         matern52     
+ Min.   :0.2114   Min.   :0.1726   Min.   :0.2012  
+ 1st Qu.:0.3582   1st Qu.:0.3009   1st Qu.:0.3669  
+ Median :0.4828   Median :0.4498   Median :0.4777  
+ Mean   :0.5839   Mean   :0.5136   Mean   :0.5781  
+ 3rd Qu.:0.7216   3rd Qu.:0.6158   3rd Qu.:0.6914  
+ Max.   :1.7562   Max.   :1.6886   Max.   :1.7795  
+\end{verbatim}
+
+\textbf{KRLS, h = 36}
+
+\begin{verbatim}
+   gaussian         matern32         matern52     
+ Min.   :0.7343   Min.   :0.4130   Min.   :0.4953  
+ 1st Qu.:0.9193   1st Qu.:0.6775   1st Qu.:0.8860  
+ Median :1.0727   Median :0.8422   Median :1.0529  
+ Mean   :1.1707   Mean   :1.0032   Mean   :1.1348  
+ 3rd Qu.:1.2824   3rd Qu.:1.3548   3rd Qu.:1.2639  
+ Max.   :1.9723   Max.   :2.4080   Max.   :2.0797 
+\end{verbatim}
+
+\textbf{DNS-KRLS, h = 12}
+
+\begin{verbatim}
+ gaussian         matern32         matern52          arima       
+ Min.   :0.2048   Min.   :0.2103   Min.   :0.2048   Min.   :0.2077  
+ 1st Qu.:0.4016   1st Qu.:0.3934   1st Qu.:0.3997   1st Qu.:0.3779  
+ Median :0.5366   Median :0.5368   Median :0.5366   Median :0.5649  
+ Mean   :0.6042   Mean   :0.6039   Mean   :0.6042   Mean   :0.6752  
+ 3rd Qu.:0.7281   3rd Qu.:0.7277   3rd Qu.:0.7281   3rd Qu.:0.8190  
+ Max.   :1.6884   Max.   :1.6870   Max.   :1.6884   Max.   :1.9544 
+\end{verbatim}
+
+\textbf{DNS-KRLS, h = 36}
+
+\begin{verbatim}
+ gaussian         matern32         matern52          arima       
+ Min.   :0.7900   Min.   :0.7900   Min.   :0.7900   Min.   :0.4698  
+ 1st Qu.:0.9294   1st Qu.:0.9294   1st Qu.:0.9294   1st Qu.:0.8527  
+ Median :1.3005   Median :1.3005   Median :1.3005   Median :1.1545  
+ Mean   :1.2645   Mean   :1.2645   Mean   :1.2645   Mean   :1.2819  
+ 3rd Qu.:1.5158   3rd Qu.:1.5158   3rd Qu.:1.5158   3rd Qu.:1.6033  
+ Max.   :1.7549   Max.   :1.7549   Max.   :1.7549   Max.   :3.2024  
+\end{verbatim}
 
