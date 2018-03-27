@@ -7,19 +7,19 @@
 
 \section{Introduction}
 
-In this chapter, we apply Kernel Regularized Least Squares (KRLS) learning methods to Yield Curve forecasting. By 'Yield Curve', we actually mean 'discount curves'. That is, we consider that the curves used in the examples do not include any counterparty credit risk, and focus on the forecasting problem. Two types of formulations of the spot rates' forecasting problem are tested here. One relying on the popular Dynamic Nelson-Siegel (DNS) framework from \cite{diebold2006forecasting}, and another one, in which we apply the KRLS directly to the Yield Curve observation dates and time to maturities, to model the spot rates.
+In this chapter, we apply Kernel Regularized Least Squares (KRLS) learning methods to Yield Curve forecasting. By \textit{Yield Curve}, we actually mean \textit{discount curves}. That is, we consider that the curves used in the examples do not include any counterparty credit risk, and focus on the forecasting problem. Two types of formulations of the spot rates' forecasting problem are tested here. One relying on the popular Dynamic Nelson-Siegel (DNS) framework from \cite{diebold2006forecasting}, and another one, in which we apply the KRLS directly to the discount curves' observation dates and time to maturities, to model the spot rates.
 
 \medskip
 
-In the DNS framework \cite{diebold2006forecasting}, each cross-section of yields observed over time is fitted by using the Nelson-Siegel \cite{nelson1987parsimonious} model. This cross-section fitting produces three time series of parameters (more details in the next section) representing the evolution of the level, slope, and curvature of the Yield Curve. The KRLS model  is applied to forecasting  the time series of parameters, using a technique which is similar to the one described in \cite{exterkate2016nonlinear}. And to finish, the forecast obtained for the trivariate time series are plugged into the Nelson-Siegel model, to deduce forecast for the cross-sections of yields.
+In the DNS framework \cite{diebold2006forecasting}, each cross-section of yields observed over time is fitted by using the Nelson-Siegel \cite{nelson1987parsimonious} model. The fitting of each cross-section observed over time, produces three time series of parameters (more details in the next section) representing the evolution of the level, slope, and curvature of the Yield Curve. A KRLS model is applied to forecasting  the time series of parameters, using a technique which is similar to the one described in \cite{exterkate2016nonlinear}. And to finish, the forecast obtained for the trivariate time series are plugged into the Nelson-Siegel model formula, to deduce forecast for the cross-sections of yields.
 
 \medskip
 
-The second approach based on KRLS is a machine learning/data-driven one, in which we put no  specific constraint on the model to reproduce the specific Yield Curve stylized facts. The regularization parameters inherent to the KRLS model will act as implicit constraints, that cause the model to converge as close as possible to reproducing these stylized facts. In this latter approach, we are mostly interested in the model with the {\it best} out-of-sample error. As a consequence, the technique as is, is probably less adapted than the former framework based on DNS (in its arbitrage-free version) to no-arbitrage pricing (if no-arbitrage pricing is required).
+The second approach based on KRLS is a machine learning/data-driven one, in which we put no  specific constraint on the model to reproduce the specific Yield Curve stylized facts. The regularization parameters inherent to the KRLS models will act as implicit constraints, that cause the model to converge as close as possible to reproducing these stylized facts. In this latter approach, we are mostly interested in the model with the {\it best} out-of-sample error. As a consequence, the technique as is, is probably less adapted than the former framework based on DNS (in its arbitrage-free version) to no-arbitrage pricing (if no-arbitrage pricing is required).
 
-\medskip
+To introduce KRLS, we start by describing the ridge regression \cite{hoerl1970ridge} and the {\it kernel trick} applied to ridge regression. Then, we make a link between the ridge regression and KRLS. 
 
-To introduce KRLS, we start by describing the ridge regression \cite{hoerl1970ridge} and the {\it kernel trick} applied to ridge regression. Then, we make a link between this kernel ridge regression and KRLS. In a ridge regression setting, we want to explain an observed variable $y \in \RR^n$, as a linear function of $p$ predictors stored in a matrix ${\bf X} \in \RR^{n \times p}$. For $i \in \left \lbrace 1, \ldots, n \right \rbrace $ and $j \in \left \lbrace1, \ldots, p \right \rbrace$ we have:
+In a ridge regression setting, we want to explain an observed variable $y \in \RR^n$, as a linear function of $p$ predictors stored in a matrix ${\bf X} \in \RR^{n \times p}$. For $i \in \left \lbrace 1, \ldots, n \right \rbrace $ and $j \in \left \lbrace1, \ldots, p \right \rbrace$ we have:
 $$
 X_{ij} =: \textbf{x}_i^{(j)}
 $$
@@ -59,7 +59,7 @@ $$
 \hat{\beta} = \Phi({\bf X})^T \left( \Phi({\bf X})\Phi({\bf X})^T + \lambda I_{n \times n} \right)^{-1} y
 $$
 
-This relationship can be useful in the case where $n << p$. That is, when there is a high number of predictors compared to the number of observations (cite Exterkate (2016)). Indeed, with this new relationship, we are no longer inverting a $p \times p$ matrix, but a $n \times n$ matrix. That's the {\it kernel trick}. And if some new observations arrive, and are stored in ${\bf X^*}$, the new values predicted by the model will be given by:
+This relationship can be useful in the case where $n << p$. That is, when there is a high number of predictors compared to the number of observations (cite Exterkate (2016)). Indeed, with this new relationship, we are no longer calculating/inverting a $p \times p$ matrix, but a $n \times n$ matrix. That's the {\it kernel trick}. And if some new observations arrive, and are stored in ${\bf X^*}$, the new values predicted by the model will be given by:
 
 $$
 y^* = \Phi({\bf X^*})\hat{\beta} = \Phi({\bf X^*})\Phi({\bf X})^T \left( \Phi({\bf X})\Phi({\bf X})^T + \lambda I_{n \times n} \right)^{-1} y
@@ -81,25 +81,27 @@ $$
 {\bf K}_{ij} =: K(\textbf{x}_i, \textbf{x}_j) = f(||\textbf{x}_i - \textbf{x}_j||_1) \: \: or \: \: f(||\textbf{x}_i - \textbf{x}_j||_2)
 $$
 
-As described in (cite Halmueller \& Hazlett (2013)), two approaches can be used to interpret/motivate the KRLS: a similarity-based view and the superposition of Gaussians view. Here, we refer only to the first one, which is the most intuitive to us, and is also the one described in (cite Ferwerda, Hainmueller et Hazlett (2017)). Indeed here, the $i^{th}$ observation of the response, $y_i$ is explained as a linear combination of functions measuring the similarity/dissimilarity between its characteristics gathered in $\textbf{x}_i$, and the other observations from the training set, $\textbf{x}_j$, $j \neq i$:
+The cost of computing the whole kernel {\bf K}, for any $i$ and $j$ is a quadratic function of the number of observations, $n$. Meaning that, the most interesting cases for using the KRLS method would be those in which $n$ is not too high.
+
+As described in (cite Halmueller \& Hazlett (2013)), two approaches can be used to interpret/motivate the KRLS learning method: a similarity-based view and the superposition of Gaussians view. Here, we refer only to the first one, which is the most intuitive to us, and is also the one described in (cite Ferwerda, Hainmueller et Hazlett (2017)). Indeed here, the $i^{th}$ observation of the response, $y_i$ is explained as a linear combination of functions measuring the similarity/dissimilarity between its characteristics gathered in $\textbf{x}_i$, and the other observations from the training set, $\textbf{x}_j$, $j \neq i$:
 
 \begin{equation}
 \label{eq:comblinresponse}
 y_i = \sum_{j = 1}^n c_j K(\textbf{x}_i, \textbf{x}_j)
 \end{equation}
 
-But again, to prevent the model from overfitting the observed data and not being able to generalize, we need to constrain the parameters $c$ under a certain norm defined by the matrix ${\bf K}$ (cite Hofmann, Schoelkopf, Smola (2008)):
+But again, to prevent the model from overfitting the observed data and not being able to generalize well, we need to constrain the parameters $c$ under a certain norm defined by the matrix ${\bf K}$ (cite Hofmann, Schoelkopf, Smola (2008)):
 
 $$
 ||c||^2_K = c^T {\bf K}  c  \leq s
 $$
 
-The solution to this new problem is:
+So that the solution to this new (constrained) problem is:
 $$
 \hat{c} = \left( {\bf K}  + \lambda I_{n \times n} \right)^{-1}{\bf y}\\
 $$
 
-where $\lambda$ is a Lagrange multiplier having a unique correspondance with $s$, and a regularization parameter. And for new observations arriving for the model, we have a solution which is identical to the one that we had for kernel ridge regression:
+$\lambda$ is a Lagrange multiplier having a unique correspondance with $s$, and a regularization parameter. And for new observations arriving for the model, we have a solution which is identical to the one that we had for kernel ridge regression:
 $$
 y^* =  {\bf K^*} \left( {\bf K} + \lambda I_{n \times n} \right)^{-1} y
 $$
@@ -115,7 +117,7 @@ $$
 K_{Gauss}(\textbf{x}_i, \textbf{x}_j) = \sigma^2 exp \left( -\frac{||\textbf{x}_i - \textbf{x}_j||^2_2}{2l^2} \right)
 $$
 
-where $l$ is a characteristic length-scale controlling the distance between peaks of the covariance function. $\sigma^2$ is the marginal variance, obtained when $\textbf{x}_i = \textbf{x}_j$. Both $l$, $\sigma^2$ are used as the machine learning model's hyperparameters, along with the regularization parameter $\lambda$.
+where $l$ is a characteristic length-scale controlling the distance between peaks of the covariance function and $\sigma^2$ is the marginal variance, obtained when $\textbf{x}_i = \textbf{x}_j$. Both $l$, $\sigma^2$ are used as the learning model's hyperparameters, along with the regularization parameter $\lambda$.
 
 \medskip
 
@@ -140,9 +142,9 @@ Figure \ref{cov_functions} below, provides more insights on the kernels we have 
 \label{cov_functions}
 \end{figure}
 
-The Gaussian kernel is the more flexible of the three kernels; then, comes the Mat\'ern 5/2, and to finish, the Mat\'ern 3/2. We observe in figure \ref{cov_functions} that the more flexible the kernel, the higher the covariance associated to observations that are close to each other (that are similar). This relationship is inverted as the distance between the observations grows, but with a lower magnitude. 
+We observe in figure \ref{cov_functions} (\textbf{left}) that: the smoother the kernel, the higher the covariance associated to observations that are close to each other (that are similar). This relationship is inverted as the distance between the observations grows, but with a lower magnitude. The Gaussian kernel is the more flexible of the three kernels. Then, comes the kernel Mat\'ern 5/2, and to finish, the kernel Mat\'ern 3/2 (cf. figure \ref{cov_functions}, \textbf{right}).
 
-Another interesting feature of KRLS learning, is the possibility to derive estimators for the  marginal effects of the covariates on the response. For example, (and like in Ferwerda, Hainmueller et Hazlett (2017)), since we have the relationship ~\ref{eq:comblinresponse}, we can write for a fixed $j_0 \in \left \lbrace 1, \ldots, p \right \rbrace$ and for any $k \in \left \lbrace 1, \ldots, n \right \rbrace $, :
+An interesting feature of KRLS learning, is the possibility to derive estimators for the  marginal effects of the covariates $\textbf{x}^{(j)}$ on the response. For example, (and like in Ferwerda, Hainmueller et Hazlett (2017)), since we have the relationship ~(\ref{eq:comblinresponse}), we can write for a fixed $j_0 \in \left \lbrace 1, \ldots, p \right \rbrace$ and for any $k \in \left \lbrace 1, \ldots, n \right \rbrace $, :
 
 \begin{equation}
 \frac{\partial y_i}{\partial \textbf{x}_k^{(j_0)}} = \sum_{j = 1}^n c_j \frac{d K(\textbf{x}_i, \textbf{x}_j)}{d \textbf{x}_k^{(j_0)}} = c_k \frac{\partial K(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}}
@@ -157,7 +159,9 @@ That's an approximation of how much of an increase (at the first order) we obtai
 \frac{1}{n}\sum_{k = 1}^n \frac{\partial y_i}{\partial x_k^{(j_0)}} = \frac{1}{n}\sum_{k = 1}^n c_k \frac{\partial K(\textbf{x}_i, \textbf{x}_k)}{\partial \textbf{x}_k^{(j_0)}}
 \end{equation}
 
-In section \ref{sec:sensitivity}, we derive formulas for the sensitivities of the response variable $y_i$ to a change in the covariates $\textbf{x}^{(j)}$. We do this for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels. These sensitivities can then be plugged into formula \ref{average_sensi}, in order to obtain average marginal effects of the covariates on the response.
+Two types of KRLS' model formulations will be described in sections \ref{sec:dnskrls} and \ref{sec:krls}. One relying on the famous Dynamic Nelson-Siegel (DNS) framework, and another one explaining the spot rates as a function of the time to maturity and date of observation. 
+
+More specifically in sections \ref{sec:sensitivity} and \ref{sec:sensi_spot_rates}, we derive formulas for the sensitivities of the response variable $y_i$ to a change in the covariates $\textbf{x}^{(j)}$, in each one of the two frameworks. We do this for Gaussian, Mat\'ern 3/2 and Mat\'ern 5/2 kernels. These sensitivities can then be plugged into formula \ref{average_sensi}, in order to obtain average marginal effects of the covariates on the response.
 
 \section{Description of the DNS-KRLS model and model's sensitivity}
 \label{sec:dnskrls}
@@ -231,7 +235,7 @@ $$
 It is also possible to add other regressors to $\bfX$, such as dummy variables, or indicators of special events. In this situation, and as discussed in \cite{exterkate2016nonlinear}, we can avoid the constraining of these dummy variables, in a Kernel ridge regression with unpenalized terms. Here, we consider only the inclusion of the observed time series' lags in the model.
 
 \subsection{Sensitivity of the response to a change in the covariates}
-\label{sec:sensitivity}
+\label{sec:sensitivity1}
 
 Here, the response is the matrix $\bfY$ described in the previous section. Thus, we are deriving the sensitivity of level, slope, and curvature, to the changes in their associated lags. 
 
@@ -368,6 +372,7 @@ $$
 
 
 \subsection{Sensitivity of the spot rates to a change in observation date and time to maturity}
+\label{sec:sensi_spot_rates}
 
 In this framework, and as mentioned in the previous section, we consider the following measure of similarity/dissimilarity between $\textbf{x}_i = (t_i, \tau_i)$ and $\textbf{x}_k = (t_k, \tau_k)$:  
 $$
@@ -389,9 +394,7 @@ $$
 (\textbf{x}_i, \textbf{x}_k) \mapsto K_{Mat\'ern5/2}(r) = \sigma^2 \left(1 +  \sqrt{5}{r} + \frac{5}{3} r^2\right) exp\left(-\sqrt{5}{r}\right)
 $$
 
-It is possible to obtain the sensitivity of the spot rates to a change in the observation date, $\frac{\partial R(t_k, \tau)}{\partial t_k}$ for any $\tau$. Even if it is actually very difficult to predict in which direction the spot rates will move, this type of indicators could still serve as decision-assistance tools for risk management.  
-
-In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:krls} on a training/testing dataset\footnote{for a further treatment, a validation set would be added, in order to verify that the models are not 'overtrained' on this training/testing set}. We have: 
+It is possible to obtain the sensitivity of the spot rates to a change in the observation date, $\frac{\partial R(t_k, \tau)}{\partial t_k}$ for any $\tau$. Even if it is actually very difficult to predict in which direction the spot rates will move, this type of indicators could still serve as decision-assistance tools for risk management. We have: 
 
 $$
 \frac{\partial r^2}{\partial t_k} = -\frac{2(t_i - t_k)}{l_1^2} 
@@ -425,7 +428,7 @@ and
 &=& \sigma^2 exp\left(-\sqrt{5}r \right) \frac{5}{3} \left[ 1 + \sqrt{5}r \right]\frac{(t_i - t_k)}{l_1^2}
 \end{eqnarray*}
 
-%\newpage
+In the next section, \ref{sec:numericalexamples}, we present the results obtained by the DNS-KRLS model from section \ref{sec:dnskrls} and the KRLS model from section \ref{sec:krls} on a training/testing dataset\footnote{for a more complete treatment, a validation set would be added, in order to verify that the models are not 'overtrained' on this training/testing set}.
 
 \section{Numerical examples}
 \label{sec:numericalexamples}
@@ -546,7 +549,7 @@ We observe that no matter the length of the training/testing window (either $12$
 
 In the next sections \ref{sec:graph_rmse} and \ref{sec:fcast_curves}, we examine these results further, by looking at the out-of-sample root mean squared error (RMSE) obtained over time, and the projected discount/discount factors'/discrete forward curves obtained with the optimal parameters.
 
-\newpage
+%\newpage
 
 \subsection{Out-of-sample RMSE over time}
 \label{sec:graph_rmse}
@@ -569,37 +572,37 @@ In the next sections \ref{sec:graph_rmse} and \ref{sec:fcast_curves}, we examine
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=12cm]{gfx/chapter-krls-models/oos_rmse_dns_krls_1}
-\caption{Boxplots for Out-of-sample RMSE over time}
+\caption{Boxplots of Out-of-sample RMSE over time, for KRLS models}
 \label{oos_rmse_dns_krls_1}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=12cm]{gfx/chapter-krls-models/oos_rmse_dns_krls_2}
-\caption{Boxplots for Out-of-sample RMSE over time}
+\caption{Boxplots of Out-of-sample RMSE over time, for DNS-KRLS models}
 \label{oos_rmse_dns_krls_2}
 \end{figure}
+
+More details on these boxplots are given in appendix \ref{appendix_summary_forecast}. 
 
 \newpage
 
 \subsection{Implied forecast term-structure of discrete forward rates}
 \label{sec:fcast_curves}
 
-The following figure, \ref{fcast_matern32}, presents the $12$-months ahead and $36$-months ahead ($h = 12$ and $h = 36$) forecasts obtained in the KRLS framework, by considering a Mat\'ern 3/2 kernel. 
+The following figure, \ref{fcast_matern32}, presents the $12$-months ahead and $36$-months ahead ($h = 12$ and $h = 36$) forecasts obtained in the KRLS framework, by considering a Mat\'ern 3/2 kernel. Similarly, figure \ref{fcast_ns_matern32}, presents the $12$-months ahead and $36$-months ahead ($h = 12$ and $h = 36$) forecasts obtained in the DNS-KRLS framework, by considering a Mat\'ern 3/2 kernel for forecasting the factors. 
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=12.5cm]{gfx/chapter-krls-models/fcast_matern32}
-\caption{discount rates, discount factors and discrete forward rates for Mat\'ern 3/2}
+\caption{Forecasts of discount rates, discount factors and discrete forward rates for Mat\'ern 3/2 for horizon = 12 and horizon = 36}
 \label{fcast_matern32}
 \end{figure}
-
-Similarly, the following figure, \ref{fcast_ns_matern32}, presents the $12$-months ahead and $36$-months ahead ($h = 12$ and $h = 36$) forecasts obtained in the DNS-KRLS framework, by considering a Mat\'ern 3/2 kernel for forecasting the factors. 
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=12.5cm]{gfx/chapter-krls-models/fcast_ns_matern32}
-\caption{discount rates, discount factors and discrete forward rates for DNS-Mat\'ern 3/2}
+\caption{Forecasts of discount rates, discount factors and discrete forward rates for DNS-Mat\'ern 3/2 for horizon = 12 and horizon = 36}
 \label{fcast_ns_matern32}
 \end{figure}
 
@@ -618,15 +621,75 @@ We observe that the discount (rates and factors) and forward curves obtained by 
 
 \section{Conclusion}
 
+In this chapter, we discussed the forecasting of discount curves, by using Kernel Regularized Least Squares (KRLS). The KRLS techniques are capable of learning nonlinear response variables, by taking into account various and complex types of covariance structures between the predictors. The response must have a relatively low number of examples, though, because of the quadratic cost of computing the kernels. 
+
+The model is highly interpretable, as it explains the responses as linear combinations of similarities/dissimilarities between the examples. Some sentivity indicators of the response as a function of the predictors are derived, and they could consitute useful decision-assistance tools. 
+
+Two types of KRLS models are considered here, specifically for the discount curves. One relying on the famous Dynamic Nelson-Siegel (DNS) framework, and another one explaining the spot rates as a function of the time to maturity and date of observation. Both types of KRLS models deliver some robust forecasts of the discount curves, as the kernels hyperparameters implicitly constrain the model to reproduce the Yield Curve's stylized facts. 
+
 \newpage
 
 \section{Appendix}
 
+\subsection{Summary of out-of-sample errors for all the models (in \%)}
+\label{appendix_oos_rmse}
+
+\textbf{KRLS, h = 12} (cf. figure \ref{oos_rmse_dns_krls_1})
+
+\begin{verbatim}
+ gaussian         matern32         matern52     
+ Min.   :0.2114   Min.   :0.1726   Min.   :0.2012  
+ 1st Qu.:0.3582   1st Qu.:0.3009   1st Qu.:0.3669  
+ Median :0.4828   Median :0.4498   Median :0.4777  
+ Mean   :0.5839   Mean   :0.5136   Mean   :0.5781  
+ 3rd Qu.:0.7216   3rd Qu.:0.6158   3rd Qu.:0.6914  
+ Max.   :1.7562   Max.   :1.6886   Max.   :1.7795  
+\end{verbatim}
+
+\textbf{KRLS, h = 36} (cf. figure \ref{oos_rmse_dns_krls_1}) 
+
+\begin{verbatim}
+   gaussian         matern32         matern52     
+ Min.   :0.7343   Min.   :0.4130   Min.   :0.4953  
+ 1st Qu.:0.9193   1st Qu.:0.6775   1st Qu.:0.8860  
+ Median :1.0727   Median :0.8422   Median :1.0529  
+ Mean   :1.1707   Mean   :1.0032   Mean   :1.1348  
+ 3rd Qu.:1.2824   3rd Qu.:1.3548   3rd Qu.:1.2639  
+ Max.   :1.9723   Max.   :2.4080   Max.   :2.0797 
+\end{verbatim}
+
+\textbf{DNS-KRLS, h = 12} (cf. figure \ref{oos_rmse_dns_krls_2})
+
+\begin{verbatim}
+ gaussian         matern32         matern52          arima       
+ Min.   :0.2048   Min.   :0.2103   Min.   :0.2048   Min.   :0.2077  
+ 1st Qu.:0.4016   1st Qu.:0.3934   1st Qu.:0.3997   1st Qu.:0.3779  
+ Median :0.5366   Median :0.5368   Median :0.5366   Median :0.5649  
+ Mean   :0.6042   Mean   :0.6039   Mean   :0.6042   Mean   :0.6752  
+ 3rd Qu.:0.7281   3rd Qu.:0.7277   3rd Qu.:0.7281   3rd Qu.:0.8190  
+ Max.   :1.6884   Max.   :1.6870   Max.   :1.6884   Max.   :1.9544 
+\end{verbatim}
+
+\textbf{DNS-KRLS, h = 36} (cf. figure \ref{oos_rmse_dns_krls_2})
+
+\begin{verbatim}
+ gaussian         matern32         matern52          arima       
+ Min.   :0.7900   Min.   :0.7900   Min.   :0.7900   Min.   :0.4698  
+ 1st Qu.:0.9294   1st Qu.:0.9294   1st Qu.:0.9294   1st Qu.:0.8527  
+ Median :1.3005   Median :1.3005   Median :1.3005   Median :1.1545  
+ Mean   :1.2645   Mean   :1.2645   Mean   :1.2645   Mean   :1.2819  
+ 3rd Qu.:1.5158   3rd Qu.:1.5158   3rd Qu.:1.5158   3rd Qu.:1.6033  
+ Max.   :1.7549   Max.   :1.7549   Max.   :1.7549   Max.   :3.2024  
+\end{verbatim}
+
+
+
 \subsection{Summary of KRLS Mat\'ern 3/2 and DNS-ARIMA forecasts (in \%) for horizon = 12 and horizon = 36}
+\label{appendix_summary_forecast}
 
 \textbf{KRLS Mat\'ern 3/2}
 
-\textbf{horizon = 12}
+\textbf{horizon = 12} (cf. figure \ref{fcast_matern32})
 
 \begin{verbatim}
 1y                5y              10y              30y       
@@ -638,7 +701,7 @@ We observe that the discount (rates and factors) and forward curves obtained by 
  Max.   :-0.1078   Max.   :0.1708   Max.   :0.8471   Max.   :1.533
 \end{verbatim}
 
-\textbf{horizon = 36}
+\textbf{horizon = 36} (cf. figure \ref{fcast_matern32})
 
 \begin{verbatim}
 1y                 5y              10y              30y       
@@ -652,7 +715,7 @@ We observe that the discount (rates and factors) and forward curves obtained by 
 
 \textbf{DNS-ARIMA}
 
-\textbf{horizon = 12}
+\textbf{horizon = 12} (cf. figure \ref{fcast_ns_arima})
 \begin{verbatim}
 1y                 5y              10y              30y       
  Min.   :-0.15142   Min.   :0.2295   Min.   :0.9237   Min.   :1.429  
@@ -663,7 +726,7 @@ We observe that the discount (rates and factors) and forward curves obtained by 
  Max.   :-0.04527   Max.   :0.2628   Max.   :0.9405   Max.   :1.434 
 \end{verbatim}
 
-\textbf{horizon = 36}
+\textbf{horizon = 36} (cf. figure \ref{fcast_ns_arima})
 \begin{verbatim}
  1y                 5y              10y              30y       
  Min.   :0.003647   Min.   :0.2782   Min.   :0.9482   Min.   :1.437  
@@ -673,54 +736,3 @@ We observe that the discount (rates and factors) and forward curves obtained by 
  3rd Qu.:0.003647   3rd Qu.:0.2782   3rd Qu.:0.9482   3rd Qu.:1.437  
  Max.   :0.003647   Max.   :0.2782   Max.   :0.9482   Max.   :1.437
 \end{verbatim}
-
-\subsection{Summary of out-of-sample errors for all the models (in \%)}
-
-\textbf{KRLS, h = 12}
-
-\begin{verbatim}
- gaussian         matern32         matern52     
- Min.   :0.2114   Min.   :0.1726   Min.   :0.2012  
- 1st Qu.:0.3582   1st Qu.:0.3009   1st Qu.:0.3669  
- Median :0.4828   Median :0.4498   Median :0.4777  
- Mean   :0.5839   Mean   :0.5136   Mean   :0.5781  
- 3rd Qu.:0.7216   3rd Qu.:0.6158   3rd Qu.:0.6914  
- Max.   :1.7562   Max.   :1.6886   Max.   :1.7795  
-\end{verbatim}
-
-\textbf{KRLS, h = 36}
-
-\begin{verbatim}
-   gaussian         matern32         matern52     
- Min.   :0.7343   Min.   :0.4130   Min.   :0.4953  
- 1st Qu.:0.9193   1st Qu.:0.6775   1st Qu.:0.8860  
- Median :1.0727   Median :0.8422   Median :1.0529  
- Mean   :1.1707   Mean   :1.0032   Mean   :1.1348  
- 3rd Qu.:1.2824   3rd Qu.:1.3548   3rd Qu.:1.2639  
- Max.   :1.9723   Max.   :2.4080   Max.   :2.0797 
-\end{verbatim}
-
-\textbf{DNS-KRLS, h = 12}
-
-\begin{verbatim}
- gaussian         matern32         matern52          arima       
- Min.   :0.2048   Min.   :0.2103   Min.   :0.2048   Min.   :0.2077  
- 1st Qu.:0.4016   1st Qu.:0.3934   1st Qu.:0.3997   1st Qu.:0.3779  
- Median :0.5366   Median :0.5368   Median :0.5366   Median :0.5649  
- Mean   :0.6042   Mean   :0.6039   Mean   :0.6042   Mean   :0.6752  
- 3rd Qu.:0.7281   3rd Qu.:0.7277   3rd Qu.:0.7281   3rd Qu.:0.8190  
- Max.   :1.6884   Max.   :1.6870   Max.   :1.6884   Max.   :1.9544 
-\end{verbatim}
-
-\textbf{DNS-KRLS, h = 36}
-
-\begin{verbatim}
- gaussian         matern32         matern52          arima       
- Min.   :0.7900   Min.   :0.7900   Min.   :0.7900   Min.   :0.4698  
- 1st Qu.:0.9294   1st Qu.:0.9294   1st Qu.:0.9294   1st Qu.:0.8527  
- Median :1.3005   Median :1.3005   Median :1.3005   Median :1.1545  
- Mean   :1.2645   Mean   :1.2645   Mean   :1.2645   Mean   :1.2819  
- 3rd Qu.:1.5158   3rd Qu.:1.5158   3rd Qu.:1.5158   3rd Qu.:1.6033  
- Max.   :1.7549   Max.   :1.7549   Max.   :1.7549   Max.   :3.2024  
-\end{verbatim}
-
