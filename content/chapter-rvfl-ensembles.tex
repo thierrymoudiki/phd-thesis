@@ -17,7 +17,7 @@ As a consequence, choosing to use ensemble models or a base model for solving a 
 
 \medskip
 
-In this paper, we apply two popular ensemble learning methods to multiple time series forecasting: Bootstrap aggregating (cite Efron), known as bagging and stacked generalization(cite Wolpert), known as stacking. The base learners that we use, are the quasi-random vector functional link neural networks introduced in Moudiki et al. (2017).
+In this paper, we apply three popular ensemble learning methods to multiple time series forecasting: Bootstrap aggregating (cite Efron), known as bagging, and stacked generalization(cite Wolpert), known as stacking. The base learners that we use, are the quasi-random vector functional link neural networks introduced in Moudiki et al. (2017).
 
 \medskip
 
@@ -26,7 +26,7 @@ In the next section, we give an overview of the base learners. Then, we describe
 \section{Description of the base models}
 \label{sec:basemodeldesc}
 
-The model described in Moudiki et al. (2017) is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
+The base learner is described in lengths in Moudiki et al. (2017). It is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
 p\right\rbrace$. The RVFL networks that we use to explain $y$ is described for $i \in \left\lbrace 1, \ldots, n\right\rbrace$ as:
 $$
 y_i = \beta_0 + \sum_{j = 1}^p \beta_j X_i^{(j)} + \sum_{l = 1}^L \gamma_l \:
@@ -168,7 +168,7 @@ $$
 \section{Ensembles of RVFL}
 \label{sec:ensemblemethods}
 
-As mentioned in the introduction, we will use bagging and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. Both techniques will be described in the next sections ~\ref{sec:rvflbagging} and \ref{sec:rvflstacking}. Firstly in a general context, and secondly as how they are applied to our RVFL models.
+As mentioned in the introduction, we will use bagging, and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. These   techniques will be described in the next sections ~\ref{sec:rvflbagging} and \ref{sec:rvflstacking}. Firstly in a general context, and secondly as how they are applied to our RVFL models.
 
 
 \subsection{Bagging}
@@ -231,6 +231,25 @@ In this chapter, we use the third approach described in (cite Rosen (1996))  (al
 \caption{Construction of $B$ bootstrap resamples by using the initial data}
 \label{bootstrap_resampling_plot}
 \end{figure}
+
+% \subsection{Boosting}
+% \label{sec:rvflboosting}
+% 
+% The boosting approach is described in details in (cite Friedman (2001)). The general idea of this algorithm is to learn the in-sample residuals of the base-learners iteratively, but to stop learning them before the out-of-sample error starts to worsen. 
+% 
+% The boosting algorithm that is used in this chapter, is the one described in (cite Friedman (2001)). It is adapted as follows, for an observation of the response variable $y_i$, and predictors stored in \textbf{x}$_i$, for $i \in \left\lbrace 1, \ldots, n \right\rbrace$: 
+% 
+% $F_0(\textbf{x}) = \bar{y}$ or $F_0(\textbf{x}) = y_{(n/2)}$\\
+% For $b = 1$ to $B$ do\\
+% $\: \tilde{y}_i = y_i - F_{b-1}\left( \textbf{x}_i\right)$\\
+% $(\rho_b, \lambda_{1, b}, \lambda_{2, b}) = ArgMin_{\rho, \lambda_1, \lambda_2}\sum_{i = 1}^n \left[\tilde{y}_i - \nu \rho h(\textbf{x}_i, \lambda_1, \lambda_2]\right)^2$\\
+% $F_b(\textbf{x}) = F_{b-1}(\textbf{x}) + \nu \rho_b h(\textbf{x}, \lambda_{1, b}, \lambda_{2, b})$\\
+% endFor\\
+% end Algorithm
+% 
+% In this algorithm, the base-learner is denoted as $h(\textbf{x}, \lambda_{1}, \lambda_{2})$, and is an RVFL model for multiple time series, as described in previous sections, with $2$ nodes in the hidden layer (because we do not want to learn too much of the residuals at each boosting iteration). $\lambda_1$ and  $\lambda_2$ are the two regularization parameters of the algorithm, as also described in the previous sections. In particular, $\nu$ is a parameter (an hyperparameter) called the learning rate, which prevents the algorithm from doing too large steps when learning the residuals.
+% 
+% We use the same number of boosting iterations and learning rate for all the observed time series. Which is probably 
 
 \subsection{Stacking}
 \label{sec:rvflstacking}
