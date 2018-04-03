@@ -554,6 +554,7 @@ In the next sections \ref{sec:graph_rmse} and \ref{sec:fcast_curves}, we examine
 \subsection{Out-of-sample RMSE over time}
 \label{sec:graph_rmse}
 
+The following figures, \ref{oos_rmse_krls} and \ref{oos_rmse_dns_krls},  present the out-of-sample RMSE obtained over time by all the KRLS models, for horizons equal to $12$ and $36$. On figure \ref{oos_rmse_krls} (on the right), we observe that despite being the best model on average, the Mat\'ern 3/2 is not necessarily the best during the liquidity/credit crunch (especially in 2008) for an horizon of $36$ months. On figure \ref{oos_rmse_dns_krls}, we observe that all the kernels lead to very similar results, with only slight differences. During the crisis, and for an horizon of $36$ months, despite displaying more volatile and less accurate results elsewhere, the DNS-ARIMA is performing better than the other models.
 
 \begin{figure}[!htb]
 \centering
@@ -562,16 +563,20 @@ In the next sections \ref{sec:graph_rmse} and \ref{sec:fcast_curves}, we examine
 \label{oos_rmse_krls}
 \end{figure}
 
+\newpage
+
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=12cm]{gfx/chapter-krls-models/krls_oos_rmse_2}
+\includegraphics[width=13cm]{gfx/chapter-krls-models/krls_oos_rmse_2}
 \caption{Out-of-sample RMSE over time for DNS-KRLS, with horizon = 12 and horizon = 36}
 \label{oos_rmse_dns_krls}
 \end{figure}
 
+The following boxplots provide a more detailed description of the distribution of the out-of-sample error, and serves as a complement for tables \ref{tab:avg_oos_rmse12} and \ref{tab:avg_oos_rmse36} (one can also report to appendix \ref{appendix_oos_rmse} for the details on these boxplots). Notably, it confirms the high variance and low median results observed for Mat\'ern 3/2 and DNS-ARIMA for an horizon equal to $36$ months. All the other results are otherwise pretty close to each other. 
+
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=12cm]{gfx/chapter-krls-models/oos_rmse_dns_krls_1}
+\includegraphics[width=13cm]{gfx/chapter-krls-models/oos_rmse_dns_krls_1}
 \caption{Boxplots of Out-of-sample RMSE over time, for KRLS models}
 \label{oos_rmse_dns_krls_1}
 \end{figure}
@@ -582,8 +587,6 @@ In the next sections \ref{sec:graph_rmse} and \ref{sec:fcast_curves}, we examine
 \caption{Boxplots of Out-of-sample RMSE over time, for DNS-KRLS models}
 \label{oos_rmse_dns_krls_2}
 \end{figure}
-
-More details on these boxplots are given in appendix \ref{appendix_summary_forecast}. 
 
 \newpage
 
@@ -617,7 +620,7 @@ These (figures \ref{fcast_matern32} and \ref{fcast_ns_matern32}) can be compared
 
 We observe that the discount (rates and factors) and forward curves obtained by each model do, indeed, exhibit the same patterns as actual market discount and discrete forward curves. In particular, for the projected negative rates, we observe projected discount factors that are greater than $1$. 
 
-\newpage
+%\newpage
 
 \section{Conclusion}
 
