@@ -130,37 +130,83 @@ $$
 \subsection{Examples on data from (cite Sapp (2014))}
 \label{sec:sapp2014}
 
-In order to demonstrate the use of the model described in the previous section, we use data from (cite Sapp (2014)). Four simulated data sets are used $SLC14.1$ and $SLC14.2$, with 2 different seeds each. 
+In order to present the performances of the model described in the previous section, we use four simulated randomized data sets, from (cite Sapp (2014)), $SLC14_1$ and $SLC14_2$ with $2$ different seeds each. These datasets are available in \code{R} package \code{caret}. 
+
+$SLC14_1$ consists of $n$ rows, where $n$ is a function parameter, and $20$ columns. Its construction starts with the simulation of a $n \times 20$ matrix \code{dat}, containing random Gaussian numbers, with mean equal to zero and variance equal to $9$. Each row of \code{dat} contains: 
+$$
+\textbf{x} = \left( x_1, x_2, \ldots, x_{20}\right) 
+$$
+and the following transformation is applied to obtain each column of $SLC14_1$
+\begin{eqnarray*}
+ \textbf{x} &\mapsto& x_1 + sin(x_2) + log(|x_3|) + x_4^2 + x_5 \times x_6 +
+I(x_7 \times x_8 \times x_9 < 0) + I(x_{10} > 0) \\
+&+& x_{11} \times I(x_{11} > 0) + \sqrt(|x_{12}|) +
+cos(x_{13}) + 2 \times x_{14} + |x_{15}| \\ 
+&+& I(x_{16} < -1) + x_{17} \times I(x_{17} < -1) - 2  \times  x_{18}
+- x_{19} \times x_{20} + \epsilon
+\end{eqnarray*}
+where $\epsilon \sim \MN\left(0, 9\right)$. The same type of idea is applied for obtaining $SLC14_2$. The construction of the dataset begins with a matrix \code{dat} having $n$ rows and $200$ columns, and the distribution of the random numbers within \code{dat}, is a Gaussian distribution with mean equal to $0$, and variance equal to $16$. And the transformation applied to the columns of \code{dat} is: 
+$$
+\textbf{x} \mapsto -1 + log(|x_1|) + \ldots + log(|x_{200}|)  + \epsilon
+$$
+where $\epsilon \sim \MN\left(0, 25\right)$.
+
+For each seed, \code{123} and \code{456}, and $n = 250$, we separate the datasets $SLC14_1$ and $SLC14_2$ into a training/testing test, and a validation set. The training set contains $70\%$ of the whole data ($175$ observations), and the test set contains the remaining $30\%$ of the data ($75$ observations). 
+
+A $5$-fold cross-validation repeated $10$ times is then applied to the training set, in order to choose \textit{optimal} hyperparameters for the BQRVL model. And to finish, the BQRVFL model with these \textit{optimal} hyperparameters is applied to predict values on the validation set. The following figures, \ref{oos_SLC14_1_seed123}, \ref{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed123}, \ref{gfx/chapter-bayesianrvfl/oos_SLC14_1_seed456}, and \ref{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed456} present the validation sets' observations (black line), along with the out-of-sample predictions on the validation set (blue line), along with $80\%$ and $95\%$ confidence intervals around the predictions.
 
 \begin{figure}[!htb]
     \centering
     \begin{minipage}{.5\textwidth}
         \centering
         \includegraphics[width=1.064\linewidth, height=0.35\textheight]{gfx/chapter-bayesianrvfl/SLC14_1.png}
-        \caption{Out-of-sample predictions and $90$\%, $95$\% confidence intervals for SLC14.1 (with \code{seed = 123})}
+        \caption{Out-of-sample predictions and $80$\%, $95$\% confidence intervals for SLC14.1 (with \code{seed = 123})}
         \label{oos_SLC14_1_seed123}
     \end{minipage}%
     \begin{minipage}{0.5\textwidth}
         \centering
         \includegraphics[width=1.064\linewidth, height=0.35\textheight]{gfx/chapter-bayesianrvfl/SLC14_2.png}
-        \caption{Out-of-sample predictions and $90$\%, $95$\% confidence intervals for SLC14.2 (with \code{seed = 123})}
+        \caption{Out-of-sample predictions and $80$\%, $95$\% confidence intervals for SLC14.2 (with \code{seed = 123})}
         \label{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed123}
     \end{minipage}
+\end{figure}
+\begin{figure}[!htb]
+\centering
     \begin{minipage}{.5\textwidth}
         \centering
         \includegraphics[width=1.064\linewidth, height=0.35\textheight]{gfx/chapter-bayesianrvfl/SLC14_1_seed456.png}
-        \caption{Out-of-sample predictions and $90$\%, $95$\% confidence intervals for SLC14.1 (with \code{seed = 456})}
+        \caption{Out-of-sample predictions and $80$\%, $95$\% confidence intervals for SLC14.1 (with \code{seed = 456})}
         \label{gfx/chapter-bayesianrvfl/oos_SLC14_1_seed456}
     \end{minipage}%
     \begin{minipage}{0.5\textwidth}
         \centering
         \includegraphics[width=1.064\linewidth, height=0.35\textheight]{gfx/chapter-bayesianrvfl/SLC14_2_seed456.png}
-        \caption{Out-of-sample predictions and $90$\%, $95$\% confidence intervals for SLC14.2 (with \code{seed = 456})}
+        \caption{Out-of-sample predictions and $80$\%, $95$\% confidence intervals for SLC14.2 (with \code{seed = 456})}
         \label{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed456}
     \end{minipage}
 \end{figure}
 
-\newpage
+We observe that the confidence intervals often contain the validation set value, with a few exceptions. The following table \ref{tab:bestparams} contain the \textit{optimal} (based on a grid search) parameters found for each dataset, with a ReLU activation function for the BQRVFL, and the proportions of points of the validation set contained into the $80$\%, $95$\% confidence intervals: 
+
+
+\begin{table}[!htb]
+\begin{center}
+% table caption is above the table
+\caption{}
+\label{tab:bestparams}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllll}
+\hline\noalign{\smallskip}
+Dataset & Number of nodes & $\lambda$ & Prop at 95\% & Prop at 80\% \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+   $SLC14_1$ - \code{seed = 123} & 975 & 1.53 & $86.11\%$ & $77.77\%$ \\
+   $SLC14_1$ - \code{seed = 456} & -1.047 & -1.024 & $0\%$ & $0\%$ \\
+   $SLC14_2$ - \code{seed = 123} & 825 & 20 & $97.22\%$ & $94.44\%$ \\
+   $SLC14_2$ - \code{seed = 456} & -1.047 & -1.027 & -1.027 & -1.027 \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \section{Bayesian optimization of black box functions}
 \label{sec:bayesopt}
@@ -366,9 +412,11 @@ Method & Min & 1st Qrt  & Median & Mean  & 3rd Qrt  & Max & Std. Dev \\
 
 A good place to apply Bayesian optimization, is to the choice of hyperparameters of machine learning algorithms. The cross-validation function, which is the objective function of the hyperparameters, is indeed expensive to train/predict over the cross-validation resamples.  
 
-\subsection{Example of DNS-KRLS vs DNS-RVFL}
+\subsection{Example of models based on Dynamic Nelson Siegel and Kernel Regularized Least Squares}
 
 \subsubsection{Description of the models}
+
+In the previous chapters, we introduced the RVFL, the KRLS, and the DNS-KRLS models. Here, we compare all these models by using the Bayesian optimization algorithm described in this chapter.  
 
 \subsubsection{Examples of minimization of the out out-of-sample RMSE}
 
@@ -403,7 +451,7 @@ A good place to apply Bayesian optimization, is to the choice of hyperparameters
 \begin{table}[!htb]
 \begin{center}
 % table caption is above the table
-\caption{out-of-sample RMSE for data-driven models}
+\caption{average out-of-sample RMSE for data-driven KRLS models}
 \label{tab:min_value_no_ns}       % Give a unique label
 % For LaTeX tables use
 \begin{tabular}{llllllll}
@@ -420,9 +468,29 @@ A good place to apply Bayesian optimization, is to the choice of hyperparameters
 \end{center}
 \end{table}
 
+\newpage
+
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=10cm]{gfx/chapter-bayesianrvfl/oos_krls.png}
-\caption{out-of-sample RMSE for data-driven models}
+\caption{average out-of-sample RMSE for data-driven models}
 \label{oos_krls}
 \end{figure}
+
+Details of the distribution of errors are provided in the appendix (boxplots and summaries). 
+
+We also show how the Mat\'ern 3/2 and the DNS-RVFL are performing over the time, for horizon = $12$ and for horizon = $36$, particularly during the credit/liquidity crunch.
+
+
+
+\subsection{Example of ensembles of RVFL}
+
+In this section, we compare the bagging and stacking of RVFL models. As in the previous section, the optimization of the out-of-sample error (the choice of model's hyperparameters) is made by using the BQRVFL as a workhorse for Bayesian optimization. 
+
+\section{Conclusion}
+
+In this chapter, we presented a quasi-randomized functional link neural networks (BQRVFL) model, by linking it to a Bayesian linear regression framework, and obtained formulas for the confidence intervals around its predictions. The BQRVFL model that we constructed is then used as a workhorse for Bayesian optimization, and notably to find \textit{optimal} hyperparameters for all the forecasting models described in the previous chapters.
+
+In general, we observe that the \textit{best} results are obtained in the DNS-KRLS framework by the RVFL (applied to the level, slope and curvature). And in the KRLS framework, the kernel Mat\'ern 3/2 performs the best. This kernel also performs the best overall, in terms of out-of-sample RMSE. However, it is worth mentioning, as in previous chapters, that the cost of computing the kernel is a quadratic function of the number of input spot rates. 
+
+When it comes to ensemble learning, we compare bagging and stacking models. 
