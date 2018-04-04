@@ -17,7 +17,7 @@ As a consequence, choosing to use ensemble models or a base model for solving a 
 
 \medskip
 
-In this paper, we apply three popular ensemble learning methods to multiple time series forecasting: Bootstrap aggregating (cite Efron), known as bagging, and stacked generalization(cite Wolpert), known as stacking. The base learners that we use, are the quasi-random vector functional link neural networks introduced in Moudiki et al. (2017).
+In this chapter, we apply three popular ensemble learning methods to multiple time series forecasting: Bootstrap aggregating (cite Efron), known as bagging, Boosting (cite Hothorn et al. (2010), Friedman et al. (2000), Bühlmann and Yu (2003)), and stacked generalization(cite Wolpert 1992), known as stacking. The base learners that we use for bagging and stacking, are the quasi-random vector functional link neural networks introduced in Moudiki et al. (2017). For the boosting algorithm, we use a slightly modified version of the model from Moudiki et al. (2017), in which the regression model parameters are not constrained in a ridge regression fashion (more details in section \ref{sec:basemodeldesc}).  
 
 \medskip
 
@@ -57,7 +57,7 @@ But other choices of activation functions, such as the sigmoid function or the h
 
 \medskip
 
-The elements $W^{(j, l)}$ of the hidden layer are taken from a quasi-random (deterministic) \textit{sobol} sequence on $[0, 1]$, which is shifted in such a way that they belong to $[-1, 1]$. Solving for the optimal $\beta_j$'s and $\gamma_l$'s is done by searching these parameters,  in restricted regions where we have:
+The elements $W^{(j, l)}$ of the hidden layer are taken from a quasi-random (deterministic) \textit{sobol} sequence on $[0, 1]$, which is shifted in such a way that they belong to $[-1, 1]$. In the case of bagging and stacking, solving for the optimal $\beta_j$'s and $\gamma_l$'s is done by searching these parameters,  in restricted regions where we have:
 $$
 \sum_{j=1}^p \beta_j^2  \leq u
 $$
@@ -65,12 +65,12 @@ and
 $$
 \sum_{l=1}^L
 \gamma_l^2 \leq v
-$$ for $u, v \in \RR^*$. That is, by applying a regularization to these unknown parameters.
+$$ for $u, v \in \RR^*$. That is, by applying a regularization to these unknown parameters. In the case of boosting, we do not restrict the regression parameters, but use the boosting algorithm described in (cite Hothorn et al. 2010). 
 
 
 \medskip
 
-Now, if we consider $p \in \mathbb{N}^*$ time series $(X_t^{(j)})_{t \geq 0}, j = 1, \ldots, p$,
+If we consider $p \in \mathbb{N}^*$ time series $(X_t^{(j)})_{t \geq 0}, j = 1, \ldots, p$,
 observed at $n \in \mathbb{N}^*$ discrete dates. We are interested in
 obtaining simultaneous forecasts of the $p$ time series at time $n+h$, $h \in
 \mathbb{N}^*$, by allowing each of the $p$ variables to be influenced by the
@@ -139,7 +139,7 @@ $$
 
 \medskip
 
-where $\lambda_1$ and $\lambda_2$ are Lagrange multipliers. Now, by denoting:
+where $\lambda_1$ and $\lambda_2$ are Lagrange multipliers. Otherwise, without the constraints, the problem to be solved is simply a least squares regression problem on the augmented dataset. By denoting:
 
 $$ A = \left( {\begin{array}{cc} \bfX^T\bfX + \lambda_1 I_{k\times p} &  \bfX^T\Phi(\bfX)\\
 \Phi(\bfX)^T\bfX & \Phi(\bfX)^T\Phi(\bfX) + \lambda_2 I_{L} \      \end{array} } \right) =:
@@ -168,8 +168,7 @@ $$
 \section{Ensembles of RVFL}
 \label{sec:ensemblemethods}
 
-As mentioned in the introduction, we will use bagging, and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. These   techniques will be described in the next sections ~\ref{sec:rvflbagging} and \ref{sec:rvflstacking}. Firstly in a general context, and secondly as how they are applied to our RVFL models.
-
+As mentioned in the introduction, we will use bagging, boosting, and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. These techniques will be described in details in the next sections ~\ref{sec:rvflbagging}, ~\ref{sec:rvflboosting}  and \ref{sec:rvflstacking}.
 
 \subsection{Bagging}
 \label{sec:rvflbagging}
@@ -227,29 +226,28 @@ In this chapter, we use the third approach described in (cite Rosen (1996))  (al
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=12cm]{gfx/chapter-rvfl-ensembles/bootstrap_resampling.png}
+\includegraphics[width=10.5cm]{gfx/chapter-rvfl-ensembles/bootstrap_resampling.png}
 \caption{Construction of $B$ bootstrap resamples by using the initial data}
 \label{bootstrap_resampling_plot}
 \end{figure}
 
-% \subsection{Boosting}
-% \label{sec:rvflboosting}
-% 
-% The boosting approach is described in details in (cite Friedman (2001)). The general idea of this algorithm is to learn the in-sample residuals of the base-learners iteratively, but to stop learning them before the out-of-sample error starts to worsen. 
-% 
-% The boosting algorithm that is used in this chapter, is the one described in (cite Friedman (2001)). It is adapted as follows, for an observation of the response variable $y_i$, and predictors stored in \textbf{x}$_i$, for $i \in \left\lbrace 1, \ldots, n \right\rbrace$: 
-% 
-% $F_0(\textbf{x}) = \bar{y}$ or $F_0(\textbf{x}) = y_{(n/2)}$\\
-% For $b = 1$ to $B$ do\\
-% $\: \tilde{y}_i = y_i - F_{b-1}\left( \textbf{x}_i\right)$\\
-% $(\rho_b, \lambda_{1, b}, \lambda_{2, b}) = ArgMin_{\rho, \lambda_1, \lambda_2}\sum_{i = 1}^n \left[\tilde{y}_i - \nu \rho h(\textbf{x}_i, \lambda_1, \lambda_2]\right)^2$\\
-% $F_b(\textbf{x}) = F_{b-1}(\textbf{x}) + \nu \rho_b h(\textbf{x}, \lambda_{1, b}, \lambda_{2, b})$\\
-% endFor\\
-% end Algorithm
-% 
-% In this algorithm, the base-learner is denoted as $h(\textbf{x}, \lambda_{1}, \lambda_{2})$, and is an RVFL model for multiple time series, as described in previous sections, with $2$ nodes in the hidden layer (because we do not want to learn too much of the residuals at each boosting iteration). $\lambda_1$ and  $\lambda_2$ are the two regularization parameters of the algorithm, as also described in the previous sections. In particular, $\nu$ is a parameter (an hyperparameter) called the learning rate, which prevents the algorithm from doing too large steps when learning the residuals.
-% 
-% We use the same number of boosting iterations and learning rate for all the observed time series. Which is probably 
+\newpage
+
+\subsection{Boosting}
+\label{sec:rvflboosting}
+
+The boosting approach adopted here, is described in Hothorn et al. (2010) and implemented in \proglang{R} package \code{mboost}. The general idea of the algorithm is to fit the in-sample residuals with base-learners, iteratively and slowly, but to stop learning before the out-of-sample error starts to worsen. With the response being $y$ and the covariates stored in  $\textbf{x}$, we are interested in constructing a regression function $\hat{f}$, so that: 
+$$
+\hat{f}(\textbf{x}) = \sum_{j=1}^B \nu \hat{f}_j(\textbf{x}) 
+$$
+$B$ is the number of boosting iterations, $\nu$ is a learning rate parameter preventing the base learners from fitting the residuals too quickly, and  $\hat{f}_j$, $j \in \left \lbrace 1, \ldots, B \right \rbrace$ are the base learners, which are obtained as: 
+$$
+\left(\hat{f}_1, \ldots,  \hat{f}_p\right) = argmin_{f_1, \ldots, f_p}  \rho \left( y, \sum_j \nu f_j\left( \textbf{x} \right) \right) 
+$$
+
+In this expression, $\rho$ is a loss function to be minimized (for example $x \mapsto x^2$, or $x \mapsto |x|$). And in the case of multivariate time series, we are doing multitask learning. Each series (their most contemporaneous observations) share the same set of predictors (their lagged observations) as in the RVFL model described in section \ref{sec:basemodeldesc}, but without regularization of the regression models' parameters. 
+
+The same number of boosting iterations and the same learning rate are used for all the observed time series. It would be possible to consider different numbers of iterations and different learning rates for each time series, but in this situation there would be as much of these parameters as time series, and the regularization parameters would be harder to optimize. 
 
 \subsection{Stacking}
 \label{sec:rvflstacking}
@@ -269,18 +267,17 @@ Typically, in this procedure, various types of base learners are used, to increa
 \begin{itemize}
 \item Train $B$ resampled RVFL models on \code{part1}, using a random subset of \code{part1} in each resampling iteration. Obtain $B$ sets of predictions ($B \times p$ new predictors) with these models, over the whole horizon  of \code{part2}.
 \item Create a new enriched data set \code{part3}, containing the observed time series from \code{part2}, and the $B \times p$ additional series predicted from \code{part1} on \code{part2}.
-\item Use a meta-learner to obtain predictions on the new, enriched dataset, \code{part3}.
+\item Use a meta-learning model to obtain predictions on the new, enriched dataset, \code{part3}.
 \end{itemize}
-
-\newpage
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=14cm]{gfx/chapter-rvfl-ensembles/rvfl_stacking.png}
+\includegraphics[width=11.5cm]{gfx/chapter-rvfl-ensembles/rvfl_stacking.png}
 \caption{Construction of the enriched/stacked dataset}
 \label{rvfl_stacking_plot}
 \end{figure}
 
+\newpage
 
 For the latter point, we consider a few meta-learner models that have been used in the past in the literature (cite Breiman's Stacked Regressions). In general, the idea is that a relatively simple meta-learner will achieve a good performance. We use the following models for this purpose:
 \begin{itemize}
@@ -389,7 +386,8 @@ A rolling forecasting cross-validation method (see \cite{bergmeir2015note} and f
 \label{rolling_cv}
 \end{figure}
 
-We use the Root Mean Squared Error (RMSE) as a measure of the out-of-sample error. All the benchmarks are made on what is defined as \code{part3} in section \ref{sec:rvflstacking}, in order to have a similar perimeter for bagging and stacking. The results obtained by the ensembles are compared to those obtained by the base RVFL model. 
+We use the Root Mean Squared Error (RMSE) as a measure of the out-of-sample error. All the benchmarks are made on what is defined as \code{part3} in section \ref{sec:rvflstacking}, in order to have a similar perimeter for bagging and stacking. The results obtained by the ensemble learners are compared to those obtained by the base RVFL model. 
+
 
 \subsection{Numerical example for bagging}
 \label{bagging_example}
