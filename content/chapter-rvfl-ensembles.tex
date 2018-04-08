@@ -9,11 +9,7 @@ The goal of ensemble learning is to combine two or more individual statistical/m
 
 \medskip
 
-Ensemble learning is widely used in the winning solutions of machine learning competitions. It allows to achieve very good performances indeed, at the expense of being relatively less interpretable than the base learners.
-
-\medskip
-
-As a consequence, choosing to use ensemble models or a base model for solving a given problem, could sometimes be seen as finding a trade-off between the desire for interpretability and the desire for an highly increased performance. That said, some techniques such as variable importance for ensemble of trees, can give a sense of which predictor contributes the most to the perfomance of the model.
+Ensemble learning is widely used in the winning solutions of machine learning competitions. It allows to achieve very good performances indeed, at the expense of being relatively less interpretable than the base learners. As a consequence, choosing to use ensemble models or a base model for solving a given problem, could sometimes be seen as finding a trade-off between the desire for interpretability and the desire for an highly increased performance. That said, some techniques such as variable importance for ensemble of trees, can give a sense of which predictor contributes the most to the perfomance of the model.
 
 \medskip
 
@@ -28,10 +24,12 @@ In the next section, we give an overview of the base learners. Then, we describe
 
 The base learner is described in lengths in Moudiki et al. (2017). It is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
 p\right\rbrace$. The RVFL networks that we use to explain $y$ is described for $i \in \left\lbrace 1, \ldots, n\right\rbrace$ as:
-$$
+
+\begin{equation}
+\label{eq:rvflequation}
 y_i = \beta_0 + \sum_{j = 1}^p \beta_j X_i^{(j)} + \sum_{l = 1}^L \gamma_l \:
 g\left(\sum_{j = 1}^p W^{(j, l)} X_i^{(j)}\right) + \epsilon_i
-$$
+\end{equation}
 
 \medskip
 
@@ -53,11 +51,11 @@ $\left \lbrace 1, \ldots, L\right\rbrace$ on the response. In this paper, we use
 $$
 g: \: x \mapsto max(x, 0)
 $$
-But other choices of activation functions, such as the sigmoid function or the hyperbolic tangent (or others) can be envisaged.
+But other choices of activation functions, such as the sigmoid function $g: \: x \mapsto \frac{1}{1+exp(-x)}$ or the hyperbolic tangent $g: \: x \mapsto tanh(x)$ (or others) can be envisaged.
 
 \medskip
 
-The elements $W^{(j, l)}$ of the hidden layer are taken from a quasi-random (deterministic) \textit{sobol} sequence on $[0, 1]$, which is shifted in such a way that they belong to $[-1, 1]$. In the case of bagging and stacking, solving for the optimal $\beta_j$'s and $\gamma_l$'s is done by searching these parameters,  in restricted regions where we have:
+The elements $W^{(j, l)}$ of the hidden layer are taken from a quasi-random (deterministic) \textit{sobol} sequence on $[0, 1]$, which is shifted in such a way that they belong to $[-1, 1]$. In the case of bagged and stacked ensembles, solving for the optimal $\beta_j$'s and $\gamma_l$'s in the base-learners is done by searching these parameters,  in restricted regions where we have:
 $$
 \sum_{j=1}^p \beta_j^2  \leq u
 $$
@@ -65,13 +63,12 @@ and
 $$
 \sum_{l=1}^L
 \gamma_l^2 \leq v
-$$ for $u, v \in \RR^*$. That is, by applying a regularization to these unknown parameters. In the case of boosting, we do not restrict the regression parameters, but use the boosting algorithm described in (cite Hothorn et al. 2010). 
+$$ for $u, v \in \RR^*$. That is, by applying a regularization to these unknown parameters. In the case of boosting, we do not restrict the regression parameters' norms to be inferior to $u$ and $v$. Instead, we rely on the boosting algorithm described in (cite Hothorn et al. 2010) (details in section \ref{sec:rvflboosting}), with the base-learners being the unrestricted regression models described by equation (\ref{eq:rvflequation}). 
 
 
 \medskip
 
-If we consider $p \in \mathbb{N}^*$ time series $(X_t^{(j)})_{t \geq 0}, j = 1, \ldots, p$,
-observed at $n \in \mathbb{N}^*$ discrete dates. We are interested in
+If we consider $p \in \mathbb{N}^*$ time series $(X_t^{(j)})_{t \geq 0}, j = 1, \ldots, p$, observed at $n \in \mathbb{N}^*$ discrete dates, we are interested in
 obtaining simultaneous forecasts of the $p$ time series at time $n+h$, $h \in
 \mathbb{N}^*$, by allowing each of the $p$ variables to be influenced by the
 others. We use $k < n$ lags of each of the observed $p$ time
@@ -82,7 +79,7 @@ Y^{(j)} = \left(X^{(j)}_n, \ldots, X^{(j)}_{k+1} \right)^T
 \end{equation}
 
 for $j \in \left\lbrace 1, \ldots,
-p \right\rbrace$. Where $X^{(j)}_n$ is the most contemporaneous observed value
+p \right\rbrace$. $X^{(j)}_n$ is the most contemporaneous observed value
 of the $j^{th}$ time series, and $X^{(j)}_{k+1}$ was observed $k$ dates earlier
 in time for $(X^{(j)}_t)_{t \geq 0}$. These output variables are stored in a
 matrix: $$ \bfY \in \RR^{(n-k) \times p} $$ and the predictors are
@@ -94,11 +91,11 @@ $p$ time series.
 
 An additional layer of transformed  predictors
 is added to $\bfX$, in order to capture the potentially non-linear
-interactions between the predictors and the output variable. Adding the transformed predictors to the original ones, leads to a new matrix of predictors with dimensions $(n-k) \times (k \times p + L)$, where $L$ is the number of nodes in the hidden layer.
+interactions between the predictors and the output variable. This also serve as a way to do achieve an automated feature engineering. Adding the transformed predictors to the original ones, leads to a new matrix of predictors with dimensions $(n-k) \times (k \times p + L)$, where $L$ is the number of nodes in the hidden layer.
 
 \medskip
 
-For example, we have $p = 2$ time series $(X^{(1)}_{t_1}, \ldots,  X^{(1)}_{t_5})$ and $(X^{(2)}_{t_1}, \ldots,  X^{(2)}_{t_5})$ observed at $n = 5$ dates $t_1 < \ldots < t_5$, with $k = 2$ lags, and $L = 3$ nodes in the hidden layer. In this case, the response variables are stored in:
+For example, we have $p = 2$ time series $(X^{(1)}_{t_1}, \ldots,  X^{(1)}_{t_5})$ and $(X^{(2)}_{t_1}, \ldots,  X^{(2)}_{t_5})$ observed at $n = 5$ dates, $t_1 < \ldots < t_5$, with $k = 2$ lags, and $L = 3$ nodes in the hidden layer. In this case, the response variables are stored in:
 $$
 \bfY = \left( {\begin{array}{cc} X^{(1)}_{t_5} &  X^{(2)}_{t_5}\\ X^{(1)}_{t_4} & X^{(2)}_{t_4} \\ X^{(1)}_{t_3} & X^{(2)}_{t_3}\      \end{array} } \right)
 $$
@@ -139,7 +136,7 @@ $$
 
 \medskip
 
-where $\lambda_1$ and $\lambda_2$ are Lagrange multipliers. Otherwise, without the constraints, the problem to be solved is simply a least squares regression problem on the augmented dataset. By denoting:
+where $\lambda_1$ and $\lambda_2$ are Lagrange multipliers. Otherwise, without the constraints (in the case of boosting, see section \ref{sec:rvflboosting}), the problem to be solved is simply a least squares regression problem on the augmented dataset, as described in equation \ref{sec:basemodeldesc}. By denoting:
 
 $$ A = \left( {\begin{array}{cc} \bfX^T\bfX + \lambda_1 I_{k\times p} &  \bfX^T\Phi(\bfX)\\
 \Phi(\bfX)^T\bfX & \Phi(\bfX)^T\Phi(\bfX) + \lambda_2 I_{L} \      \end{array} } \right) =:
@@ -168,7 +165,7 @@ $$
 \section{Ensembles of RVFL}
 \label{sec:ensemblemethods}
 
-As mentioned in the introduction, we will use bagging, boosting, and stacking to construct ensembles of RVFL from the previous section \ref{sec:basemodeldesc}. These techniques will be described in details in the next sections ~\ref{sec:rvflbagging}, ~\ref{sec:rvflboosting}  and \ref{sec:rvflstacking}.
+As mentioned in the introduction, we will use bagging, boosting, and stacking to construct ensemble models, consisting of the RVFL models from the previous section \ref{sec:basemodeldesc}. A short description of these techniques will be made in next sections ~\ref{sec:rvflbagging}, ~\ref{sec:rvflboosting}  and \ref{sec:rvflstacking}.
 
 \subsection{Bagging}
 \label{sec:rvflbagging}
@@ -177,7 +174,7 @@ The Bootstrap (cite Efron) uses multiple random replications of a given data set
 
 \medskip
 
-In order to illustrate the benefits of the bagging, we consider $n$ different base learners, with out-of-sample prediction errors equal to $\epsilon_1, \ldots, \epsilon_n$, and assume that the distribution of these errors are centered around $0$:
+In order to illustrate the benefits of the bagging procedure, we consider $n$ different base learners, with out-of-sample prediction errors equal to $\epsilon_1, \ldots, \epsilon_n$, and assume that the distribution of these errors are centered around $0$:
 $$
 \EE \left[ \epsilon_i\right] = 0
 $$
@@ -222,7 +219,11 @@ $$
 
 \medskip
 
-In this chapter, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple samples (training) data sets are constructed by randomly picking a fraction \code{col\underline{ }sample\underline{ }coeff} of the covariates, and a subset (using the fraction \code{row\underline{ }sample\underline{ }coeff}) of the lines, as described in figure \ref{bootstrap_resampling_plot} (using notations from section \ref{sec:basemodeldesc}). Taking a subset of the lines is done by respecting the serial dependence of the series and taking consecutive observations (that is, without skipping any observation) for each bootstrap resample. The predictions associated to each training set resample are then averaged, in order to obtain a single prediction, with a confidence interval around it. Some numerical examples on the application of bagging to RVFL base learners can be found in section \ref{sec:numericalexamples}
+In this chapter, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple samples (training) data sets are constructed by randomly picking a fraction \code{col\underline{ }sample\underline{ }coeff} of the covariates, and a subset (using the fraction \code{row\underline{ }sample\underline{ }coeff}) of the lines, as described in figure \ref{bootstrap_resampling_plot} (using notations from section \ref{sec:basemodeldesc}). 
+
+Taking a subset of the lines is done by respecting the serial dependence of the series and taking consecutive observations (that is, without skipping any observation) for each bootstrap resample. 
+
+The predictions associated to each training set resample are then averaged, in order to obtain a single prediction, with an uncertainty around it. Some numerical examples on the application of bagging to RVFL base learners can be found in section \ref{sec:numericalexamples}
 
 \begin{figure}[!htb]
 \centering
@@ -245,9 +246,9 @@ $$
 \left(\hat{f}_1, \ldots,  \hat{f}_p\right) = argmin_{f_1, \ldots, f_p}  \rho \left( y, \sum_j \nu f_j\left( \textbf{x} \right) \right) 
 $$
 
-In this expression, $\rho$ is a loss function to be minimized (for example $x \mapsto x^2$, or $x \mapsto |x|$). And in the case of multivariate time series, we are doing multitask learning. Each series (their most contemporaneous observations) share the same set of predictors (their lagged observations) as in the RVFL model described in section \ref{sec:basemodeldesc}, but without regularization of the regression models' parameters. 
+In this expression, $\rho$ is a loss function to be minimized (for example $x \mapsto x^2$, or $x \mapsto |x|$). And in the case of multivariate time series, we are doing multitask learning. Each series (their most contemporaneous observations) share the same set of predictors (their lagged observations) as in the RVFL model described in section \ref{sec:basemodeldesc}, but without regularization of the regression models' parameters. This model is a different version of the Stochastic Configuration Network model from (cite Wang et al. (2017)). They do not include the \textit{direct link} (linear part of the RVFL) but only the transformed predictors $\Phi(\bfX)^{(l)}= g\left(\sum_{j = 1}^p W^{(j, l)} X_i^{(j)}\right)$, and show that under certain specific conditions, the model verifies an universal approximator property. 
 
-The same number of boosting iterations and the same learning rate are used for all the observed time series. It would be possible to consider different numbers of iterations and different learning rates for each time series, but in this situation there would be as much of these parameters as time series, and the regularization parameters would be harder to optimize. 
+The same number of boosting iterations and the same learning rate are used for all the observed time series. It would be possible to consider different numbers of iterations and different learning rates for each time series, but in this situation there would be as much as parameters as time series, and the regularization parameters would be trickier to optimize. 
 
 \subsection{Stacking}
 \label{sec:rvflstacking}
@@ -270,30 +271,31 @@ Typically, in this procedure, various types of base learners are used, to increa
 \item Use a meta-learning model to obtain predictions on the new, enriched dataset, \code{part3}.
 \end{itemize}
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=11.5cm]{gfx/chapter-rvfl-ensembles/rvfl_stacking.png}
-\caption{Construction of the enriched/stacked dataset}
-\label{rvfl_stacking_plot}
-\end{figure}
-
-\newpage
-
 For the latter point, we consider a few meta-learner models that have been used in the past in the literature (cite Breiman's Stacked Regressions). In general, the idea is that a relatively simple meta-learner will achieve a good performance. We use the following models for this purpose:
 \begin{itemize}
 \item Linear \textbf{least squares regression} model
 \item Linear least squares regression model \textbf{with positive coefficients} (cite Lawson CL, Hanson RJ (1974)) and Lawson CL, Hanson RJ (1995), as used in (cite Breiman (2001))
-\item \textbf{Ridge regression} with the use of singular values of $\ldots$ (cite Hoerl et Kennard 1970)
+\item \textbf{Ridge regression} (cite Hoerl et Kennard 1970)
 \end{itemize}
 
 These selected meta-learners are trained on \code{part3}, with the most contemporaneous observations of the series as responses, and their respective lags as predictors. Some numerical examples on the application of stacking to RVFL base learners can be found in section \ref{sec:numericalexamples}
 
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=13cm]{gfx/chapter-rvfl-ensembles/rvfl_stacking.png}
+\caption{Construction of the enriched/stacked dataset}
+\label{rvfl_stacking_plot}
+\end{figure}
+
+
 \section{Numerical examples}
 \label{sec:numericalexamples}
 
-For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from (cite Greene (20something)). Four of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis. We annualize the last three time series, but keep the Treasury Bill rates unchanged. So that, the four time series are nearly on the same scale.
+For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from (cite Greene (20something)). Four of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis. 
 
-%\newpage
+We annualize the last three time series, but keep the Treasury Bill rates unchanged. So that, the four time series are nearly on the same scale.
+
+The out-of-sample Root Mean Squared Error (RMSE) is used as a measure of performance of the different implemented models.
 
 \subsection{Descriptive statistics}
 
@@ -377,7 +379,7 @@ Also, based on the correlations displayed in figure \ref{corrplot}, the Real con
 In sections \ref{bagging_example} and \ref{stacking_example}, we apply the bagging and stacking procedures described in sections \ref{sec:rvflbagging} and \ref{sec:rvflstacking} to the dataset we have just described. 
 
 
-A rolling forecasting cross-validation method (see \cite{bergmeir2015note} and figure \ref{rolling_cv}). At the beginning of the procedure, the training set contains $12$ points ($4$ years), and the test set contains $4$ points(1 year). The training set is then advanced of one point forward (rolled), and the procedure is repeated until no more data for the training set are found.  
+A rolling forecasting cross-validation method (see \cite{bergmeir2015note} and figure \ref{rolling_cv}). At the beginning of the procedure, the training set contains $24$ points ($4$ years), and the test set contains $4$ points ($1$ year) and $8$ points ($2$ years). The training set is then advanced of one point forward (rolled), and the procedure is repeated until no more data for the training set are found.  
 
 \begin{figure}[!htb]
 \centering
@@ -386,15 +388,228 @@ A rolling forecasting cross-validation method (see \cite{bergmeir2015note} and f
 \label{rolling_cv}
 \end{figure}
 
-We use the Root Mean Squared Error (RMSE) as a measure of the out-of-sample error. All the benchmarks are made on what is defined as \code{part3} in section \ref{sec:rvflstacking}, in order to have a similar perimeter for bagging and stacking. The results obtained by the ensemble learners are compared to those obtained by the base RVFL model. 
+As we said at the beginning of section \ref{sec:numericalexamples}, we use the Root Mean Squared Error (RMSE) as a measure of the out-of-sample error. All the benchmarks are made on what is defined as \code{part3} in section \ref{sec:rvflstacking}, in order to have a similar perimeter for bagging and stacking. The results obtained by the ensemble learners are compared to those obtained by the base RVFL model, which are presented here: 
+
+For the bagging example, we use $B = 100$ resamples of the data, and calculate the average out-of-sample RMSE obtained by the ensemble model on all the testing sets (see figure \ref{rolling_cv}). The dataset used, is the one defined as \code{part3} in section \ref{sec:rvflstacking}.  
+
+For the boosting example, we use $B = 10$ boosting iterations of the least squares regression model from formula ~\ref{eq:rvflequation}. The tuning parameters are the learning rate of the boosting algorithm denoted as $\nu$, the number of nodes in the hidden layer for the base-learner \code{nb\underline{  }hidden}, the fraction of the initial time series considered as predictors \code{col\underline{  }sample}, the number of lags. 
+
+For the stacking example, The dataset used, is also the one defined as \code{part3} in section \ref{sec:rvflstacking}. The tuning parameters are the number of boostrap resamples, $B$, and the hyperparameter of the ridge regression model is the regularization parameter. 
+
+\subsection{Summary of results}
+\label{results_summary}
+
+A summary of the out-of-sample RMSE is presented in figure \ref{boxplot_perfs} in a logarithmic scale, for all the methods that we described and tested in the previous sections. The numerical values corresponding to these boxplots can be found in appendix \ref{boxplot_summary}, in their original scale. 
+
+The base RVFL model is denoted as \code{ridge2}. \code{bagging}, \code{stack\underline{  }ridge}, \code{stack\underline{  }lm}, \code{stack\underline{  }nnls}, and \code{glmboost} respectively denote the bootstrap aggregating method from section \ref{sec:rvflbagging}, stacking with ridge regression, with ordinary least squares, least squares regression with positive coefficients from section \ref{sec:rvflstacking}, and boosting from section \ref{sec:rvflboosting}. We also added an unrestricted Vector AutoRegression (VAR) model to the benchmarks, denoted as \code{VAR}, which mostly helps us in assessing if the other models' implementation/predictions are not off track.  
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=14cm]{gfx/chapter-rvfl-ensembles/boxplot_perfs.png}
+\caption{Out-of-sample RMSE distribution for the different tested models}
+\label{boxplot_perfs}
+\end{figure}
+
+Bagging is performing the best on average (cf. appendix \ref{boxplot_perfs} for details) on both horizons, 4-steps ahead and 8-steps ahead, and is followed by boosting. The stacking algorithm works best with the ridge regression model taken as a meta-learner, but is failing with the other meta learners (ordinary least squares and least squares regression with positive coefficients). Overall, the boosting algorithm is also very robust, and displays the lowest standard deviation of all the models tested. 
+
+The \textit{best} hyperparameters obtained for each algorithm are presented below, for the different horizons of projection. 
+
+\newpage
+
+\begin{itemize}
+
+\item \textbf{For horizon = 4}
+
+\begin{verbatim}
+   # base RVFL
+   lags nb_hidden lambda_1 lambda_2  
+      3       100    10000      100 
+  
+   # bootstrap aggregating
+   lags nb_hidden lambda_1 lambda_2   B col_sample row_sample 
+     1         1 21.54435 21.54435 100        0.9        0.9 
+   
+   # stacking with ridge regression
+   lags   lambda   
+      3 21.54435 
+  
+  # stacking with ordinary least squares
+   lags 
+      1 
+  
+  # stacking with least squares and > 0 coeffs
+   lags  
+      1 
+  
+  # boosting
+   lags  B       eta col_sample nb_hidden lambda_1 lambda_2   
+     3 10 0.2020798          1         1      Inf      Inf 
+  
+  # VAR
+   type_VAR lags   
+      const    1 
+\end{verbatim}
+
+\item For \textbf{horizon = 8}
+\begin{verbatim}
+  # base RVFL
+  lags nb_hidden lambda_1 lambda_2   
+     3         2 21.54435    10000 
+  
+  # bootstrap aggregating
+  lags nb_hidden lambda_1 lambda_2   B col_sample row_sample  
+     1         1 21.54435 21.54435 100        0.9        0.9 
+  
+ 
+ 
+ 
+  # stacking with ridge regression
+  lags   lambda   
+     3 21.54435 
+  
+  # stacking with ordinary least squares
+  lags 
+     1 
+  
+  # stacking with least squares and > 0 coeffs
+  lags 
+     1 
+  
+  # boosting
+  lags  B   eta col_sample nb_hidden 
+     3 10 0.175          1         1 
+  
+  # VAR
+  type_VAR lags   
+     none    1 
+\end{verbatim}
+
+\end{itemize}
 
 
-\subsection{Numerical example for bagging}
-\label{bagging_example}
 
-In this example, we use $B = 100$ resamples of the data, and calculate the average out-of-sample RMSE obtained by the ensemble model on all the testing sets (see figure \ref{rolling_cv}). The dataset used, is the one defined as \code{part3} in section \ref{sec:rvflstacking}.  
 
-\subsection{Numerical example for stacking}
-\label{stacking_example}
 
-We calculate the average out-of-sample RMSE obtained by the ensemble model on all the testing sets (see figure \ref{rolling_cv}). The dataset used, is the one defined as \code{part3} in section \ref{sec:rvflstacking}.
+\begin{verbatim}
+
+\end{verbatim}
+
+%\newpage
+
+Below, in figure \ref{oos_rmse_over_time}, we can observe how the different methods perform through time. We observe that the models' errors are highly correlated, which is reassuring concerning their implementation. 
+
+The details of the correlations between these errors can be found in appendix \ref{oos_errors_cor}. The VAR model generally exhibits a higher variance than the other models (excluding stacking with \code{stack\underline{  }lm} and \code{stack\underline{  }nnls}), but is still able to perform better than them at times.    
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=15cm]{gfx/chapter-rvfl-ensembles/oos_rmse_over_time.png}
+\caption{Out-of-sample RMSE over time for the different tested models + VAR}
+\label{oos_rmse_over_time}
+\end{figure}
+
+\newpage
+
+To finish, we compute Diebold-Mariano tests for the significance of the difference in forecasting errors. The tests are computed for each ensemble model, against the errors from the base RVFL model and a VAR model.  
+
+$$
+TABLE DM TESTS HERE
+$$
+
+
+\newpage
+
+\section{Appendix}
+
+\subsection{Out-of-sample errors summary}
+\label{boxplot_summary}
+
+\textbf{horizon = 4}
+
+\begin{itemize}
+
+\item Min., 1st Qu., Median, Mean, 3rd Qu., Max
+
+\begin{verbatim}
+ ridge2           bagging          stack_ridge      stack_lm         
+ Min.   :0.9995   Min.   :0.8746   Min.   :0.9291   Min.   :0.9784   
+ 1st Qu.:1.5529   1st Qu.:1.5908   1st Qu.:1.6426   1st Qu.:1.7379   
+ Median :2.3605   Median :2.1484   Median :2.2407   Median :2.1715      
+ Mean   :2.3763   Mean   :2.3034   Mean   :2.3676   Mean   :2.5058      
+ 3rd Qu.:3.0261   3rd Qu.:2.8957   3rd Qu.:3.0690   3rd Qu.:3.0031      
+ Max.   :4.2952   Max.   :4.6781   Max.   :4.5133   Max.   :5.7641
+ 
+ stack_nnls           glmboost          VAR
+ Min.   :0.9874       Min.   :0.8996    Min.   :1.041 
+ 1st Qu.:1.7273       1st Qu.:1.6477    1st Qu.:1.680
+ Median :2.2839       Median :2.2443    Median :2.146
+ Mean   :2.5115       Mean   :2.3261    Mean   :2.498
+ 3rd Qu.:3.0494       3rd Qu.:3.0648    3rd Qu.:3.070
+ Max.   :6.0210       Max.   :4.3121    Max.   :6.068
+\end{verbatim}
+
+\item Standard deviation
+
+\begin{verbatim}
+   ridge2   bagging stack_ridge    stack_lm  stack_nnls    glmboost   VAR
+0.8804324 0.8881329   0.8870853   1.0549136   1.0889430   0.8238531   1.0511201
+\end{verbatim}
+
+\end{itemize}
+
+\textbf{horizon = 8}
+
+\begin{itemize}
+
+\item Min., 1st Qu., Median, Mean, 3rd Qu., Max
+
+\begin{verbatim}
+  ridge2         bagging       stack_ridge       stack_lm               
+ Min.   :1.192   Min.   :1.066   Min.   :1.143   Min.   :1.253      
+ 1st Qu.:1.740   1st Qu.:1.717   1st Qu.:1.754   1st Qu.:1.813      
+ Median :2.663   Median :2.467   Median :2.656   Median :2.694      
+ Mean   :2.529   Mean   :2.440   Mean   :2.509   Mean   :2.676      
+ 3rd Qu.:3.154   3rd Qu.:2.868   3rd Qu.:3.041   3rd Qu.:3.065      
+ Max.   :5.394   Max.   :4.800   Max.   :5.243   Max.   :6.032      
+ 
+ stack_nnls           glmboost          VAR
+ Min.   : 1.164       Min.   :1.203     Min.   :1.289
+ 1st Qu.: 2.056       1st Qu.:1.718     1st Qu.:1.920
+ Median : 2.775       Median :2.683     Median :2.648 
+ Mean   : 3.331       Mean   :2.478     Mean   :2.696 
+ 3rd Qu.: 4.069       3rd Qu.:3.024     3rd Qu.:2.964
+ Max.   :10.935       Max.   :5.387     Max.   :7.711
+\end{verbatim}
+
+\item Standard deviation
+
+\begin{verbatim}
+   ridge2     bagging stack_ridge    stack_lm  stack_nnls    glmboost         VAR
+0.8955453   0.8883188   0.9093582   1.0406195   1.8865643   0.8547240   1.1482777 
+\end{verbatim}
+
+\end{itemize}
+
+\subsection{Correlation of out-of-sample errors}
+\label{oos_errors_cor}
+
+\textbf{horizon = 4}
+
+\begin{verbatim}
+            ridge2   bagging      stack_ridge  glmboost       VAR
+ridge2      1.0000000 0.9350414   0.9658978    0.9627834      0.8422500
+bagging     0.9350414 1.0000000   0.9796091    0.9388819      0.8746823
+stack_ridge 0.9658978 0.9796091   1.0000000    0.9731609      0.8758017
+glmboost    0.9627834 0.9388819   0.9731609    1.0000000      0.8840573
+VAR         0.8422500 0.8746823   0.8758017    0.8840573      1.0000000
+\end{verbatim}
+
+\textbf{horizon = 8}
+
+\begin{verbatim}
+                ridge2  bagging stack_ridge  glmboost       VAR
+ridge2      1.0000000 0.9280983   0.9693424 0.9909838 0.8185879
+bagging     0.9280983 1.0000000   0.9855720 0.9481774 0.8522099
+stack_ridge 0.9693424 0.9855720   1.0000000 0.9804522 0.8561227
+glmboost    0.9909838 0.9481774   0.9804522 1.0000000 0.8622763
+VAR         0.8185879 0.8522099   0.8561227 0.8622763 1.0000000
+\end{verbatim}
