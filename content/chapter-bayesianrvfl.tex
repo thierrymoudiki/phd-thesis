@@ -283,7 +283,13 @@ Where $\Phi$ is the probability distribution function of a $\MN(0, 1)$, and $\Ph
 
 \medskip
 
-This, is to illustrate the model's behaviour on a simple example. A further tuning of the Random Forest hyperparameters, or of the parameter $\kappa$, or a different choice for $nb_{init}$, or activation function for the BQRVFL, would of course lead to different results. For $100$ seeds, and a fixed number of iterations $nb_{iter}$, we rerun the procedure described before, $100$ times. For the BQRVFL, $nb_{iter}$ goes from $5$ to $100$ with steps of $5$, and for the Random Forest with confidence intervals, $nb_{iter} \in \left \lbrace 5, 50, 100 \right \rbrace$. 
+We now illustrate the model's behaviour on a simple example. The objective function to be minimized is the rescaled Branin function, which is widely used for testing Bayesian optimization frameworks. The function is defined for $\textbf{x} = (x_1, x_2) \in [0, 1]^2$ as: 
+\begin{equation}
+\textbf{x} \mapsto \frac{1}{51.95}\left[\left(\bar{x}_2 - \frac{5.1\bar{x}_2}{4 \pi^2} + \frac{5\bar{x}_1}{\pi}-6\right)^2  + \left(10 - \frac{10}{8\pi}\right)cos(\bar{x}_1) - 44.81 \right]
+\end{equation}
+where $\bar{x}_1 = 15 x_1 - 5$ $\bar{x}_2 = 15 x_2$
+
+A further tuning of the Random Forest hyperparameters, or of the parameter $\kappa$, or a different choice for $nb_{init}$, or activation function for the BQRVFL, would of course lead to different results. For $100$ seeds, and a fixed number of iterations $nb_{iter}$, we rerun the procedure described before, $100$ times. For the BQRVFL, $nb_{iter}$ goes from $5$ to $100$ with steps of $5$, and for the Random Forest with confidence intervals, $nb_{iter} \in \left \lbrace 5, 50, 100 \right \rbrace$. 
 
 \begin{figure}[!htb]
 \centering
