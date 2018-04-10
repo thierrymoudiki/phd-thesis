@@ -283,7 +283,7 @@ In the specific case of the BQRVFL, there are two hyperparameters for the surrog
 Since it is fast to compute for these type of models and we would like to avoid a costly hyperparameters' search at this point, we choose to minimize the Generalized Cross Validation (GCV) error on the dataset $\DD$ constructed at step $1.$ (in order to obtain $\hat{\theta}$). The GCV error is a convenient approximation to the Leave-One-Out cross validation error, and is defined as: 
 
 \begin{equation}
-GCV = \frac{1}{nb_{init}}\sum_i \left( \frac{y_i - \hat{y}_i}{1 - \frac{tr(\textbf{S})}{nb_{init}}} \right)^2 
+GCV = \frac{1}{nb_{init}}\sum_{i = 1}^{nb_{init}} \left( \frac{y_i - \hat{y}_i}{1 - \frac{tr(\textbf{S})}{nb_{init}}} \right)^2 
 \end{equation}
 where $nb_{init}$ is the number of observations in the response variable 
 $$
