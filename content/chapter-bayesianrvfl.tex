@@ -136,7 +136,8 @@ $SLC14_1$ consists of $n$ rows, where $n$ is a function parameter, and $20$ colu
 $$
 \textbf{x} = \left( x_1, x_2, \ldots, x_{20}\right) 
 $$
-and the following transformation is applied to obtain each column of $SLC14_1$
+
+The following transformation is applied to obtain each column of $SLC14_1$
 \begin{eqnarray*}
  \textbf{x} &\mapsto& x_1 + sin(x_2) + log(|x_3|) + x_4^2 + x_5 \times x_6 +
 I(x_7 \times x_8 \times x_9 < 0) + I(x_{10} > 0) \\
@@ -145,15 +146,15 @@ cos(x_{13}) + 2 \times x_{14} + |x_{15}| \\
 &+& I(x_{16} < -1) + x_{17} \times I(x_{17} < -1) - 2  \times  x_{18}
 - x_{19} \times x_{20} + \epsilon
 \end{eqnarray*}
-where $\epsilon \sim \MN\left(0, 9\right)$. The same type of idea is applied for obtaining $SLC14_2$. The construction of the dataset begins with a matrix \code{dat} having $n$ rows and $200$ columns, and the distribution of the random numbers within \code{dat}, is a Gaussian distribution with mean equal to $0$, and variance equal to $16$. And the transformation applied to the columns of \code{dat} is: 
+where $\epsilon \sim \MN\left(0, 9\right)$. The same type of idea is applied for obtaining the dataset $SLC14_2$. The construction of $SLC14_2$ begins with a matrix \code{dat} having $n$ rows and $200$ columns. The distribution of the random numbers within \code{dat} is a Gaussian distribution with mean equal to $0$, and variance equal to $16$, and the transformation applied to the columns of \code{dat} is: 
 $$
 \textbf{x} \mapsto -1 + log(|x_1|) + \ldots + log(|x_{200}|)  + \epsilon
 $$
 where $\epsilon \sim \MN\left(0, 25\right)$.
 
-For each seed, \code{123} and \code{456}, and $n = 250$, we separate the datasets $SLC14_1$ and $SLC14_2$ into a training/testing test, and a validation set. The training set contains $70\%$ of the whole data ($175$ observations), and the test set contains the remaining $30\%$ of the data ($75$ observations). 
+For each seed, \code{123} and \code{456}, and $n = 250$, we separate the datasets $SLC14_1$ and $SLC14_2$ into a training/testing test, and a validation set. The training/testing set contains $70\%$ of the whole data ($175$ observations), and the test set contains the remaining $30\%$ of the data ($75$ observations). 
 
-A $5$-fold cross-validation repeated $10$ times is then applied to the training set, in order to choose \textit{optimal} hyperparameters for the BQRVL model. And to finish, the BQRVFL model with these \textit{optimal} hyperparameters is applied to predict values on the validation set. The following figures, \ref{oos_SLC14_1_seed123}, \ref{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed123}, \ref{gfx/chapter-bayesianrvfl/oos_SLC14_1_seed456}, and \ref{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed456} present the validation sets' observations (black line), along with the out-of-sample predictions on the validation set (blue line), along with $80\%$ and $95\%$ confidence intervals around the predictions.
+A $5$-fold cross-validation repeated $10$ times is applied to the training set, in order to choose some \textit{optimal} hyperparameters for the BQRVL model. The BQRVFL model with these \textit{optimal} hyperparameters is applied to predict values on the validation set. In figures \ref{oos_SLC14_1_seed123}, \ref{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed123}, \ref{gfx/chapter-bayesianrvfl/oos_SLC14_1_seed456}, and \ref{gfx/chapter-bayesianrvfl/oos_SLC14_2_seed456} we present the validation sets' observations (black line), along with the out-of-sample predictions on the validation set (blue line), and the $80\%$, $95\%$ confidence intervals around the predictions.
 
 \begin{figure}[!htb]
     \centering
@@ -186,6 +187,8 @@ A $5$-fold cross-validation repeated $10$ times is then applied to the training 
     \end{minipage}
 \end{figure}
 
+\newpage
+
 We observe that the confidence intervals often contain the validation set value, with a few exceptions. The following table \ref{tab:bestparams} contain the \textit{optimal} (based on a grid search) parameters found for each dataset, with a ReLU activation function for the BQRVFL, and the proportions of points of the validation set contained into the $80$\%, $95$\% confidence intervals: 
 
 
@@ -208,10 +211,13 @@ Dataset & Number of nodes & $\lambda$ & Prop at 95\% & Prop at 80\% \\
 \end{center}
 \end{table}
 
+In the next section, \ref{sec:bayesopt}, we are going to use this model as a workhorse for Bayesian optimization. 
+
 \section{Bayesian optimization of black box functions}
 \label{sec:bayesopt}
 
 \subsection{Description of the method}
+\label{bayesopt_desc}
 
 The optimization problem is about finding $\textbf{x}^* \in \AC \subseteq \RR^k$, so that: 
 
@@ -222,16 +228,12 @@ $f$ is the objective function, whose evaluations are expensive to calculate, and
 
 \medskip
 
-Bayesian optimization (cite Mockus et al. (1978) and Jones (2001)) will minimize an alternative, cheaper function called the acquisition function, instead of minimizing $f$ directly. 
-
-\medskip
-
-The acquisition function is based on the uncertainty around the predictions of a surrogate machine learning model, trying to approximate $f$. Here, we consider only two types of acquisition functions. We denote by $\widetilde{f}(\textbf{x}, \theta)$, the prediction obtained with the surrogate model (whose distribution depends on $\theta$) on a point $\textbf{x} \in \AC$: 
+Bayesian optimization (cite Mockus et al. (1978) and Jones (2001)) will minimize an alternative, cheaper function called the acquisition function, instead of minimizing $f$ directly. The acquisition function is based on the uncertainty around the predictions of a surrogate machine learning model, trying to approximate $f$. Here, we consider only two types of acquisition functions. If we denote by $\widetilde{f}(\textbf{x}, \theta)$, the prediction obtained with the surrogate model (whose distribution depends on $\theta$) on a point $\textbf{x} \in \AC$, they are defined as: 
 
 \begin{itemize}
 \item The \textbf{Upper Confidence Bound} (UCB) acquisition function, (actually a Lower Confidence Bound in the case of minimization). The idea is to minimize: 
 $$
-a_{UCB}(\textbf{x}) = \mu(\textbf{x}) - \kappa \sigma(\textbf{x})
+a_{UCB}(\textbf{x}; \mu, \sigma) = \mu(\textbf{x}) - \kappa \sigma(\textbf{x})
 $$
 $\kappa$ is a tuning parameter, designed to balance between exploration and exploitation (more details on this). With $\kappa = 1.96$ for example, this looks like the lower confidence bound of $\widetilde{f}(\textbf{x}, \theta)$, at a risk level of $5$\%, when the surrogate model is $\MN(\mu(\textbf{x}), \sigma(\textbf{x}))$. 
 
@@ -239,8 +241,19 @@ $\kappa$ is a tuning parameter, designed to balance between exploration and expl
 
 \item The \textbf{Expected Improvement} (EI) acquisition function. If $f^*$ is the current minimum value found after a few evaluations of $f$, we would like to maximize the expected improvement of the surrogate model's predictions over $f^*$ :  
 $$
-a_{EI}(\textbf{x}) = \EE \left[ max(\widetilde{f}(\textbf{x}, \theta) - f^*, 0)\right]
+a_{EI}(\textbf{x}; \theta) = \EE \left[ max(\widetilde{f}(\textbf{x}, \theta) - f^*, 0)\right]
 $$
+
+In the case where the posterior distribution of the surrogate model is Gaussian, $\MN(\mu(\textbf{x}), \sigma(\textbf{x}))$, the acquisition function with  Expected Improvement can be re-written as: 
+
+$$
+a_{EI}(\textbf{x}) = \sigma(\textbf{x}) \left( \mu(\textbf{x}) \Phi \left( \gamma(\textbf{x}) \right) +  \Phi^{'} \left( \gamma(\textbf{x}) \right) \right)
+$$
+
+\medskip
+
+Where $\Phi$ is the probability distribution function of a $\MN(0, 1)$, and $\Phi^{'}$ is its density function. We assume in the sequel of the paper that the  predictions of all the surrogate models are drawn from a multivariate Gaussian distribution.
+
 \end{itemize}
 
 \medskip 
@@ -252,44 +265,64 @@ The whole optimization process that we use is iterative and is described below, 
 $$
 \DD = \left \lbrace (\textbf{x}_1, f\left(\textbf{x}_1)\right), \ldots,  (\textbf{x}_{nb_{init}}, f(\textbf{x}_{nb_{init}}))\right \rbrace
 $$
-\item We train the surrogate model on $\DD$, with a fixed parameter $\theta$ for the distribution, and search for the next point to be evaluated for $f$, as: 
+\item We train the surrogate model on $\DD$, with a fixed, estimated parameter $\hat{\theta}$ on which its distribution depends, and search for the next point to be evaluated for $f$, as: 
 $$
-\textbf{x}_{next} = ArgMax_{\textbf{x} \in \AC} \: a_{EI}(\textbf{x})
+\textbf{x}_{next} = ArgMax_{\textbf{x} \in \AC} \: a_{EI}(\textbf{x}; \hat{\theta})
 $$ or 
 $$
-\textbf{x}_{next} = ArgMin_{\textbf{x} \in \AC} \: a_{UCB}(\textbf{x})
+\textbf{x}_{next} = ArgMin_{\textbf{x} \in \AC} \: a_{UCB}(\textbf{x}; \hat{\theta})
 $$
-If $\textbf{x}_{next}$ is already found in $\DD$, then $\textbf{x}_{next}$ is picked randomly in $\AC$.
-\item $\DD$ is enriched with $(\textbf{x}_{next}, f(\textbf{x}_{next}))$ and we return to point $2.$, until the $nb_{iter}$ budget is reached.
+If $\left(\textbf{x}_{next}, f(\textbf{x}_{next})\right)$ is already found in $\DD$, then $\textbf{x}_{next}$ is picked randomly in $\AC$.
+\item $\DD$ is enriched with $(\textbf{x}_{next}, f(\textbf{x}_{next}))$ and we return to point $2.$, until the budget of iterations, $nb_{iter}$, is reached.
 \end{enumerate}
 
-Step 2. is done with a gradient based optimization method (cite nlminb PORT routine).
+For the BQRVFL (or any other machine learning model considered as a surrogate model for this purpose), an important point to consider in step $2.$ is the choice of $\theta$, which is also a problem of hyperparameters' selection. 
 
-\medskip
+In the specific case of the BQRVFL, there are two hyperparameters for the surrogate model: the number of nodes in the hidden layer, and the regularization parameter $\sigma^2$. The choice of the activation function or the type of simulation for the nodes in the hidden layer is limited here to the ReLU activation function, and a Sobol sequence. 
 
-For the BQRVFL, we have to choose $\theta$, which, in this specific case, are two parameters: the number of nodes in the hidden layer, and the regularization parameter $\sigma^2$. Ths is done by using Generalized Cross Validation (GCV). More details.  
+Since it is fast to compute for these type of models and we would like to avoid a costly hyperparameters' search at this point, we choose to minimize the Generalized Cross Validation (GCV) error on the dataset $\DD$ constructed at step $1.$ (in order to obtain $\hat{\theta}$). The GCV error is a convenient approximation to the Leave-One-Out cross validation error, and is defined as: 
 
-\medskip
-
-We assume that the Random Forest predictions are Gaussian (you should check this further in the paper of Wager (2014)!). The BQRVFL's posterior distribution is also Gaussian, $\MN(\mu(\textbf{x}), \sigma(\textbf{x}))$. In this case, the acquisition function with  Expected Improvement can be re-written as: 
-
+\begin{equation}
+GCV = \frac{1}{nb_{init}}\sum_i \left( \frac{y_i - \hat{y}_i}{1 - \frac{tr(\textbf{S})}{nb_{init}}} \right)^2 
+\end{equation}
+where $nb_{init}$ is the number of observations in the response variable 
 $$
-a_{EI}(\textbf{x}) = \sigma(\textbf{x}) \left( \mu(\textbf{x}) \Phi \left( \gamma(\textbf{x}) \right) +  \Phi^{'} \left( \gamma(\textbf{x}) \right) \right)
+y = \left( f(\textbf{x}_1), \ldots, f(\textbf{x}_{nb_{init}}) \right)^T
 $$
+$\textbf{S}$ is a smoother matrix verifying $\hat{y} = \textbf{S}y$, and $tr(\textbf{S})$ is the trace of matrix $\textbf{S}$. In the case of BQRVFL, $y$ contains the observed values of the response $y$, $\textbf{S} = \left(\textbf{Z}^T\textbf{Z} + \lambda I_p \right)^{-1}\textbf{Z}^T$, and $\hat{y}$ contains the model's fitted values. 
 
-\medskip
+Having obtained $\hat{\theta}$, the \textit{optimal} $\theta$ in point $2.$, searching for the next point to be evaluated is done with a gradient based optimization (cite nlminb PORT routine) of $\textbf{x} \mapsto a_{EI}\left(\textbf{x}; \hat{\theta} \right)$ and $\textbf{x} \mapsto a_{UCB}\left(\textbf{x}; \hat{\theta}  \right)$. 
 
-Where $\Phi$ is the probability distribution function of a $\MN(0, 1)$, and $\Phi^{'}$ is its density function. 
+\subsection{Use of the BQRVFL for Bayesian optimization}
 
-\medskip
-
-We now illustrate the model's behaviour on a simple example. The objective function to be minimized is the rescaled Branin function, which is widely used for testing Bayesian optimization frameworks. The function is defined for $\textbf{x} = (x_1, x_2) \in [0, 1]^2$ as: 
+We now illustrate the BQRFL model's behaviour on a simple example of Bayesian optimization. The objective function to be minimized is the rescaled Branin function, which is widely used for testing Bayesian optimization frameworks, and notably in (cite Picheny et al. (2012), Picheny, V., Wagner, T., \& Ginsbourger, D. (2012). A benchmark of kriging-based infill criteria for noisy optimization). 
+This function is defined for $\textbf{x} = (x_1, x_2) \in [0, 1]^2$ as: 
 \begin{equation}
 \textbf{x} \mapsto \frac{1}{51.95}\left[\left(\bar{x}_2 - \frac{5.1\bar{x}_2}{4 \pi^2} + \frac{5\bar{x}_1}{\pi}-6\right)^2  + \left(10 - \frac{10}{8\pi}\right)cos(\bar{x}_1) - 44.81 \right]
 \end{equation}
-where $\bar{x}_1 = 15 x_1 - 5$ $\bar{x}_2 = 15 x_2$
+where $\bar{x}_1 = 15 x_1 - 5$ $\bar{x}_2 = 15 x_2$. The rescaled Branin function is presented below, in figures \ref{resc_branin_persp} and \ref{resc_branin_levelplot}. 
 
-A further tuning of the Random Forest hyperparameters, or of the parameter $\kappa$, or a different choice for $nb_{init}$, or activation function for the BQRVFL, would of course lead to different results. For $100$ seeds, and a fixed number of iterations $nb_{iter}$, we rerun the procedure described before, $100$ times. For the BQRVFL, $nb_{iter}$ goes from $5$ to $100$ with steps of $5$, and for the Random Forest with confidence intervals, $nb_{iter} \in \left \lbrace 5, 50, 100 \right \rbrace$. 
+\begin{figure}[!htb]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[width=1.064\linewidth, height=0.3\textheight]{gfx/chapter-bayesianrvfl/resc_branin_persp.png}
+        \caption{Rescaled Branin function perspective plot}
+        \label{resc_branin_persp}
+    \end{minipage}%
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=1.064\linewidth, height=0.3\textheight]{gfx/chapter-bayesianrvfl/resc_branin_levelplot.png}
+        \caption{Rescaled Branin function level plot}
+        \label{resc_branin_levelplot}
+    \end{minipage}
+\end{figure}
+
+\medskip
+
+The global minimum value of the function is found (by using a multi-start gradient-based optimization) at $\textbf{x} = \left(0.5427728, 0.1516667\right)$, and is equal to $-1.047394$. Below, in figures \ref{min_value_dist_bqrvfl} and \ref{min_value_dist_rf} (and tables \ref{tab:min_values_bqrvfl_ei} and \ref{tab:min_values_bqrvfl_ucb}), we present the results obtained by using the BQRVFL model, and the Random Forest model with confidence intervals as workhorses for the Bayesian optimization of the rescaled Branin function. We use $nb_{init} = 100$ and a total budget of $100$ iterations. 
+
+\medskip
 
 \begin{figure}[!htb]
 \centering
@@ -379,15 +412,20 @@ Nb. of iterations & Min & 1st Qrt  & Median & Mean  & 3rd Qrt  & Max & Std. Dev 
 \end{center}
 \end{table}
 
-Some pretty good results were obtained with the Random Forest for the mean and the median value. But generally with a higher variance on the minimum value obtained than BQRVFL. 
+\newpage
 
-\medskip
+For $100$ seeds, and a fixed number of iterations $nb_{iter}$, we rerun the procedure described before in section \ref{bayesopt_desc}, $100$ times. For the BQRVFL, $nb_{iter}$ goes from $5$ to $100$ with steps of $5$, and for the Random Forest with confidence intervals, $nb_{iter} \in \left \lbrace 5, 50, 100 \right \rbrace$. A further tuning of the Random Forest hyperparameters, or of the parameter $\kappa$, or a different choice for $nb_{init}$, or activation function for the BQRVFL, would of course lead to different results. 
 
-Another interesting information obtained through these simulations is the number of times (over $nb_{iter} = 100$ iterations) $\textbf{x}_{next}$ has been picked randomly in $\AC$ at Step 2. (when $\textbf{x}_{next}$ is already in $\DD$). 
+We observe that pretty good results are obtained with the Random Forest for the mean and the median value. But generally with a higher variance on the minimum value obtained than BQRVFL. Another interesting information obtained through these simulations is the number of times (over $nb_{iter} = 100$ iterations) $\textbf{x}_{next}$ has been picked randomly in $\AC$ at Step 2. (when $\textbf{x}_{next}$ is already in $\DD$). 
 
-\medskip
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=12cm]{gfx/chapter-bayesianrvfl/nb_is_found.png}
+\caption{Distribution of the number of times a simulation of $\textbf{x}_{next} \in \AC$ has been required at step 2.}
+\label{nb_is_found_dist}
+\end{figure}
 
-In table \ref{tab:nb_sims} and figure \ref{nb_is_found_dist}, we observe that on this part, BQRVFL generally performs better. With BQRVFL and Expected Improvement acquisition function for example, the next point to be evaluated is never obtained by simulation of $\textbf{x}_{next} \in \AC$. 
+\newpage
 
 \begin{table}[!htb]
 \begin{center}
@@ -408,13 +446,8 @@ Method & Min & 1st Qrt  & Median & Mean  & 3rd Qrt  & Max & Std. Dev \\
 \end{center}
 \end{table}
 
+In table \ref{tab:nb_sims} and figure \ref{nb_is_found_dist}, we observe that on this part, BQRVFL generally performs better. With BQRVFL and Expected Improvement acquisition function for example, the next point to be evaluated is never obtained by simulation of $\textbf{x}_{next} \in \AC$. 
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=12cm]{gfx/chapter-bayesianrvfl/nb_is_found.png}
-\caption{Distribution of the number of times a simulation of $\textbf{x}_{next} \in \AC$ has been required at step 2.}
-\label{nb_is_found_dist}
-\end{figure}
 
 A good place to apply Bayesian optimization, is to the choice of hyperparameters of machine learning algorithms. The cross-validation function, which is the objective function of the hyperparameters, is indeed expensive to train/predict over the cross-validation resamples.  
 
@@ -422,7 +455,7 @@ A good place to apply Bayesian optimization, is to the choice of hyperparameters
 
 \subsubsection{Description of the models}
 
-In the previous chapters, we introduced the RVFL, the KRLS, and the DNS-KRLS models. Here, we compare all these models by using the Bayesian optimization algorithm described in this chapter.  
+In the previous chapters, we introduced the RVFL, the KRLS, and the DNS-RVFL, DNS-KRLS models. Here, we compare all these models by using the Bayesian optimization algorithm described in this chapter.  
 
 \subsubsection{Examples of minimization of the out out-of-sample RMSE}
 
@@ -485,13 +518,7 @@ In the previous chapters, we introduced the RVFL, the KRLS, and the DNS-KRLS mod
 
 Details of the distribution of errors are provided in the appendix (boxplots and summaries). 
 
-We also show how the Mat\'ern 3/2 and the DNS-RVFL are performing over the time, for horizon = $12$ and for horizon = $36$, particularly during the credit/liquidity crunch.
-
-
-
-\subsection{Example of ensembles of RVFL}
-
-In this section, we compare the bagging and stacking of RVFL models. As in the previous section, the optimization of the out-of-sample error (the choice of model's hyperparameters) is made by using the BQRVFL as a workhorse for Bayesian optimization. 
+\newpage
 
 \section{Conclusion}
 
@@ -503,12 +530,10 @@ Figure (\ref{timings}) illustrates this fact very well (see appendix \ref{sec:ti
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=13cm]{gfx/chapter-bayesianrvfl/timings.png}
-\caption{timings KRLS vs timings RVFL}
+\includegraphics[width=14cm]{gfx/chapter-bayesianrvfl/timings.png}
+\caption{timings of KRLS vs timings of RVFL}
 \label{timings}
 \end{figure}
-
-When it comes to ensemble learning, we compare bagging, boosting and stacking models. Both.
 
 \newpage
 
