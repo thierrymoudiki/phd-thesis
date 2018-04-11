@@ -197,7 +197,7 @@ We observe that the confidence intervals often contain the validation set value,
 \begin{table}[!htb]
 \begin{center}
 % table caption is above the table
-\caption{}
+\caption{optimal hyperparameters found for the BQRVFL on $SLC14_1$ and $SLC14_2$}
 \label{tab:bestparams}       % Give a unique label
 % For LaTeX tables use
 \begin{tabular}{llllll}
@@ -205,9 +205,9 @@ We observe that the confidence intervals often contain the validation set value,
 Dataset & Number of nodes & $\lambda$ & Prop at 95\% & Prop at 80\% \\
 \noalign{\smallskip}\hline\noalign{\smallskip}
    $SLC14_1$ - \code{seed = 123} & 975 & 1.53 & $86.11\%$ & $77.77\%$ \\
-   $SLC14_1$ - \code{seed = 456} & -1.047 & -1.024 & $0\%$ & $0\%$ \\
+   $SLC14_1$ - \code{seed = 456} & 700 & 132.19 & $100.00\%$ & $97.22\%$ \\
    $SLC14_2$ - \code{seed = 123} & 825 & 20 & $97.22\%$ & $94.44\%$ \\
-   $SLC14_2$ - \code{seed = 456} & -1.047 & -1.027 & -1.027 & -1.027 \\
+   $SLC14_2$ - \code{seed = 456} & 650 & 1788.65 & $100.00\%$ & $100.00\%$ \\
 \noalign{\smallskip}\hline
 \end{tabular}
 \end{center}
@@ -426,7 +426,7 @@ We observe that pretty good results are obtained with the Random Forest for the 
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=12cm]{gfx/chapter-bayesianrvfl/nb_is_found.png}
+\includegraphics[width=8.25cm]{gfx/chapter-bayesianrvfl/nb_is_found.png}
 \caption{Distribution of the number of times a simulation of $\textbf{x}_{next} \in \AC$ has been required at step 2.}
 \label{nb_is_found_dist}
 \end{figure}
@@ -452,7 +452,7 @@ Method & Min & 1st Qrt  & Median & Mean  & 3rd Qrt  & Max & Std. Dev \\
 \end{center}
 \end{table}
 
-In table \ref{tab:nb_sims} and figure \ref{nb_is_found_dist}, we observe that on this part, BQRVFL generally performs better. With BQRVFL and Expected Improvement acquisition function for example, the next point to be evaluated is never obtained by simulation of $\textbf{x}_{next} \in \AC$. 
+In table \ref{tab:nb_sims} and figure \ref{nb_is_found_dist}, we observe that on choosing \textit{good} next points at step $2.$, BQRVFL generally performs better than the other models. Indeed with BQRVFL and Expected Improvement acquisition function for example, the next point to be evaluated is never obtained by simulation of $\textbf{x}_{next} \in \AC$. 
 
 
 A good place to apply Bayesian optimization, is to the choice of hyperparameters of machine learning algorithms. The cross-validation function, which is the objective function of the hyperparameters, is indeed expensive to train/predict over the cross-validation resamples.  
@@ -522,9 +522,7 @@ In the previous chapters, we introduced the RVFL, the KRLS, and the DNS-RVFL, DN
 \label{oos_krls}
 \end{figure}
 
-Details of the distribution of errors are provided in the appendix (boxplots and summaries). 
-
-\newpage
+Details of the distribution of errors are provided in the appendix \ref{sec:timings} (boxplots and summaries). 
 
 \section{Conclusion}
 
@@ -532,7 +530,7 @@ In this chapter, we presented a quasi-randomized functional link neural networks
 
 In general, we observe that the \textit{best} results are obtained in the DNS-KRLS framework by the RVFL (applied to the level, slope and curvature). And in the KRLS framework, the kernel Mat\'ern 3/2 performs the best. This kernel also performs the best overall, in terms of average out-of-sample RMSE. However, it is worth mentioning, as in previous chapters, that the cost of computing the kernel is a quadratic function of the number of input spot rates. 
 
-Figure (\ref{timings}) illustrates this fact very well (see appendix \ref{sec:timings} for details on the timings). It compares the KRLS and RVFL models timings on training and forecasting horizons equal to $12$ months and $36$ months, and respectively $15$, $22$ and $30$ observed time to maturities. The RVFL timings remain relatively stable as the number of time to maturities increase, whereas the KRLS timings increase at a fast pace in the same situation.
+Figure (\ref{timings}) illustrates this fact very well, with $100$ repeats at each time to maturity (see appendix \ref{sec:timings} for details on the timings). It compares the KRLS and RVFL models timings on training and forecasting horizons equal to $12$ months and $36$ months, and respectively $15$, $22$ and $30$ observed time to maturities. The RVFL timings remain relatively stable as the number of time to maturities increase, whereas the KRLS timings increase at a fast pace in the same situation.
 
 \begin{figure}[!htb]
 \centering
@@ -552,13 +550,13 @@ Figure (\ref{timings}) illustrates this fact very well (see appendix \ref{sec:ti
     \centering
     \begin{minipage}{.5\textwidth}
         \centering
-        \includegraphics[width=1.064\linewidth, height=0.3\textheight]{gfx/chapter-bayesianrvfl/min_branin_10_iter.png}
+        \includegraphics[width=1.064\linewidth, height=0.32\textheight]{gfx/chapter-bayesianrvfl/min_branin_10_iter.png}
         \caption{Points found by the algorithm after $10$ iterations}
         \label{min_branin_10_iter}
     \end{minipage}%
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=1.064\linewidth, height=0.3\textheight]{gfx/chapter-bayesianrvfl/min_branin_50_iter.png}
+        \includegraphics[width=1.064\linewidth, height=0.32\textheight]{gfx/chapter-bayesianrvfl/min_branin_50_iter.png}
         \caption{Points found by the algorithm after $50$ iterations}
         \label{min_branin_50_iter}
     \end{minipage}
@@ -567,13 +565,13 @@ Figure (\ref{timings}) illustrates this fact very well (see appendix \ref{sec:ti
     \centering
     \begin{minipage}{.5\textwidth}
         \centering
-        \includegraphics[width=1.064\linewidth, height=0.3\textheight]{gfx/chapter-bayesianrvfl/min_branin_100_iter.png}
+        \includegraphics[width=1.064\linewidth, height=0.32\textheight]{gfx/chapter-bayesianrvfl/min_branin_100_iter.png}
         \caption{Points found by the algorithm after $100$ iterations}
         \label{min_branin_100_iter}
     \end{minipage}%
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=1.064\linewidth, height=0.3\textheight]{gfx/chapter-bayesianrvfl/min_branin_250_iter.png}
+        \includegraphics[width=1.064\linewidth, height=0.32\textheight]{gfx/chapter-bayesianrvfl/min_branin_250_iter.png}
         \caption{Points found by the algorithm after $250$ iterations}
         \label{min_branin_250_iter}
     \end{minipage}
