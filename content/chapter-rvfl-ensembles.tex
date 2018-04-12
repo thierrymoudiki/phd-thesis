@@ -412,43 +412,97 @@ The base RVFL model is denoted as \code{ridge2}. \code{bagging}, \code{stack\und
 
 Bagging is performing the best on average (cf. appendix \ref{boxplot_perfs} for details) on both horizons, 4-steps ahead and 8-steps ahead, and is followed by boosting. The stacking algorithm works best with the ridge regression model taken as a meta-learner, but is failing with the other meta learners (ordinary least squares and least squares regression with positive coefficients). Overall, the boosting algorithm is also very robust, and displays the lowest standard deviation of all the models tested. 
 
-The \textit{best} hyperparameters obtained for each algorithm are presented below, for the different horizons of projection. 
+The \textit{best} hyperparameters obtained for each algorithm are presented below, for the different horizons of projection. The best hyperparameter found for stacking with ordinary least squares, with a constraint on the regression parameters or not, is the number of lags equal to $1$ and $B = 1$. 
 
-\newpage
+\textbf{For horizon = 4}
+
+\begin{table}[!htb]
+\begin{center}
+% table caption is above the table
+\caption{\textit{Best} hyperparameters for the base RVFL}
+\label{tab:bestparamsrvfl}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{lllllll}
+\hline\noalign{\smallskip}
+Method & lags & nodes & $\lambda_1$ & $\lambda_2$ &   &   \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  \textbf{RVFL} & 3 & 100 & 10000 & 100 &  &  \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!htb]
+\begin{center}
+% table caption is above the table
+\caption{\textit{Best} hyperparameters for the bagging of RVFLs}
+\label{tab:bestparamsbagrvfl}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllllll}
+\hline\noalign{\smallskip}
+Method & lags & nodes & $\lambda_1$ & $\lambda_2$ & B  &  col. sample  & row. sample\\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  \textbf{Bagging} & 1 & 1 & 21.54435 & 21.54435 & 100 & 0.9 & 0.9\\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!htb]
+\begin{center}
+% table caption is above the table
+\caption{\textit{Best} hyperparameters for the stacking with ridge regression}
+\label{tab:bestparamsbagrvfl}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllllll}
+\hline\noalign{\smallskip}
+Method & lags & $\lambda$ & $B$ & col. sample  &  row. sample  \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  \textbf{Stacking (ridge)} & 3 & 21.54435 &  1 & 0.9 & 0.8   \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!htb]
+\begin{center}
+% table caption is above the table
+\caption{\textit{Best} hyperparameters for the boosting algorithm}
+\label{tab:bestparamsbagrvfl}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllllll}
+\hline\noalign{\smallskip}
+Method & lags & nodes & $\nu$ & $B$ & col. sample  &  & \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  \textbf{Boosting} & 3 & 1 & $0.2020798$ & 10 & 1 & & \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+% table caption is above the table
+\caption{\textit{Best} hyperparameters for the VAR}
+\label{tab:bestparamsvar}       % Give a unique label
+% For LaTeX tables use
+\begin{tabular}{llllllll}
+\hline\noalign{\smallskip}
+Method & lags & type of regressor &  &  &  &  & \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+  \textbf{VAR} & 1 & const &  & &  & & \\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+\textbf{For horizon = 8}
+
+
 
 \begin{itemize}
-
-\item \textbf{For horizon = 4}
-
-\begin{verbatim}
-   # base RVFL
-   lags nb_hidden lambda_1 lambda_2  
-      3       100    10000      100 
-  
-   # bootstrap aggregating
-   lags nb_hidden lambda_1 lambda_2   B col_sample row_sample 
-     1         1 21.54435 21.54435 100        0.9        0.9 
-   
-   # stacking with ridge regression
-   lags   lambda   
-      3 21.54435 
-  
-  # stacking with ordinary least squares
-   lags 
-      1 
-  
-  # stacking with least squares and > 0 coeffs
-   lags  
-      1 
-  
-  # boosting
-   lags  B       eta col_sample nb_hidden lambda_1 lambda_2   
-     3 10 0.2020798          1         1      Inf      Inf 
-  
-  # VAR
-   type_VAR lags   
-      const    1 
-\end{verbatim}
 
 \item For \textbf{horizon = 8}
 \begin{verbatim}
