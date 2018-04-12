@@ -496,25 +496,14 @@ The \textit{best} hyperparameters obtained for each algorithm are presented belo
 
 %\newpage
 
-Below, in figure \ref{oos_rmse_over_time}, we can observe how the different methods perform through time. We observe that the models' errors are highly correlated, which is reassuring concerning their implementation. 
-
-The details of the correlations between these errors can be found in appendix \ref{oos_errors_cor}. The VAR model generally exhibits a higher variance than the other models (excluding stacking with \code{stack\underline{  }lm} and \code{stack\underline{  }nnls}), but is still able to perform better than them at times.    
+Below, in figure \ref{oos_rmse_over_time}, we can observe how the different methods perform through time. We observe that the models' errors are highly correlated, which is (kind of!) reassuring concerning their implementation. The details of the correlations between these errors can be found in appendix \ref{oos_errors_cor}. The VAR model generally exhibits a higher variance than the other models (excluding stacking with \code{stack\underline{  }lm} and \code{stack\underline{  }nnls}), but is still able to perform better than them at times (due to the high variance...).    
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=15cm]{gfx/chapter-rvfl-ensembles/oos_rmse_over_time.png}
+\includegraphics[width=14cm]{gfx/chapter-rvfl-ensembles/oos_rmse_over_time.png}
 \caption{Out-of-sample RMSE over time for the different tested models + VAR}
 \label{oos_rmse_over_time}
 \end{figure}
-
-\newpage
-
-To finish, we compute Diebold-Mariano tests for the significance of the difference in forecasting errors. The tests are computed for each ensemble model, against the errors from the base RVFL model and a VAR model.  
-
-$$
-TABLE DM TESTS HERE
-$$
-
 
 \newpage
 
