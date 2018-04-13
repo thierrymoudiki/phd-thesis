@@ -22,15 +22,15 @@ With the BQRVFL model presented here, it is possible to obtain predictions from 
 
 \medskip 
 
-There are other types of models, which are also capable of achieving this purpose - obtain predictions from a nonlinear model, along with confidence intervals around the model's predictions - like Gaussian process regression models (cite Rasmussen et al. (2006)) and random forests models with confidence intervals (cite Wager et al. (2014)). Depending on the problem at hand, and the desire from the user for a higher  accuracy and/or interpretability, one of these alternative models could also be considered.    
+There are other types of models, which are also capable of achieving this purpose - obtain predictions from a nonlinear model, along with confidence intervals around the model's predictions - like Gaussian process regression models \cite{rasmussen2006gaussian} and random forests models with confidence intervals (\cite{wager2014confidence}). Depending on the problem at hand, and the desire from the user for a higher  accuracy and/or interpretability, one of these alternative models could also be considered.    
 
 \medskip 
 
-In section \ref{sec:modelprez}, we present the BQRFVL model, with one hidden layer. Formulas for the estimation of its parameters are given, along with formulas for the calculation of confidence intervals around the predictions. The model's predictions on a validation set, and on simulated data from (cite Sapp (2014)) are also presented. 
+In section \ref{sec:modelprez}, we present the BQRFVL model, with one hidden layer. Formulas for the estimation of its parameters are given, along with formulas for the calculation of confidence intervals around the predictions. The model's predictions on a validation set, and on simulated data from \cite{sapp2014subsemble} are also presented. 
 
 \medskip 
 
-In section \ref{sec:bayesopt}, the model is used as a workhorse for Bayesian optimization (cite Mockus et al. (1978)). This type of optimization methods are useful for finding minima or maxima of black box functions, whose evaluations are expensive, and gradients are not necessarily available in a closed form. It has been shown to be very effective on challenging optimization functions (cite Jones (1998) and Snoek et al. (2015)).
+In section \ref{sec:bayesopt}, the model is used as a workhorse for Bayesian optimization \cite{mockus1978toward}. This type of optimization methods are useful for finding minima or maxima of black box functions, whose evaluations are expensive, and gradients are not necessarily available in a closed form. It has been shown to be very effective on challenging optimization functions (\cite{jones2001taxonomy} and \cite{snoek2012practical}).
 
 \medskip 
 
@@ -38,11 +38,11 @@ The idea of Bayesian optimization is to optimize an alternative, cheaper functio
 
 \medskip 
 
-The surrogate model's posterior distribution tries to approximate the objective function in the best way. And this posterior distribution is enhanced, as more points of the objective function are evaluated. Gaussian process regression models are often used are surrogate models (cite Snoek et al. (2015) for example). Here, the surrogate model will be the BQRVFL model presented in \ref{sec:modelprez}.
+The surrogate model's posterior distribution tries to approximate the objective function in the best way. And this posterior distribution is enhanced, as more points of the objective function are evaluated. Gaussian process regression models are often used are surrogate models (\cite{snoek2012practical} for example). Here, the surrogate model will be the BQRVFL model presented in \ref{sec:modelprez}.
 
 \medskip 
 
-We apply Bayesian optimization using the BQRVFL as a surrogate model, to the minimization of the cross-validation error (produced on discount curve forecasting) of four machine learning models. One of these models is based on an RVFL applied to multivariate time series forecast (cite Moudiki et al. (2018)). The second one applies Kernel Regularized Least Squares (cite chapter) (KRLS hereafter) directly to the curves' observation dates and time to maturities. The two remaining models are based on the popular DNS framework, and are a DNS-KRLS and a DNS-RVFL (more details here or refer to another section). 
+We apply Bayesian optimization using the BQRVFL as a surrogate model, to the minimization of the cross-validation error (produced on discount curve forecasting) of four machine learning models. One of these models is based on an RVFL applied to multivariate time series forecast (\cite{moudiki2018multiple}). The second one applies Kernel Regularized Least Squares (see chapter \ref{sec:discount_curve_krls}) (KRLS hereafter) directly to the curves' observation dates and time to maturities. The two remaining models are based on the popular DNS framework (\cite{diebold2006forecasting}), and are a DNS-KRLS and a DNS-RVFL (more details here or refer to another section). 
 
 \newpage
 
@@ -55,7 +55,7 @@ We consider a response variable $y \in \RR^n$ that has to be explained as a func
 $$
 g \left(\textbf{X} W \right)
 $$
-where $g$ is an activation function, as in of neural networks models, and $W \in \RR^{p \times L}$ are the nodes in the hidden layer, obtained from a deterministic sobol sequence of quasi-random numbers (cite Niderreiter (1992) and Boyle et Tan (1997)). $L$ is the number of nodes in the hidden layer. 
+where $g$ is an activation function, as in of neural networks models, and $W \in \RR^{p \times L}$ are the nodes in the hidden layer, obtained from a deterministic sobol sequence of quasi-random numbers (\cite{niederreiter1992random} and \cite{boyle1997quasi}). $L$ is the number of nodes in the hidden layer. 
 
 \medskip 
 
@@ -63,7 +63,7 @@ The parameters $W$ are used to combine the $p$ columns of \textbf{X} into $L$ ne
 $$
 y = \textbf{Z} \beta + \epsilon
 $$
-where $\beta \sim \MN(0_{\RR^{p + L}}, I_{p + L})$ are the parameters of the model that have to be estimated,  and $\epsilon \sim \MN(0_{\RR^n}, \sigma^2 I_n)$ is the error term. It is possible to show, in a Bayesian linear regression setting (cite Rasmussen et al. (2006) for example, for details) that for new observations arriving in the model and stored in matrix $\textbf{Z}_*$ , we have the following properties for the associated predictions: 
+where $\beta \sim \MN(0_{\RR^{p + L}}, I_{p + L})$ are the parameters of the model that have to be estimated,  and $\epsilon \sim \MN(0_{\RR^n}, \sigma^2 I_n)$ is the error term. It is possible to show, in a Bayesian linear regression setting (see \cite{rasmussen2006gaussian} for example, for details) that for new observations arriving in the model and stored in matrix $\textbf{Z}_*$ , we have the following properties for the associated predictions: 
 $$
 y* \sim  \MN(\textbf{Z}_* \mu_{\beta | y, \textbf{Z}}, \: \textbf{Z}_* \Sigma_{\beta | y, \textbf{Z}} \textbf{Z}_*^T + \sigma^2 I_n)
 $$
@@ -78,7 +78,7 @@ $$
 
 \medskip
 
-By using the Woodbury identity (cite Gene H. Golub and Charles F. van Loan. Matrix Computations and cite Max Welling The Kalman filter, Lecture Note) for ${\bf P}$ and ${\bf R}$ positive definite
+By using the Woodbury identity (\cite{golub2012matrix} and \cite{welling2010kalman}) for ${\bf P}$ and ${\bf R}$ positive definite
 $$
 \left({\bf P}^{-1} + {\bf B}^T {\bf R}^{-1} {\bf B} \right)^{-1}{\bf B}^T {\bf R}^{-1} =
 {\bf P}{\bf B}^T \left( {\bf B} {\bf P} {\bf B}^T + {\bf R}\right)^{-1}
@@ -127,10 +127,10 @@ $$
 
 \newpage
 
-\subsection{Examples on data from (cite Sapp (2014))}
+\subsection{Examples on data from \cite{sapp2014subsemble}}
 \label{sec:sapp2014}
 
-In order to present the performances of the model described in section \ref{sec:sapp2014}, we use four simulated randomized data sets, from (cite Sapp (2014)), $SLC14_1$ and $SLC14_2$ with $2$ different seeds each. These datasets are available in \code{R} package \code{caret}. 
+In order to present the performances of the model described in section \ref{sec:sapp2014}, we use four simulated randomized data sets, from \cite{sapp2014subsemble}, $SLC14_1$ and $SLC14_2$ with $2$ different seeds each. These datasets are available in \code{R} package \code{caret}. 
 
 $SLC14_1$ consists of $n$ rows, where $n$ is a function parameter, and $20$ columns. Its construction starts with the simulation of a $n \times 20$ matrix \code{dat}, containing random Gaussian numbers, with mean equal to zero and variance equal to $9$. Each row of \code{dat} contains: 
 $$
@@ -230,7 +230,7 @@ $f$ is the objective function, whose evaluations are expensive to calculate, and
 
 \medskip
 
-Bayesian optimization (cite Mockus et al. (1978) and Jones (2001)) will minimize an alternative, cheaper function called the acquisition function, instead of minimizing $f$ directly. The acquisition function is based on the uncertainty around the predictions of a surrogate machine learning model, trying to approximate $f$. Here, we consider only two types of acquisition functions. If we denote by $\widetilde{f}(\textbf{x}, \theta)$, the prediction obtained with the surrogate model (whose distribution depends on $\theta$) on a point $\textbf{x} \in \AC$, they are defined as: 
+Bayesian optimization (\cite{mockus1978toward} and \cite{jones2001taxonomy}) will minimize an alternative, cheaper function called the acquisition function, instead of minimizing $f$ directly. The acquisition function is based on the uncertainty around the predictions of a surrogate machine learning model, trying to approximate $f$. Here, we consider only two types of acquisition functions. If we denote by $\widetilde{f}(\textbf{x}, \theta)$, the prediction obtained with the surrogate model (whose distribution depends on $\theta$) on a point $\textbf{x} \in \AC$, they are defined as: 
 
 \begin{itemize}
 \item The \textbf{Upper Confidence Bound} (UCB) acquisition function, (actually a Lower Confidence Bound in the case of minimization). The idea is to minimize: 
@@ -282,7 +282,7 @@ For the BQRVFL (or any other machine learning model considered as a surrogate mo
 
 In the specific case of the BQRVFL, there are two hyperparameters for the surrogate model: the number of nodes in the hidden layer, and the regularization parameter $\sigma^2$. The choice of the activation function or the type of simulation for the nodes in the hidden layer is limited here to the ReLU activation function, and a Sobol sequence. 
 
-Since it is fast to compute for these type of models and we would like to avoid a costly hyperparameters' search at this point, we choose to minimize the Generalized Cross Validation (GCV) error on the dataset $\DD$ constructed at step $1.$ (in order to obtain $\hat{\theta}$). The GCV error is a convenient approximation to the Leave-One-Out cross validation error, and is defined as: 
+Since it is fast to compute for these type of models and we would like to avoid a costly hyperparameters' search at this point, we choose to minimize the Generalized Cross Validation (GCV) error (see \cite{golub1979generalized}) on the dataset $\DD$ constructed at step $1.$ (in order to obtain $\hat{\theta}$). The GCV error is a convenient approximation to the Leave-One-Out cross validation error, and is defined as: 
 
 \begin{equation}
 GCV = \frac{1}{nb_{init}}\sum_{i = 1}^{nb_{init}} \left( \frac{y_i - \hat{y}_i}{1 - \frac{tr(\textbf{S})}{nb_{init}}} \right)^2 
