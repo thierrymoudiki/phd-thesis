@@ -13,7 +13,7 @@ Ensemble learning is widely used in the winning solutions of machine learning co
 
 \medskip
 
-In this chapter, we apply three popular ensemble learning methods to multiple time series forecasting: Bootstrap aggregating (cite Efron), known as bagging, Boosting (cite Hothorn et al. (2010), Friedman et al. (2000), Bühlmann and Yu (2003)), and stacked generalization(cite Wolpert 1992), known as stacking. The base learners that we use for bagging and stacking, are the quasi-random vector functional link neural networks introduced in Moudiki et al. (2017). For the boosting algorithm, we use a slightly modified version of the model from Moudiki et al. (2017), in which the regression model parameters are not constrained in a ridge regression fashion (more details in section \ref{sec:basemodeldesc}).  
+In this chapter, we apply three popular ensemble learning methods to multiple time series forecasting: Bootstrap aggregating (\cite{breiman1996bagging}), known as bagging, Boosting (\cite{friedman2001greedy}, \cite{buhlmann2003boosting}, \cite{hothorn2010model}), and stacked generalization(\cite{wolpert1992stacked}), known as stacking. The base learners that we use for bagging and stacking, are the quasi-random vector functional link neural networks introduced in \cite{moudiki2018multiple}. For the boosting algorithm, we use a slightly modified version of the model from \cite{moudiki2018multiple}, in which the regression model parameters are not constrained in a ridge regression fashion (more details in section \ref{sec:basemodeldesc}).  
 
 \medskip
 
@@ -22,7 +22,7 @@ In the next section, we give an overview of the base learners. Then, we describe
 \section{Description of the base models}
 \label{sec:basemodeldesc}
 
-The base learner is described in lengths in Moudiki et al. (2017). It is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
+The base learner is described in lengths in \cite{moudiki2018multiple}. It is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
 p\right\rbrace$. The RVFL networks that we use to explain $y$ is described for $i \in \left\lbrace 1, \ldots, n\right\rbrace$ as:
 
 \begin{equation}
@@ -63,7 +63,7 @@ and
 $$
 \sum_{l=1}^L
 \gamma_l^2 \leq v
-$$ for $u, v \in \RR^*$. That is, by applying a regularization to these unknown parameters. In the case of boosting, we do not restrict the regression parameters' norms to be inferior to $u$ and $v$. Instead, we rely on the boosting algorithm described in (cite Hothorn et al. 2010) (details in section \ref{sec:rvflboosting}), with the base-learners being the unrestricted regression models described by equation (\ref{eq:rvflequation}). 
+$$ for $u, v \in \RR^*$. That is, by applying a regularization to these unknown parameters. In the case of boosting, we do not restrict the regression parameters' norms to be inferior to $u$ and $v$. Instead, we rely on the boosting algorithm described in \cite{hothorn2010model} (details in section \ref{sec:rvflboosting}), with the base-learners being the unrestricted regression models described by equation (\ref{eq:rvflequation}). 
 
 
 \medskip
@@ -170,7 +170,7 @@ As mentioned in the introduction, we will use bagging, boosting, and stacking to
 \subsection{Bagging}
 \label{sec:rvflbagging}
 
-The Bootstrap (cite Efron) uses multiple random replications of a given data set, to obtain standard errors of model parameters, for example. In the context of ensemble learning, these replications of the original data set are used to produce various predictions of the base models, which are then aggregated - in the case of regression problems, they are averaged, and in the case of classification problems, majority vote could be used - to obtain a single prediction with less out-of-sample variance. This procedure is called bootstrap aggregating or \textit{bagging}.
+The Bootstrap (\cite{efron1986bootstrap}, \cite{efron1992bootstrap}) uses multiple random replications of a given data set, to obtain standard errors of model parameters, for example. In the context of ensemble learning, these replications of the original data set are used to produce various predictions of the base models, which are then aggregated - in the case of regression problems, they are averaged, and in the case of classification problems, majority vote could be used - to obtain a single prediction with less out-of-sample variance. This procedure is called bootstrap aggregating or \textit{bagging}.
 
 \medskip
 
@@ -204,11 +204,11 @@ Having a low value for $\gamma$, along with a low out-of-sample expected error, 
 
 \medskip
 
-This decorrelation among the base learners is achieved for example in Random Forest models (cite Breiman, L. (2001)), by growing each tree in the forest, with only a subset of the predictors available. Also, an example of use of decorrelation, specifically for ensembles of neural networks is demonstrated in (cite Rosen (1996)). The author presents three approaches for achieving \textit{disagreement} between the networks: one in which they are trained independently and aggregated with the hope that their predictions are somewhat different; a second one, in which different activation functions or achitecture (typically, more or less hidden layers or nodes in the hidden layers etc.) for each base learner. A third approach consists in training the individual networks on different subsamples of the original training set. The case of decorrelation learning for RVFL is treated in (cite Alamdoosh et Wang (2014))
+This decorrelation among the base learners is achieved for example in Random Forest models \cite{breiman2001random}, by growing each tree in the forest, with only a subset of the predictors available. Also, an example of use of decorrelation, specifically for ensembles of neural networks is demonstrated in \cite{rosen1996ensemble}. The author presents three approaches for achieving \textit{disagreement} between the networks: one in which they are trained independently and aggregated with the hope that their predictions are somewhat different; a second one, in which different activation functions or achitecture (typically, more or less hidden layers or nodes in the hidden layers etc.) for each base learner. A third approach consists in training the individual networks on different subsamples of the original training set. The case of decorrelation learning for RVFL is treated in \cite{alhamdoosh2014fast}.
 
 \medskip
 
-In both papers, (cite Rosen (1996)) and (cite Alamdoosh et Wang (2014)), the procedure implemented in order to obtain a decorrelation of the base learners is denoted as Negative Correlation Learning (NCL). The general idea is to minimize the penalized Root Mean Squared Error:
+In both papers, \cite{rosen1996ensemble} and \cite{alhamdoosh2014fast}, the procedure implemented in order to obtain a decorrelation of the base learners is denoted as Negative Correlation Learning (NCL). The general idea is to minimize the penalized Root Mean Squared Error:
 $$
 \sum_{i = 1}^n\left[\left(y_i - f_k(\textbf{x}_i)\right)^2 + \lambda p_k(\textbf{x}_i)\right]
 $$
@@ -219,7 +219,7 @@ $$
 
 \medskip
 
-In this chapter, we use the third approach described in (cite Rosen (1996))  (although many other approaches can be envisaged). Multiple samples (training) data sets are constructed by randomly picking a fraction \code{col\underline{ }sample\underline{ }coeff} of the covariates, and a subset (using the fraction \code{row\underline{ }sample\underline{ }coeff}) of the lines, as described in figure \ref{bootstrap_resampling_plot} (using notations from section \ref{sec:basemodeldesc}). 
+In this chapter, we use the third approach described in \cite{rosen1996ensemble}  (although many other approaches can be envisaged),  which is actually more \textit{subsampling} than bootstrapping. Multiple samples (training) data sets are constructed by randomly picking a fraction \code{col\underline{ }sample\underline{ }coeff} of the covariates, and a subset (using the fraction \code{row\underline{ }sample\underline{ }coeff}) of the lines, as described in figure \ref{bootstrap_resampling_plot} (using notations from section \ref{sec:basemodeldesc}). 
 
 Taking a subset of the lines is done by respecting the serial dependence of the series and taking consecutive observations (that is, without skipping any observation) for each bootstrap resample. 
 
@@ -237,7 +237,7 @@ The predictions associated to each training set resample are then averaged, in o
 \subsection{Boosting}
 \label{sec:rvflboosting}
 
-The boosting approach adopted here, is described in Hothorn et al. (2010) and implemented in \proglang{R} package \code{mboost}. The general idea of the algorithm is to fit the in-sample residuals with base-learners, iteratively and slowly, but to stop learning before the out-of-sample error starts to worsen. With the response being $y$ and the covariates stored in  $\textbf{x}$, we are interested in constructing a regression function $\hat{f}$, so that: 
+The boosting approach adopted here, is described in \cite{hothorn2010model} and implemented in \proglang{R} package \code{mboost}. The general idea of the algorithm is to fit the in-sample residuals with base-learners, iteratively and slowly, but to stop learning before the out-of-sample error starts to worsen. With the response being $y$ and the covariates stored in  $\textbf{x}$, we are interested in constructing a regression function $\hat{f}$, so that: 
 $$
 \hat{f}(\textbf{x}) = \sum_{j=1}^B \nu \hat{f}_j(\textbf{x}) 
 $$
@@ -246,14 +246,14 @@ $$
 \left(\hat{f}_1, \ldots,  \hat{f}_p\right) = argmin_{f_1, \ldots, f_p}  \rho \left( y, \sum_j \nu f_j\left( \textbf{x} \right) \right) 
 $$
 
-In this expression, $\rho$ is a loss function to be minimized (for example $x \mapsto x^2$, or $x \mapsto |x|$). And in the case of multivariate time series, we are doing multitask learning. Each series (their most contemporaneous observations) share the same set of predictors (their lagged observations) as in the RVFL model described in section \ref{sec:basemodeldesc}, but without regularization of the regression models' parameters. This model is a different version of the Stochastic Configuration Network model from (cite Wang et al. (2017)). They do not include the \textit{direct link} (linear part of the RVFL) but only the transformed predictors $\Phi(\bfX)^{(l)}= g\left(\sum_{j = 1}^p W^{(j, l)} X_i^{(j)}\right)$, and show that under certain specific conditions, the model verifies an universal approximator property. 
+In this expression, $\rho$ is a loss function to be minimized (for example $x \mapsto x^2$, or $x \mapsto |x|$). And in the case of multivariate time series, we are doing multitask learning. Each series (their most contemporaneous observations) share the same set of predictors (their lagged observations) as in the RVFL model described in section \ref{sec:basemodeldesc}, but without regularization of the regression models' parameters. 
 
 The same number of boosting iterations and the same learning rate are used for all the observed time series. It would be possible to consider different numbers of iterations and different learning rates for each time series, but in this situation there would be as much as parameters as time series, and the regularization parameters would be trickier to optimize. 
 
 \subsection{Stacking}
 \label{sec:rvflstacking}
 
-Stacked generalization or stacking, was introduced (cite Wolpert (1992)). It is also presented in (Breiman (2001)) for regression models. The idea behind this procedure is to construct new predictors for the training data set, by using diverse predictions of multiple models, which are combined by a meta-learner model. A simple example of 2-fold stacking applied to regression is described hereafter. It is possible to imagine examples with more stacked layers:
+Stacked generalization or stacking, was introduced in \cite{wolpert1992stacked}. It is also presented in \cite{breiman1996stacked} for regression models. The idea behind this procedure is to construct new predictors for the training data set, by using diverse predictions of multiple models, which are combined by a meta-learner model. A simple example of 2-fold stacking applied to regression is described hereafter. It is possible to imagine examples with more stacked layers:
 
 \begin{itemize}
 \item Divide the original training data set $\textbf{X} \in \RR^{n \times p}$, into two parts: \code{part1} and \code{part2}, each with $n/2$ rows
@@ -271,11 +271,11 @@ Typically, in this procedure, various types of base learners are used, to increa
 \item Use a meta-learning model to obtain predictions on the new, enriched dataset, \code{part3}.
 \end{itemize}
 
-For the latter point, we consider a few meta-learner models that have been used in the past in the literature (cite Breiman's Stacked Regressions). In general, the idea is that a relatively simple meta-learner will achieve a good performance. We use the following models for this purpose:
+For the latter point, we consider a few meta-learner models that have been used in the past in the literature (\cite{breiman1996stacked}). In general, the idea is that a relatively simple meta-learner will achieve a good performance. We use the following models for this purpose:
 \begin{itemize}
-\item Linear \textbf{least squares regression} model
-\item Linear least squares regression model \textbf{with positive coefficients} (cite Lawson CL, Hanson RJ (1974)) and Lawson CL, Hanson RJ (1995), as used in (cite Breiman (2001))
-\item \textbf{Ridge regression} (cite Hoerl et Kennard 1970)
+\item Linear \textbf{least squares regression} model.
+\item Linear least squares regression model \textbf{with positive coefficients} (\cite{lawson1974solving}, \cite{lawson1995solving}), as used in \cite{breiman1996stacked}.
+\item \textbf{Ridge regression} (\cite{hoerl1970ridge}).
 \end{itemize}
 
 These selected meta-learners are trained on \code{part3}, with the most contemporaneous observations of the series as responses, and their respective lags as predictors. Some numerical examples on the application of stacking to RVFL base learners can be found in section \ref{sec:numericalexamples}
@@ -291,7 +291,7 @@ These selected meta-learners are trained on \code{part3}, with the most contempo
 \section{Numerical examples}
 \label{sec:numericalexamples}
 
-For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from (cite Greene (20something)). Four of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis. 
+For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from \cite{greene2000econometric}. Four of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis. 
 
 We annualize the last three time series, but keep the Treasury Bill rates unchanged. So that, the four time series are nearly on the same scale.
 
@@ -304,7 +304,7 @@ Figure \ref{all_series_plot} presents the resulting time series' data obtained a
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=10cm]{gfx/chapter-rvfl-ensembles/all_series.png}
-\caption{Treasury Bills rates and transformed Real consumption, Real disposable income, and  Inflation data from (cite Greene et. al (2007)) in a \textit{data-rich} environment}
+\caption{Treasury Bills rates and transformed Real consumption, Real disposable income, and  Inflation data from \cite{greene2003econometric} in a \textit{data-rich} environment}
 \label{all_series_plot}
 \end{figure}
 
@@ -312,7 +312,7 @@ Figure \ref{all_series_plot} presents the resulting time series' data obtained a
 \begin{table}[!htb]
 \begin{center}
 % table caption is above the table
-\caption{Summary statistics for the four transformed time series: Treasury Bills and transformed Real consumption, Real disposable income, and  Inflation data from (cite Greene et. al (2007))}
+\caption{Summary statistics for the four transformed time series: Treasury Bills and transformed Real consumption, Real disposable income, and  Inflation data from \cite{greene2003econometric}}
 \label{tab:summary_four_ts}       % Give a unique label
 % For LaTeX tables use
 \begin{tabular}{llllllll}
@@ -357,7 +357,7 @@ Series &  \code{X-squared} & \code{p-value}  \\
 
 \newpage
 
-The Box-Pierce tests results presented in table \ref{tab:boxpierce}, and the autocorrelation functions presented in \ref{acf}, show that the two time series for Real consumption and Real disposable income could be considered as stationary after the transformations. Whereas for the Treasury Bills rates and Inflation, there is still a non-negligible autocorrelation within the series. 
+The Box-Pierce tests (\cite{box1970distribution}, \cite{ljung1978measure}, \cite{harvey1993time}) results presented in table \ref{tab:boxpierce}, and the autocorrelation functions presented in \ref{acf}, show that the two time series for Real consumption and Real disposable income could be considered as stationary after the transformations. Whereas for the Treasury Bills rates and Inflation, there is still a non-negligible autocorrelation within the series. 
 
 \medskip
 
@@ -376,7 +376,7 @@ Also, based on the correlations displayed in figure \ref{corrplot}, the Real con
 
 %\newpage
 
-In sections \ref{bagging_example} and \ref{stacking_example}, we apply the bagging and stacking procedures described in sections \ref{sec:rvflbagging} and \ref{sec:rvflstacking} to the dataset we have just described. 
+In section \ref{results_summary}, we apply the bagging and stacking procedures described in sections \ref{sec:rvflbagging} and \ref{sec:rvflstacking} to the dataset we have just described. 
 
 
 A rolling forecasting cross-validation method (see \cite{bergmeir2015note} and figure \ref{rolling_cv}). At the beginning of the procedure, the training set contains $24$ points ($4$ years), and the test set contains $4$ points ($1$ year) and $8$ points ($2$ years). The training set is then advanced of one point forward (rolled), and the procedure is repeated until no more data for the training set are found.  
