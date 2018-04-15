@@ -6,12 +6,13 @@
 \section{Motivation and Problem Statement}
 \label{sec:intro:motivation}
 
-\section{Results}
-\label{sec:intro:results}
+The Own Risk Solvency and Assessment (ORSA) is a set of processes defined in the European prudential directive Solvency II, that serve for decision-making and strategic analysis. In the context of ORSA, insurance companies are required to assess their solvency needs in a continuous and prospective way. For this purpose, they notably need to forecast their balance sheet -asset and liabilities- over a defined horizon. 
 
-\subsection{Some References}
-\label{sec:intro:results:refs}
-\cite{WEB:GNU:GPL:2010,WEB:Miede:2011}
+Here, we specifically focus on the assets' forecasting part. \textbf{This thesis is about the Yield Curve, Forecasting, and Forecasting the Yield Curve}. We present a few novel techniques for the construction, the extrapolation of static curves (that is, curves which are constructed at a fixed date), and for forecasting the spot interest rates over time. 
+
+Throughout the text, when we say 'Yield Curve', we actually mean 'Discount curve'. That is: we ignore the counterparty credit risk, and consider that the curves are \textit{risk-free}. Though, the same techniques could be applied to construct/forecast the actual \textit{risk-free} curves and credit spreads' curves, and combine both to obtain pseudo-discount curves incorporating the counterparty credit risk. 
+
+The structure of the thesis is described in section \ref{sec:intro:structure}. 
 
 \section{Thesis Structure}
 \label{sec:intro:structure}
@@ -20,7 +21,7 @@
 We derived a class of discount curve construction and extrapolation methods,  based on a class of interest rate models called \textit{exogenous short-rate models}. That means: constructing a static Yield Curve at a given date, by using some specific financial instruments with different maturities quoted at this date. Then, defining what are the discount rates beyond the longest maturity observed for these financial instruments. The extrapolated part of the curve is typically necessary for the pricing of long-term insurance liabilities. In the framework that we propose, Yield Curve forecasts can be obtained by using a \textbf{functional principal components analysis} on the model parameters.
 
 \textbf{Chapter \ref{sec:rvfl_mts}} \\[0.2em]
-We were interested in obtaining forecasts for multiple time series, by taking into account the potential nonlinear relationships between their observations. For this purpose, we used a specific type of regression model on an augmented dataset of lagged time series. Our model is inspired by dynamic regression models, with the response variable's lags included as predictors, and is known as \textbf{random vector functional link (RVFL) neural networks}. The RVFL neural networks have been successfully applied in the past, to solving regression and classification problems. The novelty of our approach is to apply an RVFL model to multivariate time series, under two separate regularization constraints on the regression parameters.
+We are interested in obtaining forecasts for multiple time series, by taking into account the potential nonlinear relationships between their observations. For this purpose, we used a specific type of regression model on an augmented dataset of lagged time series. Our model is inspired by dynamic regression models, with the response variable's lags included as predictors, and is known as \textbf{random vector functional link (RVFL) neural networks}. The RVFL neural networks have been successfully applied in the past, to solving regression and classification problems. The novelty of our approach is to apply an RVFL model to multivariate time series, under two separate regularization constraints on the regression parameters.
 
 \textbf{Chapter \ref{sec:rvfl_ensembles}} \\[0.2em]
 The goal of ensemble learning is to combine two or more statistical/machine learning models - the base learners - into one, in order to obtain an ensemble model. The ensemble model is expected to have an improved out-of-sample error over the base models. We apply two popular ensemble learning methods to multiple time series forecasting: \textbf{bootstrap aggregating}, known as bagging, \textbf{boosting}, and \textbf{stacked generalization}, known as stacking. The base learners that we use, are the RVFL introduced in the previous paragraph.
