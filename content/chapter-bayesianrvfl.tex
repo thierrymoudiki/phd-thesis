@@ -293,11 +293,11 @@ y = \left( f(\textbf{x}_1), \ldots, f(\textbf{x}_{nb_{init}}) \right)^T
 $$
 $\textbf{S}$ is a smoother matrix verifying $\hat{y} = \textbf{S}y$, and $tr(\textbf{S})$ is the trace of matrix $\textbf{S}$. In the case of BQRVFL, $y$ contains the observed values of the response $y$, $\textbf{S} = \left(\textbf{Z}^T\textbf{Z} + \lambda I_p \right)^{-1}\textbf{Z}^T$, and $\hat{y}$ contains the model's fitted values. 
 
-Having obtained $\hat{\theta}$, the \textit{optimal} $\theta$ in point $2.$, searching for the next point to be evaluated is done with a gradient based optimization (cite nlminb PORT routine) of $\textbf{x} \mapsto a_{EI}\left(\textbf{x}; \hat{\theta} \right)$ and $\textbf{x} \mapsto a_{UCB}\left(\textbf{x}; \hat{\theta}  \right)$. 
+Having obtained $\hat{\theta}$, the \textit{optimal} $\theta$ in point $2.$, searching for the next point to be evaluated is done with a gradient based optimization (\cite{gay1990usage}) of $\textbf{x} \mapsto a_{EI}\left(\textbf{x}; \hat{\theta} \right)$ and $\textbf{x} \mapsto a_{UCB}\left(\textbf{x}; \hat{\theta}  \right)$. 
 
 \subsection{Use of the BQRVFL for Bayesian optimization}
 
-We now illustrate the BQRFL model's behaviour on a simple example of Bayesian optimization. The objective function to be minimized is the rescaled Branin function, which is widely used for testing Bayesian optimization frameworks, and notably in (cite Picheny et al. (2012), Picheny, V., Wagner, T., \& Ginsbourger, D. (2012). A benchmark of kriging-based infill criteria for noisy optimization). 
+We now illustrate the BQRFL model's behaviour on a simple example of Bayesian optimization. The objective function to be minimized is the rescaled Branin function, which is widely used for testing Bayesian optimization frameworks, and notably in \cite{picheny2013benchmark}. 
 This function is defined for $\textbf{x} = (x_1, x_2) \in [0, 1]^2$ as: 
 \begin{equation}
 \textbf{x} \mapsto \frac{1}{51.95}\left[\left(\bar{x}_2 - \frac{5.1\bar{x}_2}{4 \pi^2} + \frac{5\bar{x}_1}{\pi}-6\right)^2  + \left(10 - \frac{10}{8\pi}\right)cos(\bar{x}_1) - 44.81 \right]
