@@ -326,7 +326,7 @@ The global minimum value of the function is found (by using a multi-start gradie
 
 Below, in figures \ref{min_value_dist_bqrvfl} and \ref{min_value_dist_rf} (and tables \ref{tab:min_values_bqrvfl_ei} and \ref{tab:min_values_bqrvfl_ucb}), we present the results obtained by using the BQRVFL model, and the Random Forest model as workhorses for the Bayesian optimization of the rescaled Branin function. In appendix \ref{sec:chosen_points}, we also present the evolution of the algorithm for the BQRVFL, as more $\textbf{x}_{next}$ points (chosen by maximizing $a_{EI}(., \hat{\theta})$) are added to $\DD$. 
 
-For figures \ref{min_value_dist_bqrvfl} and \ref{min_value_dist_rf} (and tables \ref{tab:min_values_bqrvfl_ei} and \ref{tab:min_values_bqrvfl_ucb}), we use $nb_{init} = 100$ and a total budget of $100$ iterations. The algorithm is stochastic, because the $nb_{init}$ points are picked randomly in $\AC$ for each choice of \code{seed} (each restart of the algorithm).  
+For figures \ref{min_value_dist_bqrvfl} and \ref{min_value_dist_rf} (and tables \ref{tab:min_values_bqrvfl_ei} and \ref{tab:min_values_bqrvfl_ucb}), we use $nb_{init} = 10$ and a total budget of $100$ iterations. The algorithm is stochastic, because the $nb_{init}$ points are picked randomly in $\AC$ for each choice of \code{seed} (each restart of the algorithm).  
 
 \medskip
 
