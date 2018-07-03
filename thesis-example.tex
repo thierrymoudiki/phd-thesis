@@ -24,36 +24,31 @@
 % **************************************************
 % Information and Commands for Reuse
 % **************************************************
-\newcommand{\thesisTitle}{Yield Curve modeling for Insurance \\ \textit{Interpolation, extrapolation and forecasting} }
-\newcommand{\thesisName}{Thierry Moudiki}
+\newcommand{\thesisTitle}{The Clean Thesis Style}
+\newcommand{\thesisName}{Ricardo Langner}
 \newcommand{\thesisSubject}{Documentation}
-\newcommand{\thesisDate}{July 03, 2018}
-\newcommand{\thesisVersion}{v0.3}
+\newcommand{\thesisDate}{August 26, 2015}
+\newcommand{\thesisVersion}{My First Draft}
 
-\newcommand{\thesisFirstReviewer}{Donatien Hainaut}
-\newcommand{\thesisFirstReviewerUniversity}{\protect{University}}
-\newcommand{\thesisFirstReviewerDepartment}{Department}
+\newcommand{\thesisFirstReviewer}{Jane Doe}
+\newcommand{\thesisFirstReviewerUniversity}{\protect{Clean Thesis Style University}}
+\newcommand{\thesisFirstReviewerDepartment}{Department of Clean Thesis Style}
 
-\newcommand{\thesisSecondReviewer}{Franck Moraux}
-\newcommand{\thesisSecondReviewerUniversity}{\protect{University}}
-\newcommand{\thesisSecondReviewerDepartment}{Department}
+\newcommand{\thesisSecondReviewer}{John Doe}
+\newcommand{\thesisSecondReviewerUniversity}{\protect{Clean Thesis Style University}}
+\newcommand{\thesisSecondReviewerDepartment}{Department of Clean Thesis Style}
 
-\newcommand{\thesisFirstSupervisor}{Areski Cousin}
-\newcommand{\thesisSecondSupervisor}{Fr\'ed\'eric Planchet}
+\newcommand{\thesisFirstSupervisor}{Jane Doe}
+\newcommand{\thesisSecondSupervisor}{John Smith}
 
-\newcommand{\thesisUniversity}{\protect{University Claude Bernard Lyon I}}
-\newcommand{\thesisUniversityDepartment}{Department}
-\newcommand{\thesisUniversityInstitute}{ISFA, Laboratoire SAF}
-\newcommand{\thesisUniversityGroup}{}
-\newcommand{\thesisUniversityCity}{Lyon}
+\newcommand{\thesisUniversity}{\protect{Clean Thesis Style University}}
+\newcommand{\thesisUniversityDepartment}{Department of Clean Thesis Style}
+\newcommand{\thesisUniversityInstitute}{Institut for Clean Thesis Dev}
+\newcommand{\thesisUniversityGroup}{Clean Thesis Group (CTG)}
+\newcommand{\thesisUniversityCity}{City}
 \newcommand{\thesisUniversityStreetAddress}{Street address}
 \newcommand{\thesisUniversityPostalCode}{Postal Code}
 
-\newcommand{\forcenewpage}{\clearpage \newpage \mbox{~} \clearpage \newpage}
-
-% --------------------------
-% new commands
-% --------------------------
 \newcommand{\CC}{\ensuremath{\mathbb{C}} }
 \newcommand{\NN}{\ensuremath{\mathbb{N}} }
 \newcommand{\RR}{\ensuremath{\mathbb{R}} }
@@ -81,12 +76,10 @@
 \newcommand{\bfX}{{\bf X}}
 \newcommand{\bfY}{{\bf Y}}
 
-
 % **************************************************
 % Load and Configure Packages
 % **************************************************
 \usepackage[utf8]{inputenc}		% defines file's character encoding
-%\usepackage[latin1]{inputenc}		% defines file's character encoding
 \usepackage[english]{babel} % babel system, adjust the language of the content
 \usepackage[					% clean thesis style
 	figuresep=colon,%
@@ -100,17 +93,6 @@
 	bibfile=bib-refs,%
 	bibstyle=alphabetic,%
 ]{cleanthesis}
-
-% --------------------------
-% packages
-% --------------------------
-\usepackage{amssymb,amsfonts,amsmath, bm}
-
-\usepackage{graphicx}
-
-\def\proof{\noindent \textbf{\emph{\textbf{Proof}.$\,$}}}
-\def\finproof {\hfill $\Box$ \vskip 5 pt }
-
 
 \hypersetup{					% setup the hyperref-package options
 	pdftitle={\thesisTitle},	% 	- title (PDF meta)
@@ -146,13 +128,13 @@
 \cleardoublepage
 
 \pagestyle{plain}				% display just page numbers
-%\input{content/abstract}		% INCLUDE: the abstracts (english and german)
-%\cleardoublepage
+\input{content/abstract}		% INCLUDE: the abstracts (english and german)
+\cleardoublepage
 %
 \input{content/acknowledgement} % INCLUDE: acknowledgement
 \cleardoublepage
 %
-\setcounter{tocdepth}{3}		% define depth of toc
+\setcounter{tocdepth}{2}		% define depth of toc
 \tableofcontents				% display table of contents
 \cleardoublepage
 
@@ -164,25 +146,18 @@
 \pagestyle{maincontentstyle} 	% fancy header and footer
 
   \input{content/chapter-introduction} % INCLUDE: introduction
-  \cleardoublepage
 
   \input{content/chapter-yc-insurance} % INCLUDE: yc-insurance
-  \cleardoublepage
 
   \input{content/chapter-rvfl-mts} % INCLUDE: rvfl-mts
-  \cleardoublepage
 
   \input{content/chapter-rvfl-ensembles} % INCLUDE: rvfl-ensembles
-  \cleardoublepage
 
   \input{content/chapter-krls-models} % INCLUDE: krls-models
-  \cleardoublepage
 
   \input{content/chapter-bayesianrvfl} % INCLUDE: rvfl-ensembles
-  \cleardoublepage
 
   \input{content/chapter-conclusion} % INCLUDE: conclusion
-  \cleardoublepage
 
 % --------------------------
 % Back matter
@@ -203,11 +178,11 @@
 \listoftables
 \cleardoublepage
 
-%\input{content/colophon}
-%\cleardoublepage
+\input{content/colophon}
+\cleardoublepage
 
-%\input{content/declaration}
-%\clearpage
+\input{content/declaration}
+\clearpage
 \newpage
 \mbox{}
 

@@ -2,85 +2,155 @@
 %
 % ------------------------------------  --> cover title page
 \begin{titlepage}
-	\pdfbookmark[0]{Cover}{Cover}
-	\flushright
-	\hfill
-	\vfill
-	{\LARGE\thesisTitle \par}
-	\rule[5pt]{\textwidth}{.4pt} \par
-	{\Large\thesisName}
-	\vfill
-	\textit{\large\thesisDate} \\
-	Version: \thesisVersion
+\setlength{\parindent}{0pt}
+\thispagestyle{empty}
+
+
+\begin{center}
+\includegraphics[height=1.75cm]{gfx/logo}
+\end{center}
+
+
+\fontsize{10pt}{12pt}\selectfont
+N\textsuperscript{o} d'ordre NNT : xxx
+
+\vspace{0.1cm}
+
+\begin{center}
+\fontsize{13pt}{15pt}\selectfont
+\textbf{\uppercase{These de doctorat de l'universite de Lyon}}\\
+\fontsize{11pt}{13pt}\selectfont
+operee au sein de\\
+\textbf{l'Universite Claude Bernard Lyon 1}
+
+\vspace{0.2cm}
+
+\textbf{Ecole Doctorale ED SEG\\% rectifier le numero d'accreditation
+EA n°2429}% nom complet de l'ecole doctorale
+
+\vspace{0.1cm}
+
+\textbf{Specialite de doctorat : Actuariat\\
+Discipline : Sciences de Gestion} % eventuellement
+
+\vspace{0.1cm}
+
+Soutenue publiquement le 05/07/2018, par :\\
+\fontsize{14pt}{16pt}\selectfont
+\textbf{Thierry Moudiki Ndoumbe}
+
+\vspace{0.1cm} % adapter à la longueur du titre
+
+\rule[20pt]{\textwidth}{0.5pt}
+
+\fontsize{20pt}{25pt}\selectfont
+\textbf{Interest rates modeling for insurance - interpolation, extrapolation, and forecasting}
+
+\rule{\textwidth}{0.5pt}
+
+\vspace{0.1cm} % adapter à la longueur du titre
+\end{center}
+
+\fontsize{11pt}{13pt}\selectfont
+Devant le jury compose de :
+\medskip
+
+\fontsize{9pt}{11pt}\selectfont
+
+Nom Prenom, grade/qualite, etablissement/entreprise \hfill President(e)
+
+\medskip
+
+Franck Moraux, Professeur des universites, Universite de Rennes I \hfill  Rapporteur(e)
+
+Donatien Hainaut,  Professeur des universites, Universite Catholique de Louvain \hfill Rapporteur(e)
+
+Diana Dorobantu, Maitre de Conferences, ISFA, Universite Lyon I \hfill Examinatrice
+
+Armelle Guillou, Professeur des universites, Universite de Strasbourg \hfill Examinatrice
+
+Florence Picard, Presidente de la commission scientifique, Institut des actuaires \hfill Examinatrice
+
+Stephane Loisel, Professeur des universites, ISFA, Universite Lyon I \hfill Examinateur/trice
+
+\medskip
+
+Frederic Planchet, Professeur des universites, ISFA, Universite Lyon I \hfill Directeur de these
+
+Areski Cousin, Professeur des universites, Universite de Strasbourg \hfill Co-directeur de these % le cas echeant
+
+\newpage
+%\fontsize{12pt}{14pt}\selectfont   % si le document general n'est pas en police 11pt, decommenter et preciser la taille utilisee
+% Suite du manuscrit
 \end{titlepage}
 
 
 % ------------------------------------  --> main title page
-\begin{titlepage}
-	\pdfbookmark[0]{Titlepage}{Titlepage}
-	\tgherosfont
-	\centering
-
-	{\Large \thesisUniversity} \\[4mm]
-	\includegraphics[width=6cm]{gfx/Clean-Thesis-Logo} \\[2mm]
-	\textsf{\thesisUniversityDepartment} \\
-	\textsf{\thesisUniversityInstitute} \\
-	\textsf{\thesisUniversityGroup} \\
-
-	\vfill
-	{\large \thesisSubject} \\[5mm]
-	{\LARGE \color{ctcolortitle}\textbf{\thesisTitle} \\[10mm]}
-	{\Large \thesisName} \\
-
-	\vfill
-	\begin{minipage}[t]{.27\textwidth}
-		\raggedleft
-		\textit{1. Reviewer}
-	\end{minipage}
-	\hspace*{15pt}
-	\begin{minipage}[t]{.65\textwidth}
-		{\Large \thesisFirstReviewer} \\
-	  	{\small \thesisFirstReviewerDepartment} \\[-1mm]
-		{\small \thesisFirstReviewerUniversity}
-	\end{minipage} \\[5mm]
-	\begin{minipage}[t]{.27\textwidth}
-		\raggedleft
-		\textit{2. Reviewer}
-	\end{minipage}
-	\hspace*{15pt}
-	\begin{minipage}[t]{.65\textwidth}
-		{\Large \thesisSecondReviewer} \\
-	  	{\small \thesisSecondReviewerDepartment} \\[-1mm]
-		{\small \thesisSecondReviewerUniversity}
-	\end{minipage} \\[10mm]
-	\begin{minipage}[t]{.27\textwidth}
-		\raggedleft
-		\textit{Supervisors}
-	\end{minipage}
-	\hspace*{15pt}
-	\begin{minipage}[t]{.65\textwidth}
-		\thesisFirstSupervisor\ and \thesisSecondSupervisor
-	\end{minipage} \\[10mm]
-
-	\thesisDate \\
-
-\end{titlepage}
+% \begin{titlepage}
+% 	\pdfbookmark[0]{Titlepage}{Titlepage}
+% 	\tgherosfont
+% 	\centering
+%
+% 	{\Large \thesisUniversity} \\[4mm]
+% 	\includegraphics[width=6cm]{gfx/Clean-Thesis-Logo} \\[2mm]
+% 	\textsf{\thesisUniversityDepartment} \\
+% 	\textsf{\thesisUniversityInstitute} \\
+% 	\textsf{\thesisUniversityGroup} \\
+%
+% 	\vfill
+% 	{\large \thesisSubject} \\[5mm]
+% 	{\LARGE \color{ctcolortitle}\textbf{\thesisTitle} \\[10mm]}
+% 	{\Large \thesisName} \\
+%
+% 	\vfill
+% 	\begin{minipage}[t]{.27\textwidth}
+% 		\raggedleft
+% 		\textit{1. Reviewer}
+% 	\end{minipage}
+% 	\hspace*{15pt}
+% 	\begin{minipage}[t]{.65\textwidth}
+% 		{\Large \thesisFirstReviewer} \\
+% 	  	{\small \thesisFirstReviewerDepartment} \\[-1mm]
+% 		{\small \thesisFirstReviewerUniversity}
+% 	\end{minipage} \\[5mm]
+% 	\begin{minipage}[t]{.27\textwidth}
+% 		\raggedleft
+% 		\textit{2. Reviewer}
+% 	\end{minipage}
+% 	\hspace*{15pt}
+% 	\begin{minipage}[t]{.65\textwidth}
+% 		{\Large \thesisSecondReviewer} \\
+% 	  	{\small \thesisSecondReviewerDepartment} \\[-1mm]
+% 		{\small \thesisSecondReviewerUniversity}
+% 	\end{minipage} \\[10mm]
+% 	\begin{minipage}[t]{.27\textwidth}
+% 		\raggedleft
+% 		\textit{Supervisors}
+% 	\end{minipage}
+% 	\hspace*{15pt}
+% 	\begin{minipage}[t]{.65\textwidth}
+% 		\thesisFirstSupervisor\ and \thesisSecondSupervisor
+% 	\end{minipage} \\[10mm]
+%
+% 	\thesisDate \\
+%
+% \end{titlepage}
 
 
 % ------------------------------------  --> lower title back for single page layout
-\hfill
-\vfill
-{
-	\small
-	\textbf{\thesisName} \\
-	\textit{\thesisTitle} \\
-	\thesisSubject, \thesisDate \\
-	Reviewers: \thesisFirstReviewer\ and \thesisSecondReviewer \\
-	Supervisors: \thesisFirstSupervisor\ and \thesisSecondSupervisor \\[1.5em]
-	\textbf{\thesisUniversity} \\
-	\textit{\thesisUniversityGroup} \\
-	\thesisUniversityInstitute \\
-	\thesisUniversityDepartment \\
-	\thesisUniversityStreetAddress \\
-	\thesisUniversityPostalCode\ and \thesisUniversityCity
-}
+% \hfill
+% \vfill
+% {
+% 	\small
+% 	\textbf{\thesisName} \\
+% 	\textit{\thesisTitle} \\
+% 	\thesisSubject, \thesisDate \\
+% 	Reviewers: \thesisFirstReviewer\ and \thesisSecondReviewer \\
+% 	Supervisors: \thesisFirstSupervisor\ and \thesisSecondSupervisor \\[1.5em]
+% 	\textbf{\thesisUniversity} \\
+% 	\textit{\thesisUniversityGroup} \\
+% 	\thesisUniversityInstitute \\
+% 	\thesisUniversityDepartment \\
+% 	\thesisUniversityStreetAddress \\
+% 	\thesisUniversityPostalCode\ and \thesisUniversityCity
+% }

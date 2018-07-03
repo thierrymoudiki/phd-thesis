@@ -1,4 +1,4 @@
-% !TEX root = ../thesis-example.tex
+% !TEX root = ../moudiki_thesis.tex
 %
 \chapter{Multiple time series forecasting using quasi-randomized functional link neural networks}
 \label{sec:rvfl_mts}
@@ -33,7 +33,7 @@ In our various numerical examples from section \ref{sec:numericalexamples}, we w
 
 \section{Description of the model}
 
-The general procedure for obtaining the model's optimal parameters and predictions is  summarized in figure \ref{fig:flowchart}. 
+The general procedure for obtaining the model's optimal parameters and predictions is  summarized in figure \ref{fig:flowchart}.
 
 \begin{figure}[!htb]
 \centering
@@ -43,7 +43,7 @@ The general procedure for obtaining the model's optimal parameters and predictio
 \end{figure}
 
 
-This procedure is described in details in the next sections, especially sections \ref{solve_rvfl} and \ref{sec:preds}. 
+This procedure is described in details in the next sections, especially sections \ref{solve_rvfl} and \ref{sec:preds}.
 
 \clearpage
 
@@ -129,30 +129,30 @@ $$
 i = \sum_k i_k 2^k = ( \ldots \: i_3 \: i_2 \: i_1)_2
 $$
 
-For example, $5 = 1 \times 2^2 + 0 \times 2^1 + 1 \times 2^0$ can be expressed as $(101)_2$ in binary representation. Then, by using the sequence of bits describing $i$ in base $2$, we can obtain $x_{i, j}$ as: 
+For example, $5 = 1 \times 2^2 + 0 \times 2^1 + 1 \times 2^0$ can be expressed as $(101)_2$ in binary representation. Then, by using the sequence of bits describing $i$ in base $2$, we can obtain $x_{i, j}$ as:
 
 \begin{equation}
 \label{ithjthsobol}
-x_{i, j} = i_1 v_{1, j} \oplus i_2 v_{2, j} \oplus \ldots 
+x_{i, j} = i_1 v_{1, j} \oplus i_2 v_{2, j} \oplus \ldots
 \end{equation}
 
-Where $\oplus$ is a bitwise exclusive-or operation, and the numbers $v_{i, j}$ are called the direction numbers, defined for $k \geq 1$ as: 
+Where $\oplus$ is a bitwise exclusive-or operation, and the numbers $v_{i, j}$ are called the direction numbers, defined for $k \geq 1$ as:
 
 \begin{equation}
 \label{directionv}
 v_{k, j} = \frac{m_{k, j}}{2^k} = \frac{2 a_{1, j} m_{k-1, j} \oplus 2^2 a_{2, j}m_{k-2, j} \oplus \ldots \oplus 2^{s_j - 1} a_{s_j - 1, j}m_{k-s_j+1, j} \oplus 2^{s_j} m_{k-s_j, j} \oplus m_{k-s_j, j}   }{2^k}
 \end{equation}
 
-A few details on equation \ref{directionv}: 
+A few details on equation \ref{directionv}:
 
 \begin{itemize}
-\item The bitwise exclusive-or operation $\oplus$ applied to two integers $p$ and $q \in \left \lbrace 0, 1 \right \rbrace$ returns $1$ if and only if one of the two (but not both) inputs is equal to $1$. Otherwise, $p \oplus q$ is equal to 0. 
-\item The second term of the equation relies on primitive polynomials of degree $s_j$, with coefficients $a_{i, j}$ taken in $\left \lbrace 0, 1 \right \rbrace$: 
+\item The bitwise exclusive-or operation $\oplus$ applied to two integers $p$ and $q \in \left \lbrace 0, 1 \right \rbrace$ returns $1$ if and only if one of the two (but not both) inputs is equal to $1$. Otherwise, $p \oplus q$ is equal to 0.
+\item The second term of the equation relies on primitive polynomials of degree $s_j$, with coefficients $a_{i, j}$ taken in $\left \lbrace 0, 1 \right \rbrace$:
 \begin{equation}
 \label{primitivepoly}
 x^{s_j} + a_{1, j} x^{s_j - 1} + a_{2, j} x^{s_j - 2} + \ldots + a_{s_j - 1, j} x + 1
 \end{equation}
-\item The terms $m_{k, j}$ are obtained recursively, with the initial values  $m_{1, j}, m_{2, j}, \ldots, m_{k - s_j, j}$ chosen freely, under the condition that $m_{k, j}, 1 \leq k \leq s_j$ is odd and less than $2^k$. 
+\item The terms $m_{k, j}$ are obtained recursively, with the initial values  $m_{1, j}, m_{2, j}, \ldots, m_{k - s_j, j}$ chosen freely, under the condition that $m_{k, j}, 1 \leq k \leq s_j$ is odd and less than $2^k$.
 \end{itemize}
 
 A more complete treatment of \textit{low discrepancy} sequences can be found in \cite{niederreiter1992random}. And an example with $s_j = 3$, $a_{1, j} = 0$, $a_{2, j} = 1$ is given in \cite{joe2008sobol}.
@@ -395,7 +395,7 @@ The factor loadings $1$, $\left(\frac{1-e^{-T/\lambda}}{e^{-T/\lambda}}\right)$ 
 
 \medskip
 
-This type of model (DNS) cannot be used for no-arbitrage pricing as is, but it could be useful for example, for \textit{stressing} the yield curve factors under the historical probability. It can however be made arbitrage-free, if necessary (see \cite{diebold2013yield}). We will benchmark the RVFL model applied to the three time series $\alpha_{i, t}, i = 1, \ldots, 3$, against ARIMA and VAR models. \cite{diebold2006forecasting} applied an autoregressive AR(1) model separately to each one of the parameters, $\alpha_{i, t}, i = 1, \ldots, 3$. 
+This type of model (DNS) cannot be used for no-arbitrage pricing as is, but it could be useful for example, for \textit{stressing} the yield curve factors under the historical probability. It can however be made arbitrage-free, if necessary (see \cite{diebold2013yield}). We will benchmark the RVFL model applied to the three time series $\alpha_{i, t}, i = 1, \ldots, 3$, against ARIMA and VAR models. \cite{diebold2006forecasting} applied an autoregressive AR(1) model separately to each one of the parameters, $\alpha_{i, t}, i = 1, \ldots, 3$.
 
 \medskip
 
@@ -419,7 +419,7 @@ A rolling forecasting methodology (see \cite{bergmeir2015note}) is implemented i
 \label{log_RMSE}
 \end{figure}
 
-Figure \ref{error_dist} presents boxplots for the distribution of out-of-sample errors obtained in the cross-validation procedure, and figure \ref{log_RMSE} presents the 12 months-ahead out-of-sample errors over time. ARIMA (separate (\cite{hyndman2008automatic}) ARIMA models applied to each series $\alpha_{i, t}, i = 1, \ldots, 3$) gives good results, as already suggested by  \cite{diebold2006forecasting}. They are nearly comparable to results from RVFL, but a bit more volatile, with an outlier point observed on the $log(RMSE)$ box plot. 
+Figure \ref{error_dist} presents boxplots for the distribution of out-of-sample errors obtained in the cross-validation procedure, and figure \ref{log_RMSE} presents the 12 months-ahead out-of-sample errors over time. ARIMA (separate (\cite{hyndman2008automatic}) ARIMA models applied to each series $\alpha_{i, t}, i = 1, \ldots, 3$) gives good results, as already suggested by  \cite{diebold2006forecasting}. They are nearly comparable to results from RVFL, but a bit more volatile, with an outlier point observed on the $log(RMSE)$ box plot.
 
 \medskip
 
@@ -477,7 +477,7 @@ Another advantage of RVFL over ARIMA or AR(1) in this context is that, it would 
 
 \subsection{Forecasting 1 year, 10 years and 20 years spot rates}
 
-For this second example, we forecast the 1-year, 10-years and 20-years spot rates time series from the previous dataset, on a 12-months horizon. As described in the previous section, we use a rolling forecasting methodology, with a training window of 12 months length. 
+For this second example, we forecast the 1-year, 10-years and 20-years spot rates time series from the previous dataset, on a 12-months horizon. As described in the previous section, we use a rolling forecasting methodology, with a training window of 12 months length.
 
 \medskip
 
@@ -563,11 +563,11 @@ Method & Lower bound & Upper bound  & Mean \\
 
 \subsection{Forecasting on a longer horizon, with a longer training window}
 
-In this third example, as in section \ref{section:dnsexample1}, we apply the DNS framework to the forecasting of spot rates. But with a longer training set (36 months), and a longer horizon for the test set (36 months as well). We use interest rate swaps data from the Federal Reserve Bank of St Louis website \footnote{Available at https://fred.stlouisfed.org/categories/32299}, observed on a monthly basis from july 2000 to september 2016, with maturities equal to $1, 2, 3, 4, 5, 7, 10, 30$, and a tenor equal to three months. 
+In this third example, as in section \ref{section:dnsexample1}, we apply the DNS framework to the forecasting of spot rates. But with a longer training set (36 months), and a longer horizon for the test set (36 months as well). We use interest rate swaps data from the Federal Reserve Bank of St Louis website \footnote{Available at https://fred.stlouisfed.org/categories/32299}, observed on a monthly basis from july 2000 to september 2016, with maturities equal to $1, 2, 3, 4, 5, 7, 10, 30$, and a tenor equal to three months.
 
 \medskip
 
-On figure \ref{example3:1}, we present three of the eight time series of swap rates, observed for time to maturities equal to $3, 10$ and $30$. The swap rates for different maturities generally exhibit a decreasing trend, and are nearly equal to 0 by the end of 2016, for the shortest maturities. 
+On figure \ref{example3:1}, we present three of the eight time series of swap rates, observed for time to maturities equal to $3, 10$ and $30$. The swap rates for different maturities generally exhibit a decreasing trend, and are nearly equal to 0 by the end of 2016, for the shortest maturities.
 
 \begin{figure}[!htb]
 \centering
@@ -581,7 +581,7 @@ On figure \ref{example3:1}, we present three of the eight time series of swap ra
 
 \medskip
 
-We also observe that the spreads between swap rates with different maturities start to narrow in 2006 until the end of 2007, and the  swap rates for short term maturities are relatively high during the same period. This is the period corresponding to the Liquidity and Credit Crunch 2007-2008. Table \ref{tab:freddatatables1} presents the descriptive statistics for these three time series. 
+We also observe that the spreads between swap rates with different maturities start to narrow in 2006 until the end of 2007, and the  swap rates for short term maturities are relatively high during the same period. This is the period corresponding to the Liquidity and Credit Crunch 2007-2008. Table \ref{tab:freddatatables1} presents the descriptive statistics for these three time series.
 
 \begin{table}
 \begin{center}
@@ -603,19 +603,19 @@ Maturity & Min. & 1st Qrt & Median & Mean & 3rd Qrt & Max.\\
 
 \medskip
 
-All the swap rates (for all the maturities available) were then transformed into zero rates, by using a single curve calibration methodology (that is, ignoring the counterparty credit risk) with linear interpolation between the swaps' maturities. Then, the Nelson \& Siegel model was used for fitting and forecasting the curves in a DNS framework, with both \code{auto.arima} and the RVFL model presented in this chapter, applied to the three factors. In the fashion of section ~\ref{section:dnsexample1}. But now, we obtain 36-months ahead forecasts, from a rolling training windows with a fixed 36 months length. The average out-of-sample $RMSE$ are then calculated for each method. 
+All the swap rates (for all the maturities available) were then transformed into zero rates, by using a single curve calibration methodology (that is, ignoring the counterparty credit risk) with linear interpolation between the swaps' maturities. Then, the Nelson \& Siegel model was used for fitting and forecasting the curves in a DNS framework, with both \code{auto.arima} and the RVFL model presented in this chapter, applied to the three factors. In the fashion of section ~\ref{section:dnsexample1}. But now, we obtain 36-months ahead forecasts, from a rolling training windows with a fixed 36 months length. The average out-of-sample $RMSE$ are then calculated for each method.
 
 \medskip
 
 The \textit{best} hyperparameters - associated with the lowest out-of-sample average $RMSE$ - for each model are obtained through a search on a grid of values. We have:
 \begin{itemize}
-\item DNS with ARIMA (\code{auto.arima}): $\lambda = 1.4271$ (Nelson Siegel parameter)  
-\item DNS with RVFL: \textbf{number of lags} for each series: 1, \textbf{activation function}: ReLU, \textbf{number of nodes} in the hidden layer: $45$, $\lambda_1 = 4.6416$, $\lambda_2 = 774.2637$ (RVFL parameters) and $\lambda = 24$ (Nelson Siegel parameter)   
+\item DNS with ARIMA (\code{auto.arima}): $\lambda = 1.4271$ (Nelson Siegel parameter)
+\item DNS with RVFL: \textbf{number of lags} for each series: 1, \textbf{activation function}: ReLU, \textbf{number of nodes} in the hidden layer: $45$, $\lambda_1 = 4.6416$, $\lambda_2 = 774.2637$ (RVFL parameters) and $\lambda = 24$ (Nelson Siegel parameter)
 \end{itemize}
 
 \medskip
 
-With these parameters, the results detailed in table \ref{tab:freddatatables4} are obtained, for the out-of-sample $RMSE$. A $95\%$ confidence interval around the difference of out-of-sample $RMSE$ between ARIMA (applied to each one of the three factors) and RVFL is presented in table \ref{tab:confint3}. 
+With these parameters, the results detailed in table \ref{tab:freddatatables4} are obtained, for the out-of-sample $RMSE$. A $95\%$ confidence interval around the difference of out-of-sample $RMSE$ between ARIMA (applied to each one of the three factors) and RVFL is presented in table \ref{tab:confint3}.
 
 \begin{table}[!htb]
 \begin{center}
@@ -664,15 +664,15 @@ Figure \ref{example3:2} presents the evolution of the out-of-sample $log(RMSE)$ 
 
 \medskip
 
-Figure \ref{example3:3}, presents the convergence of the out-of-sample $log(RMSE)$ for the DNS + RVFL model from this section, as a function of $log(\lambda_1)$ and $log(\lambda_2)$. $\lambda_1$ and $\lambda_2$ both range from $10^{-2}$ to $10^{4}$, with ten equally-spaced points each (hence, a grid of one hundred points $\left( log(\lambda_1), log(\lambda_2), log(RMSE)\right)$. 
+Figure \ref{example3:3}, presents the convergence of the out-of-sample $log(RMSE)$ for the DNS + RVFL model from this section, as a function of $log(\lambda_1)$ and $log(\lambda_2)$. $\lambda_1$ and $\lambda_2$ both range from $10^{-2}$ to $10^{4}$, with ten equally-spaced points each (hence, a grid of one hundred points $\left( log(\lambda_1), log(\lambda_2), log(RMSE)\right)$.
 
 \medskip
 
-The number of nodes in the hidden layer is equal to $45$, and the value of $\lambda$, parameter from the \cite{nelson1987parsimonious} model presented in section \ref{section:dnsexample1}, is fixed and equal to $24$. The one hundred points $\left( log(\lambda_1), log(\lambda_2), log(RMSE)\right)$ that we use for figure \ref{example3:3} can be found in appendix \ref{sec:cv_log_rmse}. 
+The number of nodes in the hidden layer is equal to $45$, and the value of $\lambda$, parameter from the \cite{nelson1987parsimonious} model presented in section \ref{section:dnsexample1}, is fixed and equal to $24$. The one hundred points $\left( log(\lambda_1), log(\lambda_2), log(RMSE)\right)$ that we use for figure \ref{example3:3} can be found in appendix \ref{sec:cv_log_rmse}.
 
 \medskip
 
-There is a rectangular region at the top, in the middle of the figure, where the $log(RMSE)$ is the lowest. In this region, the lowest value of the out-of-sample $log(RMSE)$ is observed for $\lambda_1 = 4.6416$ and $\lambda_2 = 464.1589$ and the out-of-sample $RMSE$ is equal to $0.01206$ ($75^{th}$ point in appendix \ref{sec:cv_log_rmse}).   
+There is a rectangular region at the top, in the middle of the figure, where the $log(RMSE)$ is the lowest. In this region, the lowest value of the out-of-sample $log(RMSE)$ is observed for $\lambda_1 = 4.6416$ and $\lambda_2 = 464.1589$ and the out-of-sample $RMSE$ is equal to $0.01206$ ($75^{th}$ point in appendix \ref{sec:cv_log_rmse}).
 
 \begin{figure}[!htb]
 \centering
@@ -813,7 +813,7 @@ alpha3   y_lo80   y_hi80   y_lo95   y_hi95
 \nocite{wickham2016ggplot2}
 
 
-\appendix
+\section{Appendix}
 
 \subsection{Mean forecast and confidence intervals for $\alpha_{i, t}, i = 1, \ldots, 3$ forecasts}
 
