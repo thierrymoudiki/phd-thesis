@@ -243,7 +243,7 @@ $$
 $$
 $B$ is the number of boosting iterations, $\nu$ is a learning rate parameter preventing the base learners from fitting the residuals too quickly, and  $\hat{f}_j$, $j \in \left \lbrace 1, \ldots, B \right \rbrace$ are the base learners, which are obtained as:
 $$
-\left(\hat{f}_1, \ldots,  \hat{f}_p\right) = argmin_{f_1, \ldots, f_p}  \rho \left( y, \sum_j \nu f_j\left( \textbf{x} \right) \right)
+\left(\hat{f}_1, \ldots,  \hat{f}_B\right) = argmin_{f_1, \ldots, f_B}  \rho \left( y, \sum_j \nu f_j\left( \textbf{x} \right) \right)
 $$
 
 In this expression, $\rho$ is a loss function to be minimized (for example $x \mapsto x^2$, or $x \mapsto |x|$). And in the case of multivariate time series, we are doing multitask learning. Each series (their most contemporaneous observations) share the same set of predictors (their lagged observations) as in the RVFL model described in section \ref{sec:basemodeldesc}, but without regularization of the regression models' parameters.
