@@ -73,45 +73,46 @@ In the next sections, we describe the model proposed for discount curve construc
 \section{Curve construction and extrapolation}
 \label{curveconstruction}
 
-The class of models proposed for discount curve construction and extrapolation relies on short-rate models with a time-varying mean-reversion parameter: exogenous short-rate models. In this section, we provide details on how they are derived. 
+The class of models proposed for discount curve construction and extrapolation relies on short-rate models. Specifically, on short-rate models with a time-varying mean-reversion parameter, also known as exogenous short-rate models. In this section, we provide details on how they are derived. 
 
-\medskip
+% \medskip
+% 
+% In the sequel, let $Y$ denote a  L{\'e}vy process and $W$ a standard brownian motion. We assume that all introduced processes are defined with respect to a stochastic basis $(\Omega,\mathcal{F},\mathbb{F},\mathbb{Q})$. 
+% %to be given, i.e. a probability space $(\Omega,\mathcal{F},\mathbb{Q})$ equipped with a filtration $\mathbb{F}:=(\mathcal{F}_{t})_{t \geq 0}$ satisfying the usual conditions. 
+% %The driving process $Y=(Y_t)_{0 \leq t \leq T}$ is supposed to be an $\mathbb{F}$-adapted, $\mathbb{R}^{d}$  valued time-homogeneous L\'evy process. 
+% For every considered  L{\'e}vy process $Y$, its cumulant function is denoted by $\kappa$, i.e., $\kappa(\theta)=\log\mathbb{E}\left[e^{\theta Y_1}\right]$. 
+% As a matter of example, some cumulant functions are given in Table \ref{Table:Levy} for the Brownian motion and for two class of L{\'e}vy subordinators parametrized by a single variable $\lambda$ which inversely controls the jump size of the L\'evy process. We refer the reader to \cite{tankov2003financial} for more details on L\'evy processes. 	
+% \begin{table}[h]	
+% \begin{center}
+% {\renewcommand{\arraystretch}{1.8}
+% \begin{tabular}{|l|l|l|}
+% 		%\hline
+% \cline{2-3} \multicolumn{1}{c|}{}  & L{\'e}vy measure   & Cumulant \\
+% 		\hline
+% 		 Brownian motion &  $\rho(dx)=0 $ &  $\kappa(\theta)=\frac{\theta^2}{2}$  \\
+% 
+% 		\hline
+% 		 Gamma process &  $\rho(dx)=\frac{e^{-\lambda x}}{x}1_{x>0}dx$ &  $\kappa(\theta)=-\log\left(1- \frac{\theta}{\lambda}\right)$  \\
+% 		 \hline
+% 		 Inverse Gaussian process&   $\rho(dx)=\frac{1}{\sqrt{2 \pi x^3}}\exp\left(-\frac{1}{2} \lambda^2 x \right)1_{{x>0}}dx$\ & $\kappa(\theta)= \lambda-\sqrt{\lambda^2-2\theta}$   \\
+% 		 \hline
+% 		\end{tabular}
+% 		}
+% \end{center}
+% \caption{Examples of L\'evy measures and cumulants}
+% \label{Table:Levy}	
+% \end{table}
 
-In the sequel, let $Y$ denote a  L{\'e}vy process and $W$ a standard brownian motion. We assume that all introduced processes are defined with respect to a stochastic basis $(\Omega,\mathcal{F},\mathbb{F},\mathbb{Q})$. 
-%to be given, i.e. a probability space $(\Omega,\mathcal{F},\mathbb{Q})$ equipped with a filtration $\mathbb{F}:=(\mathcal{F}_{t})_{t \geq 0}$ satisfying the usual conditions. 
-%The driving process $Y=(Y_t)_{0 \leq t \leq T}$ is supposed to be an $\mathbb{F}$-adapted, $\mathbb{R}^{d}$  valued time-homogeneous L\'evy process. 
-For every considered  L{\'e}vy process $Y$, its cumulant function is denoted by $\kappa$, i.e., $\kappa(\theta)=\log\mathbb{E}\left[e^{\theta Y_1}\right]$. 
-As a matter of example, some cumulant functions are given in Table \ref{Table:Levy} for the Brownian motion and for two class of L{\'e}vy subordinators parametrized by a single variable $\lambda$ which inversely controls the jump size of the L\'evy process. We refer the reader to \cite{tankov2003financial} for more details on L\'evy processes. 	
-\begin{table}[h]	
-\begin{center}
-{\renewcommand{\arraystretch}{1.8}
-\begin{tabular}{|l|l|l|}
-		%\hline
-\cline{2-3} \multicolumn{1}{c|}{}  & L{\'e}vy measure   & Cumulant \\
-		\hline
-		 Brownian motion &  $\rho(dx)=0 $ &  $\kappa(\theta)=\frac{\theta^2}{2}$  \\
-
-		\hline
-		 Gamma process &  $\rho(dx)=\frac{e^{-\lambda x}}{x}1_{x>0}dx$ &  $\kappa(\theta)=-\log\left(1- \frac{\theta}{\lambda}\right)$  \\
-		 \hline
-		 Inverse Gaussian process&   $\rho(dx)=\frac{1}{\sqrt{2 \pi x^3}}\exp\left(-\frac{1}{2} \lambda^2 x \right)1_{{x>0}}dx$\ & $\kappa(\theta)= \lambda-\sqrt{\lambda^2-2\theta}$   \\
-		 \hline
-		\end{tabular}
-		}
-\end{center}
-\caption{Examples of L\'evy measures and cumulants}
-\label{Table:Levy}	
-\end{table}
- We assume that, under a risk-neutral probability measure $\QQ$, the  short-term interest rate is either governed by  an extended L\'evy-driven Ornstein-Uhlenbeck process (L\'evy-driven OU)
-  \begin{equation}
-\label{bra}
-dX_t = a(b(t) - X_t)dt + \sigma dY_{ct},
-\end{equation}
-or an extended CIR process  %mean-reverting square-root process
-\begin{equation}
-\label{cir}
-dX_t = a(b(t) - X_t)dt + \sigma \sqrt{X_t} dW_{t},
-\end{equation}
+%  We assume that, under a risk-neutral probability measure $\QQ$, the  short-term interest rate is either governed by  an extended L\'evy-driven Ornstein-Uhlenbeck process (L\'evy-driven OU)
+%   \begin{equation}
+% \label{bra}
+% dX_t = a(b(t) - X_t)dt + \sigma dY_{ct},
+% \end{equation}
+% or an extended CIR process  %mean-reverting square-root process
+% \begin{equation}
+% \label{cir}
+% dX_t = a(b(t) - X_t)dt + \sigma \sqrt{X_t} dW_{t},
+% \end{equation}
 %\begin{equation}
 %\label{bra}
 %dX_t = a(b(t;\mathbf{p},\mathbf{T},\mathbf{S}) - X_t)dt + \sigma dY_{ct},
@@ -121,64 +122,64 @@ dX_t = a(b(t) - X_t)dt + \sigma \sqrt{X_t} dW_{t},
 %\label{cir}
 %dX_t = a(b(t;\mathbf{p},\mathbf{T},\mathbf{S}) - X_t)dt + \sigma \sqrt{X_t} dW_{t},
 %\end{equation}
-where the long-term mean parameter $b$ is assumed to be a deterministic function of time, $a$ is a positive parameter which controls the speed of mean-reversion and $\sigma$ is a positive volatility parameter. %The underlying L{\'e}vy parameters  $\mathbf{p}_L$
+% where the long-term mean parameter $b$ is assumed to be a deterministic function of time, $a$ is a positive parameter which controls the speed of mean-reversion and $\sigma$ is a positive volatility parameter. %The underlying L{\'e}vy parameters  $\mathbf{p}_L$
 %in the case of the CIR process and by the underlying L{\'e}vy parameters in the case of the L{\'e}vy-driven OU process. 
-Concerning the L\'evy-driven OU specification \ref{bra}, we use an additional positive parameter $c$ 
-which appears as an increasing  change of time $t \rightarrow ct$. This parameter can also be interpreted as a volatility parameter but, contrarily to $\sigma$, it controls jump frequency (an increase of $c$ makes the underlying L\'evy process jumps more frequently). Let $X_0$ be the value at time $t_0$ of the process $X$.  The use of L\'evy processes as a driver of short rate or default intensity dynamics stems from the fact that processes driven by some L\'evy processes could provide better fit on time series of bond returns than when driven by a Brownian motion. For more details on  term structure modeling with L\'evy processes, the reader is referred for instance to  \cite{Cariboni2004,Crepey2012,Eberlein1999,Kluge2005}.\\
+% Concerning the L\'evy-driven OU specification \ref{bra}, we use an additional positive parameter $c$ 
+% which appears as an increasing  change of time $t \rightarrow ct$. This parameter can also be interpreted as a volatility parameter but, contrarily to $\sigma$, it controls jump frequency (an increase of $c$ makes the underlying L\'evy process jumps more frequently). Let $X_0$ be the value at time $t_0$ of the process $X$.  The use of L\'evy processes as a driver of short rate or default intensity dynamics stems from the fact that processes driven by some L\'evy processes could provide better fit on time series of bond returns than when driven by a Brownian motion. For more details on  term structure modeling with L\'evy processes, the reader is referred for instance to  \cite{Cariboni2004,Crepey2012,Eberlein1999,Kluge2005}.\\
 %\cite{Hainaut2010}
 
-\textbf{Remark: }
-Specification \ref{bra} corresponds to a L\'evy Hull-White extended Vasicek model. However, in the seminal Hull-White approach (see \cite{Hull1990}), the initial term-structure is given as a model input  and the function $b$ is defined in such a way that the input term-structure is reproduced by the model. In our approach, contrarily to the Hull and White framework, the deterministic function $b$ is \emph{directly} calibrated on market quotes of interest-rate products.
-
-Under the previous short-rate models, arbitrage-free prices of zero-coupon bonds can be expressed analytically.
+% \textbf{Remark: }
+% Specification \ref{bra} corresponds to a L\'evy Hull-White extended Vasicek model. However, in the seminal Hull-White approach (see \cite{Hull1990}), the initial term-structure is given as a model input  and the function $b$ is defined in such a way that the input term-structure is reproduced by the model. In our approach, contrarily to the Hull and White framework, the deterministic function $b$ is \emph{directly} calibrated on market quotes of interest-rate products.
+% 
+% Under the previous short-rate models' specification, arbitrage-free prices of zero-coupon bonds can be expressed analytically.
 
 \subsection{Curve explicit analytical expressions}
-%\label{subsec:pricing}
+\label{subsec:pricing}
 
-We rely on a standard pricing framework where, in absence of arbitrage opportunity, the value at time $t_0$ of a default-free zero-coupon bond with maturity time $t$ is given by
-\begin{equation}
-\label{ZC_price}
-P(t_0, t) = \EE_{\QQ}\left[ \exp\left(-\int_{t_{0}}^t{ X_u du}\right) \mid \FF_{t_{0}}\right],
-\end{equation}
-where $\FF$ is the natural filtration of the short-rate process $X$.
-
-When the mean-reverting level $b$ is a deterministic function of time, the following proposition, which is a classical result in the theory of affine term-structure models, gives an analytical expression for $P(t_0, t)$ in the class of L\'evy-driven OU models.
-
-\textbf{Proposition: }
-\label{Levy-OU:affine}
-In the L\'evy-driven OU model (\ref{bra}), the value at time $t_0$ of a default-free zero-coupon bond with maturity $t$ is given by
-\begin{equation}
-\label{eq1}
-P(t_0,t) =\exp\left(-\phi(t-t_0)X_0- a\int_{t_0}^{t}{b(u)\phi(t-u)du} -c\psi(t-t_0)
-\right)
-\end{equation}
-where the functions $\phi$ and $\psi$ are defined by
-\begin{align}
-\label{eq:phi}
-\phi(s)&:=\frac{1}{a}\left(1-e^{-as}\right), \\
-\label{eq:psi}
-\psi(s)&:=-\int_{0}^{s}{\kappa \left(-\sigma\phi(s-\theta)\right)d\theta}.
-\end{align}
-
-\proof  
+% We rely on a standard pricing framework where, in absence of arbitrage opportunity, the value at time $t_0$ of a default-free zero-coupon bond with maturity time $t$ is given by
+% \begin{equation}
+% \label{ZC_price}
+% P(t_0, t) = \EE_{\QQ}\left[ \exp\left(-\int_{t_{0}}^t{ X_u du}\right) \mid \FF_{t_{0}}\right],
+% \end{equation}
+% where $\FF$ is the natural filtration of the short-rate process $X$.
+% 
+% When the mean-reverting level $b$ is a deterministic function of time, the following proposition, which is a classical result in the theory of affine term-structure models, gives an analytical expression for $P(t_0, t)$ in the class of L\'evy-driven OU models.
+% 
+% \textbf{Proposition: }
+% \label{Levy-OU:affine}
+% In the L\'evy-driven OU model (\ref{bra}), the value at time $t_0$ of a default-free zero-coupon bond with maturity $t$ is given by
+% \begin{equation}
+% \label{eq1}
+% P(t_0,t) =\exp\left(-\phi(t-t_0)X_0- a\int_{t_0}^{t}{b(u)\phi(t-u)du} -c\psi(t-t_0)
+% \right)
+% \end{equation}
+% where the functions $\phi$ and $\psi$ are defined by
+% \begin{align}
+% \label{eq:phi}
+% \phi(s)&:=\frac{1}{a}\left(1-e^{-as}\right), \\
+% \label{eq:psi}
+% \psi(s)&:=-\int_{0}^{s}{\kappa \left(-\sigma\phi(s-\theta)\right)d\theta}.
+% \end{align}
+% 
+% \proof  
 %Note that the piecewise constant function $b(\cdot)$ is characterized by the time tenor
 %$\setT = (T_k)_{k=1, \ldots, n}$ and the corresponding set of parameters $\setb = (b_k)_{k=1, \ldots, n}$. 
-Using It\^o's lemma,  the L\'evy-driven OU process is such that, for any $t>t_0$
-\begin{equation}
-\label{eq:solLevyOU}
-X_t= e^{-a(t-t_0)}X_{0} + a\int_{t_0}^{t}{b(\theta)e^{-a(t-\theta)}d\theta}  + \sigma \int_{t_0}^{t}{e^{-a(t-\theta)}dY_{c \theta}}.
-\end{equation}
-and, using (\ref{bra}) and (\ref{eq:solLevyOU}), the integral $\int_{t_0}^{t}{X_{u}du}$ can be reformulated as
-\begin{eqnarray}
-\label{cond}
-\int_{t_0}^{t}{X_{u}du}= \phi(t-t_0)X_{0}+a\int_{t_0}^{t}{b(u)\phi(t-u)du} +\sigma\int_{t_0}^{t}{\phi(t-u)dY_{cu}}.
-\end{eqnarray}
+% Using It\^o's lemma,  the L\'evy-driven OU process is such that, for any $t>t_0$
+% \begin{equation}
+% \label{eq:solLevyOU}
+% X_t= e^{-a(t-t_0)}X_{0} + a\int_{t_0}^{t}{b(\theta)e^{-a(t-\theta)}d\theta}  + \sigma \int_{t_0}^{t}{e^{-a(t-\theta)}dY_{c \theta}}.
+% \end{equation}
+% and, using (\ref{bra}) and (\ref{eq:solLevyOU}), the integral $\int_{t_0}^{t}{X_{u}du}$ can be reformulated as
+% \begin{eqnarray}
+% \label{cond}
+% \int_{t_0}^{t}{X_{u}du}= \phi(t-t_0)X_{0}+a\int_{t_0}^{t}{b(u)\phi(t-u)du} +\sigma\int_{t_0}^{t}{\phi(t-u)dY_{cu}}.
+% \end{eqnarray}
 %Hence $\forall s>t$ and $y\geq 0$, we have:
 %\begin{eqnarray}
 %\label{cond}
 %\int_{t}^{s}{X_{u}du} + yX_s=\phi(s-t;y)X_{t}+ a\int_{t}^{s}{b(u)\phi(s-u;y)du} + \sigma\int_{t}^{s}{\phi(s-u;y)dL_{cu}}.
 %\end{eqnarray}
-Expression (\ref{eq1}) is obtained from (\ref{ZC_price}) and (\ref{cond})  and by using Lemma 3.1 in \cite{Eberlein1999}.% $(\ref{EDO})$ then we got:
+% Expression (\ref{eq1}) is obtained from (\ref{ZC_price}) and (\ref{cond})  and by using Lemma 3.1 in \cite{Eberlein1999}.% $(\ref{EDO})$ then we got:
 %\begin{eqnarray}
 %\label{eq1}
 %P^{D}(t_0,t) =\exp\left(-\phi(t-t_0)X_{t_0}- a\int_{t_0}^{t}{b(u)\phi(t-u)du} -c\psi(t-t_0)
@@ -201,53 +202,99 @@ Expression (\ref{eq1}) is obtained from (\ref{ZC_price}) and (\ref{cond})  and b
 % \int_{t_0}^{t}{b(u)\phi(T-u)du}=\sum_{k=1}^{i-1}{b_{k}\left[\xi(t-T_{k-1})-\xi(t-T_k)\right]} + b_{i}\xi(t-T_{i-1})
 % \end{equation}
 %We conclude the proof by plugging \eqref{eq2} in \eqref{eq1}.
-\finproof 
+% \finproof 
+% 
+% \textbf{Remark: } Note that the function $\phi$ does not depend on the L\'evy process specification. Moreover, for most L\'evy processes, the integral of the cumulant transform in (\ref{eq:psi}) has no simple closed-form solution but can be easily computed numerically. The reader is referred to \cite{Hainaut2007} for examples of L\'evy processes for which the function $\psi$ defined by (\ref{eq:psi})  admits a closed-form expression.
+% 
+% Similar analytical expressions are available under model specification \ref{cir} where the underlying short-rate process follows an extended CIR process with deterministic long-term mean parameter $b$.%, as described by \ref{cir}.
+% % $X$ follows an extended ,  an closed-formed expression of the current value of discount factors is available according to the following lemma
+% \textbf{proposition}
+% \label{cir:affine}
+% In the extended CIR model (\ref{cir}), the value at time $t_0$ of a zero-coupon bond with maturity $t$ is given by
+% \begin{equation}
+% \label{feyn}
+% P(t_0,t) =\exp\left(-X_0\varphi(t-t_0 ) -a \int_{t_0}^t \varphi(t-u  ) b(u) du\right)
+% \end{equation}
+% where $\varphi $ is given by 
+% \begin{equation}
+% \label{eqq:xi_CIR}
+% \varphi(s):=\frac{2(1-e^{-hs})}{h+a + (h-a)e^{-hs}} 
+% %\%xi(s)&:=& 2a\left[\frac{s}{h+a} +  \frac{1}{\sigma^2}\log\frac{h+a+(h-a)e^{-hs}}{2h}\right] \nonumber
+% \end{equation}
+% and $h := \sqrt{a^2 + 2\sigma^2}.$
+% 
+% \proof
+% %Suppose that  the current value of discount factors is given by \ref{feyn} with unknown function $\phi$ then 
+% For any maturity date $t$, thanks to the Feynman-Kac formula, the function $\tilde{P}$ defined for any $u$ such that $t_0\leq u \leq t$ by
+% $$
+% \tilde{P}(u,x) := \EE_{\QQ}\left[ \exp\left(-\int_{u}^t{ X_u du}\right) \mid X_u = x\right]
+% $$
+% is solution of the following PDE
+% \begin{equation}
+% \label{kac}
+%  \frac{\partial \tilde{P}(u,x)}{\partial u} + a\left( b(u)-x\right)\frac{\partial \tilde{P}(u,t)}{\partial x} +\frac{1}{2}\sigma^2x\frac{\partial^2\tilde{P}(u,t)}{\partial x^2} - \tilde{P}(u,t)x=0,
+% \end{equation}
+% with the final condition $\tilde{P}(t, x)=1$, for all $x$. It is straightforward to check that the function $\tilde{P}$ defined by
+% $$
+% \tilde{P}(u,x) =\exp\left(-x\varphi(t-u ) -a \int_{u}^t \varphi(t-s  ) b(s) ds\right)
+% $$
+% with $\varphi $ given by  (\ref{eqq:xi_CIR}) is solution of PDE (\ref{kac}).
+% 
+% \finproof
+% 
+% 
+% Depending on the chosen term-structure model, Proposition \ref{Levy-OU:affine} or Proposition \ref{cir:affine} can be used to compute  present values of market instruments involved in the curve construction. 
 
-\textbf{Remark: } Note that the function $\phi$ does not depend on the L\'evy process specification. Moreover, for most L\'evy processes, the integral of the cumulant transform in (\ref{eq:psi}) has no simple closed-form solution but can be easily computed numerically. The reader is referred to \cite{Hainaut2007} for examples of L\'evy processes for which the function $\psi$ defined by (\ref{eq:psi})  admits a closed-form expression.
+The exogenous short rates model that we consider under a risk-neutral probability measure $\QQ$ is an Hull-White extended Vasicek (citer Hull \& White (1990)) model: 
 
-Similar analytical expressions are available under model specification \ref{cir} where the underlying short-rate process follows an extended CIR process with deterministic long-term mean parameter $b$.%, as described by \ref{cir}.
-% $X$ follows an extended ,  an closed-formed expression of the current value of discount factors is available according to the following lemma
-\textbf{proposition}
-\label{cir:affine}
-In the extended CIR model (\ref{cir}), the value at time $t_0$ of a zero-coupon bond with maturity $t$ is given by
+\begin{equation} 
+\label{hw} dX_t = a(b(t) - X_t)dt + \sigma dW_t 
+\end{equation} 
+
+where $(W_t)_{t \geq 0}$ is a standard brownian motion under $\QQ$. But the methodology can be directly extended to any other no-arbitrage short rate model with closed form formulas for discount factors, including multi-factor short rate models.
+
+\medskip
+
+$a$ controls the speed of mean reversion of the short rates, and $\sigma$ is their volatility. $t \mapsto b(t)$ is a time-varying deterministic function, used for fitting exactly the current term structure of discount factors $P^M(0, t)$.
+
+\medskip
+
+Assuming the absence of arbitrage, the value at time $t_0$ of a discount factor with maturity $t$ (under model from equation (\ref{hw})) is given by
 \begin{equation}
-\label{feyn}
-P(t_0,t) =\exp\left(-X_0\varphi(t-t_0 ) -a \int_{t_0}^t \varphi(t-u  ) b(u) du\right)
+\label{ZC_price}
+P(t_0, t) = \EE_{\QQ}\left[ exp\left(-\int_{t_0}^t X_u du\right) | \FF_{t_0}\right]
 \end{equation}
-where $\varphi $ is given by 
+where $\FF$ is the natural filtration associated to the short-rate process $X$. %which is a short-rate process.
+
+\medskip
+
+
+For (\ref{hw}), some closed-form formulas are available for discount factors (and implicitly for discount rates and instantaneous forward rates). Indeed, assuming that $X_{t_0} = X_0$, we can write:
 \begin{equation}
-\label{eqq:xi_CIR}
-\varphi(s):=\frac{2(1-e^{-hs})}{h+a + (h-a)e^{-hs}} 
-%\%xi(s)&:=& 2a\left[\frac{s}{h+a} +  \frac{1}{\sigma^2}\log\frac{h+a+(h-a)e^{-hs}}{2h}\right] \nonumber
+\label{eq1}
+P(t_0,t) =\exp\left(-X_0\phi(t-t_0)- a\int_{t_0}^{t}{b(u)\phi(t-u)du} -c\psi(t-t_0)
+\right)
 \end{equation}
-and $h := \sqrt{a^2 + 2\sigma^2}.$
+where $\phi$ and $\psi$ are defined as
+\begin{align}
+\label{eq:phi}
+\phi(s)&:=\frac{1}{a}\left(1-e^{-as}\right), \\
+\label{eq:psi}
+\psi(s)&:=-\int_{0}^{s}{ \left( \frac{\sigma^2}{2} \phi^2(s-\theta)\right)d\theta}.
+\end{align}
 
-\proof
-%Suppose that  the current value of discount factors is given by \ref{feyn} with unknown function $\phi$ then 
-For any maturity date $t$, thanks to the Feynman-Kac formula, the function $\tilde{P}$ defined for any $u$ such that $t_0\leq u \leq t$ by
-$$
-\tilde{P}(u,x) := \EE_{\QQ}\left[ \exp\left(-\int_{u}^t{ X_u du}\right) \mid X_u = x\right]
-$$
-is solution of the following PDE
-\begin{equation}
-\label{kac}
- \frac{\partial \tilde{P}(u,x)}{\partial u} + a\left( b(u)-x\right)\frac{\partial \tilde{P}(u,t)}{\partial x} +\frac{1}{2}\sigma^2x\frac{\partial^2\tilde{P}(u,t)}{\partial x^2} - \tilde{P}(u,t)x=0,
-\end{equation}
-with the final condition $\tilde{P}(t, x)=1$, for all $x$. It is straightforward to check that the function $\tilde{P}$ defined by
-$$
-\tilde{P}(u,x) =\exp\left(-x\varphi(t-u ) -a \int_{u}^t \varphi(t-s  ) b(s) ds\right)
-$$
-with $\varphi $ given by  (\ref{eqq:xi_CIR}) is solution of PDE (\ref{kac}).
+\medskip
 
-\finproof
+$t \mapsto b(t)$ uses to be constructed as a function of $f^M(0,t) =\frac{\partial P^M(0,t)}{\partial t}$. In our approach, we are going to derive $P(0,t)=:P^M(0,t)$ from market inputs, based on  (\ref{eq1}). By doing so, we avoid the use of cubic splines or Nelson-Siegel methods to obtain $P^M(0,t)$. Instead, the curve fitting model is directly derived from the short rate model  (\ref{hw}) and from (\ref{eq1}).  
 
+\medskip
 
-Depending on the chosen term-structure model, Proposition \ref{Levy-OU:affine} or Proposition \ref{cir:affine} can be used to compute  present values of market instruments involved in the curve construction. 
+Deriving $P^M(0,t)$ in this framework uses some ideas from \cite{Schlogl2000}. It requires the time-varying function $t \mapsto b(t)$ to be a piece-wise constant function, whose steps are derived from vanilla (IRS) or overnight swaps (OIS) cash-flows. For curve extrapolation, the speed of convergence to the Ultimate Forward Rate (UFR) will be controlled by the reversion speed of the short rates, $a$.
 
 \subsection{Piecewise-constant long-term mean parameter $b(t)$}
 \label{calibr_bi}
 
-Typically, in order to obtain an \textit{exact} fit in the Hull-White extended Vasicek model (that is, a model from class \ref{bra} with $c=1$ and a Brownian motion as L\'evy driver), we have to choose:
+In order to obtain an \textit{exact} fit in the Hull-White extended Vasicek model, we have to choose:
 \begin{equation}
 \label{b_equation}
 b(t) = \frac{1}{a}\frac{df^M}{dt}(0, t) - f^M(0, t) + \frac{1}{2}\frac{\sigma^2}{a^3}\left( 1 - e^{-2at}\right)
@@ -266,7 +313,7 @@ b(t)= b_{n+1},\;\; \mbox{for } t \geq T_n
 \end{equation}
 \medskip
 and $T_0 = t_0 = 0$.\\
-Under this specification of the long-term mean parameter, closed-form formulas can be obtained for the discount factors. Under model class \ref{bra} and given that $t_{0}=0$, the integral term  in equation \eqref{eq1} becomes 
+Under this specification of the long-term mean parameter, closed-form formulas can be obtained for the discount factors. Given that $t_{0}=0$, the integral term  in equation \eqref{eq1} becomes 
 \begin{equation}
 \label{Intb}
 I_{n+1}(t) = \sum_{k=1}^n b_k \left( \xi(t - T_{k-1} \wedge t) -  \xi(t - T_k \wedge t) \right)
@@ -281,7 +328,7 @@ for $t > T_n$ where $\xi$ is defined as
 \begin{equation}
 \xi(s) := s - \phi(s), \: s \geq 0.
 \end{equation}
-Under model class \ref{cir} and given that $t_{0}=0$, the integral term  in equation \eqref{feyn} becomes 
+Given that $t_{0}=0$, the integral term  in equation \label{ZC_price} becomes 
 \begin{equation}
 \label{Intb}
 I_{n+1}(t) = \sum_{k=1}^n b_k \left( \eta(t - T_{k-1} \wedge t) -  \eta(t - T_k \wedge t) \right)
@@ -301,7 +348,7 @@ The previous result can also be found in \cite{Bielecki2014} under a more genera
 \medskip
 
 Recall that our aim is to construct a discount curve by fitting the mean-reversion function $b$ on quoted swaps observed for different standard maturities. The interpolation of the curve at intermediary dates between quoted swaps maturities directly comes from the properties of the model.
-Contrarily to the Hull-White approach where an exogenous term-structure is given as a model input, in our approach, the fitted risk-neutral short-rate model is, by construction, consistent in the sense of \cite{bjork1999interest}. 
+Contrary to the Hull-White approach where an exogenous term-structure is given as a model input, in our approach, the fitted risk-neutral short-rate model is, by construction, consistent in the sense of \cite{bjork1999interest}. 
 
 \medskip
 
@@ -311,7 +358,7 @@ In the next section, we explain how model parameters can be calibrated in differ
 \label{Vasicek}
 dX_t = a(b(t) - X_t)dt + \sigma dW_{t}.
 \end{equation}
-This model belongs to class \ref{bra} with $c=1$ and with a Brownian motion as L\'evy driver. However, the presented calibration method can easily be adapted to other mean-reverting models of class \ref{bra} and \ref{cir}.
+
 Pseudo-discount curves could also be constructed in a dual curve environment, by using this method along with the techniques described for example in \cite{ametrano2013everything} and \cite{white2012multiple}. 
 
 \subsection{Calibration of the model}
