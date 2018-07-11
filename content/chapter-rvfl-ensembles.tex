@@ -22,7 +22,7 @@ In the next section, we give an overview of the base learners. Then, we describe
 \section{Description of the base models}
 \label{sec:basemodeldesc}
 
-The base learner is described in lengths in \cite{moudiki2018multiple}. It is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
+The base learner is described in details in \cite{moudiki2018multiple}. It is a single layer feed forward neural networks (SLFN). We have an output variable $y \in \RR^n$, which has to be explained by a set of observed predictors $X^{(j)} \in \RR^n$, $j \in \left\lbrace 1, \ldots,
 p\right\rbrace$. The RVFL networks that we use to explain $y$ is described for $i \in \left\lbrace 1, \ldots, n\right\rbrace$ as:
 
 \begin{equation}
@@ -259,7 +259,7 @@ Stacked generalization or stacking, was introduced in \cite{wolpert1992stacked}.
 \item Divide the original training data set $\textbf{X} \in \RR^{n \times p}$, into two parts: \code{part1} and \code{part2}, each with $n/2$ rows
 \item Train a base learner model on \code{part1} and obtain $n/2$ predictions on \code{part2}.
 \item Train the same base learner model on \code{part2} and obtain $n/2$ predictions on \code{part1}.
-\item Train a  meta-learner model on the new data set \code{part3}, consisting in the the original predictors, plus the predictors constructed by applying the base learner model on \code{part1} and \code{part2}.
+\item Train a  meta-learner model on the new data set \code{part3}, consisting in the original predictors, plus the predictors constructed by applying the base learner model on \code{part1} and \code{part2}.
 \end{itemize}
 \medskip
 
@@ -291,11 +291,13 @@ These selected meta-learners are trained on \code{part3}, with the most contempo
 \section{Numerical examples}
 \label{sec:numericalexamples}
 
-For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from \cite{greene2000econometric}. Four of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis.
+For the numerical examples, we obtain forecast of the Treasury Bill rates among other macroeconomic variables, in a \textit{data-rich} environment. We use data from \cite{greene2000econometric} (available at \url{http://pages.stern.nyu.edu/~wgreene/Text/Edition7/tablelist8new.htm} with a description). Four of the time series are considered: the Treasury Bill rates, the real consumption, the consumer price index, and the real expenditure. They are all observed on a quaterly basis.
 
 We annualize the last three time series, but keep the Treasury Bill rates unchanged. So that, the four time series are nearly on the same scale.
 
 The out-of-sample Root Mean Squared Error (RMSE) is used as a measure of performance of the different implemented models.
+
+The procedure for choosing the hyperparameters (number of boosting iterations, number of subsamples, etc.) is described in section , and the \textit{best} hyperparameters can be found in table \ref{results_summary}
 
 \subsection{Descriptive statistics}
 
